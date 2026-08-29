@@ -1,6 +1,6 @@
 # ⚡ FinDashIQ
 
-**Self-Hosted AI Financial Intelligence, Watchlist Hub & Quantitative Terminal**
+**Self-Hosted Financial Intelligence, Watchlist Hub & Quantitative Terminal**
 
 > ⚠️ **Primary Purpose & Disclaimer**: FinDashIQ is designed primarily as a **self-hosted, private personal financial dashboard with artificial intelligence for private usage**. This platform is developed strictly for personal utility, educational exploration, and quantitative market research. **No liability or responsibility is assumed** for any financial, trading, or investment decisions, outcomes, losses, or software inaccuracies. Always perform your own due diligence.
 
@@ -31,8 +31,8 @@ FinDashIQ provides a privacy-first, web-based financial analytics terminal that 
 ### 2. 🔍 Stock Deep-Dive & Terminal (Top Tab 2)
 Independent single-stock and multi-stock search terminal housing 4 specialized sub-tabs:
 
-#### 🧠 Sub-Tab 1: AI Financial Intelligence & Copilot
-- **AI Conviction Gauge & Directional Bias**: Quantitative momentum score.
+#### 🧠 Sub-Tab 1: Financial Intelligence & Copilot
+- ** Conviction Gauge & Directional Bias**: Quantitative momentum score.
 - **Executive Thesis & Tailwinds**: Fundamental drivers, key catalysts, and invalidation risk factors.
 - **30-Day Probabilistic Scenarios**: Bull, Base, and Bear case target prices with scenario rationale.
 - **Execution Matrix**: Dynamic entry zones, volatility-based stop-loss levels, asymmetric take-profit targets, and risk/reward ratios.
@@ -62,12 +62,12 @@ Independent single-stock and multi-stock search terminal housing 4 specialized s
 
 ---
 
-### 3. 🛰️ AI Quantitative Stock Scanner & Opportunity Discovery (Top Tab 3)
+### 3. 🛰️ Quantitative Stock Scanner & Opportunity Discovery (Top Tab 3)
 - **Uncovered Alpha Screener**: Automated radar designed specifically to uncover high-conviction buy recommendations for assets **not currently in the user's watchlist**.
 - **Thematic & Ecological Universe**: Dedicated filtering across **Clean Energy & Solar/Wind Decarbonization**, **Pure AI & Quantum Silicon**, **Cybersecurity & Cloud Observability**, **Biotech & Genomics**, **Fintech**, and **Industrial Automation**.
 - **Multi-Factor Indicator Concurrency**: Concurrently evaluates SuperTrend trendline support, RSI oversold dip-buys (<55), Chaikin Money Flow accumulation (>+0.05), and VWAP benchmark positioning.
 - **Dynamic Trade Execution Matrix**: Automated entry zones, volatility stop-losses, take-profit targets (TP1), and risk/reward ratios.
-- **AI Investment Thesis & ESG Scoring**: Contextual narrative breakdown with Elite/Leader ESG sustainability ratings.
+- **Investment Thesis & ESG Scoring**: Contextual narrative breakdown with Elite/Leader ESG sustainability ratings.
 - **1-Click Actions**: Instantly add discovered stocks to server-persisted watchlist (`+ Add to Watchlist`) or route directly into Terminal (`Deep-Dive →`).
 
 ---
@@ -104,7 +104,7 @@ FinDashIQ/
 │   └── cache/                  # Server-side historical market data cache
 ├── services/
 │   ├── stock_service.py        # Quotes, indicators, backtesting, delta download engine & cache
-│   └── ai_service.py           # Gemini/OpenAI synthesis, scenario modeling & Copilot chat
+│   └── ai_service.py           # Gemini synthesis, scenario modeling & Copilot chat
 ├── static/
 │   ├── css/
 │   │   └── style.css           # Modern dark/bright glassmorphism theme & responsive layouts
@@ -113,7 +113,7 @@ FinDashIQ/
 └── templates/
     ├── index.html              # Master layout container
     ├── components/
-    │   ├── header.html         # Interactive brand logo, AI status badge & user profile menu
+    │   ├── header.html         # Interactive brand logo, status badge & user profile menu
     │   ├── top_nav.html        # Top-level 4-tab navigation bar (Watchlist, Terminal, Scanner, Alerts)
     │   ├── footer.html         # Footer branding, versioning, Impressum & creator badges
     │   ├── search_bar.html     # Terminal ticker search input and quick preset watchlists
@@ -255,13 +255,13 @@ WantedBy=multi-user.target
 
 ## 📖 Documentation & Project Wiki
 
-Comprehensive documentation, architectural guides, and integration tutorials are available in the official **[FinDashIQ GitHub Wiki](https://github.com/TheyAreMe/FinDashIQ/wiki)**:
+Comprehensive documentation, architectural guides, and integration tutorials are available in the official **[FinDashIQ GitHub Wiki](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki)**:
 
-- 📖 **[Project Wiki Home](https://github.com/TheyAreMe/FinDashIQ/wiki)** — Full knowledge base, setup walk-throughs, and architecture overviews.
-- 🔔 **[Configuring the Notification Section](https://github.com/TheyAreMe/FinDashIQ/wiki/Configuring-Notifications)** — Step-by-step alert configuration, multi-factor indicator types, thresholds, rule lifecycle, and test simulation.
-- 📱 **[Telegram Bot Setup Guide](https://github.com/TheyAreMe/FinDashIQ/wiki/Telegram-Bot-Setup)** — Setting up bots via `@BotFather`, obtaining Chat IDs, and dispatching alerts.
-- 💬 **[Discord Webhook Integration](https://github.com/TheyAreMe/FinDashIQ/wiki/Discord-Webhook-Setup)** — Setting up webhooks and formatting Discord trading channel embeds.
-- 🌐 **[Custom API & Email Webhooks](https://github.com/TheyAreMe/FinDashIQ/wiki/Custom-API-and-Email-Webhooks)** — JSON payload schemas and connecting to external trading bots, Zapier, and n8n.
+- 📖 **[Project Wiki Home](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki)** — Full knowledge base, setup walk-throughs, and architecture overviews.
+- 🔔 **[Configuring the Notification Section](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Configuring-Notifications)** — Step-by-step alert configuration, multi-factor indicator types, thresholds, rule lifecycle, and test simulation.
+- 📱 **[Telegram Bot Setup Guide](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Telegram-Bot-Setup)** — Setting up bots via `@BotFather`, obtaining Chat IDs, and dispatching alerts.
+- 💬 **[Discord Webhook Integration](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Discord-Webhook-Setup)** — Setting up webhooks and formatting Discord trading channel embeds.
+- 🌐 **[Custom API & Email Webhooks](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Custom-API-and-Email-Webhooks)** — JSON payload schemas and connecting to external trading bots, Zapier, and n8n.
 
 ---
 
