@@ -1,5 +1,5 @@
 {
-  "timestamp": 1788020489.7678638,
+  "timestamp": 1788022396.1249237,
   "ticker": "RIVN",
   "country": "United States",
   "flag": "🇺🇸",
@@ -12,7 +12,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -24,7 +24,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -36,7 +36,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -48,7 +48,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -60,7 +60,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -72,7 +72,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -84,7 +84,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -96,7 +96,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -108,7 +108,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -120,7 +120,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -132,7 +132,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -144,7 +144,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -156,7 +156,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -168,8 +168,104 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020490,
+      "timestamp": 1788022396,
       "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "GE Vernova swipes Rivian CFO",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/90fbd4ec-e9fc-36da-a370-b1ccbac5539d/ge-vernova-swipes-rivian-cfo.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:15AM",
+      "timestamp": 1788022396,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rivian CFO is stepping down",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/f51face9-3671-304b-a82b-1a62f449ad8d/rivian-cfo-is-stepping-down.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:47AM",
+      "timestamp": 1788022396,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rivians CFO is leaving the company",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/rivian-cfo-leaving-company-202310094.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:23PM",
+      "timestamp": 1788022396,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rivian's finance chief steps down amid affordable EV rollout",
+      "summary": "",
+      "url": "https://finance.yahoo.com/news/rivians-finance-chief-steps-down-200738254.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:07PM",
+      "timestamp": 1788022396,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rivian Announces CFO Transition Plan",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260827254756/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:05PM",
+      "timestamp": 1788022396,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "What's Going on With Rivian Stock Friday",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/whats-going-rivian-stock-friday-195412865.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-21-26 03:54PM",
+      "timestamp": 1788022396,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rivian spinout EV start-up Also closes $150m funding round",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/0d8a3afc-d69b-33e6-ade0-4a4b1b28082f/rivian-spinout-ev-start-up.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "07:26AM",
+      "timestamp": 1788022396,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rivian spinout Also raises another $150M",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/articles/rivian-spinout-raises-another-150-153947554.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-19-26 11:39AM",
+      "timestamp": 1788022396,
+      "sourceType": "finviz",
       "timeAgo": "Just now"
     }
   ]

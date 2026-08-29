@@ -1,79 +1,19 @@
 {
-  "timestamp": 1788020487.8461742,
+  "timestamp": 1788022392.6922798,
   "ticker": "IONQ",
   "country": "United States",
   "flag": "🇺🇸",
   "news": [
     {
-      "title": "Why Is IonQ Stock Sinking?",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/d3d64ef6-81ef-3c5d-b153-200c8a070060/why-is-ionq-stock-sinking%3F.html",
-      "publisher": "Yahoo Finance",
+      "title": "IonQ Announces Record Second Quarter 2026 Revenues, Growing 287% YoY - IonQ",
+      "summary": "IonQ Announces Record Second Quarter 2026 Revenues, Growing 287% YoY&nbsp;&nbsp;IonQ",
+      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPRlFZVTA4Snl6cmVuRUdyRENPbDg2dnMtUnVNTEdBUHFvYzd5a1ZZZDdsRGJPa3hFRU9NWXVxSklGZHVMM0RHZzdVd1FvQWF0X0p4cklYZDBsV3ZVd3Jxc2hvUmcxeVFHTkxKX1lsVkFoOXFuTlBtOWoweTMyanlBSkVycUd0Z2N5ZUJ0ZTBRb1RtYkNkcnBv?oc=5",
+      "publisher": "Google News Wire",
       "country": "United States",
       "flag": "🇺🇸",
-      "publishedAt": "12:17PM",
-      "timestamp": 1788020489,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "IonQ Appoints Dr. Eric Ball and Timothy Baxter to Board of Directors",
-      "summary": "",
-      "url": "/news/385328/ionq-appoints-dr-eric-ball-and-timothy-baxter-to-board-of-directors",
-      "publisher": "Financial Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-25-26 09:05AM",
-      "timestamp": 1788020489,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "IonQ Makes Unexpected Move Beyond Quantum",
-      "summary": "",
-      "url": "https://finance.yahoo.com/technology/articles/ionq-makes-unexpected-move-beyond-191115510.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-24-26 03:11PM",
-      "timestamp": 1788020489,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "IonQ's Skyloom Optical Communications Terminals Reach 84 On-Orbit Installations Following Latest Launch",
-      "summary": "",
-      "url": "/news/384789/ionqs-skyloom-optical-communications-terminals-reach-84-on-orbit-installations-following-latest-launch",
-      "publisher": "Financial Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "08:05AM",
-      "timestamp": 1788020489,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "IonQ and CMC Microsystems Announce Collaboration to Expand Cloud Quantum Computing Access in Canada",
-      "summary": "",
-      "url": "https://www.businesswire.com/news/home/20260818599586/en/",
-      "publisher": "Financial Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-18-26 04:05PM",
-      "timestamp": 1788020489,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Following IonQ and D-Wave Earnings, Don't Count Out These Smaller Quantum Stocks",
-      "summary": "",
-      "url": "https://www.barrons.com/articles/horizon-xanadu-quantum-stocks-earnings-7682e4cb?mod=bar_FV",
-      "publisher": "Barron's",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-10-26 11:58AM",
-      "timestamp": 1788020489,
-      "sourceType": "finviz",
+      "publishedAt": "",
+      "timestamp": 1788022393,
+      "sourceType": "rss",
       "timeAgo": "Just now"
     },
     {
@@ -84,19 +24,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "IonQ Announces Record Second Quarter 2026 Revenues, Growing 287% YoY - IonQ",
-      "summary": "IonQ Announces Record Second Quarter 2026 Revenues, Growing 287% YoY&nbsp;&nbsp;IonQ",
-      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPRlFZVTA4Snl6cmVuRUdyRENPbDg2dnMtUnVNTEdBUHFvYzd5a1ZZZDdsRGJPa3hFRU9NWXVxSklGZHVMM0RHZzdVd1FvQWF0X0p4cklYZDBsV3ZVd3Jxc2hvUmcxeVFHTkxKX1lsVkFoOXFuTlBtOWoweTMyanlBSkVycUd0Z2N5ZUJ0ZTBRb1RtYkNkcnBv?oc=5",
-      "publisher": "Google News Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -108,7 +36,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -120,7 +48,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -132,7 +60,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -144,7 +72,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -156,7 +84,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -168,7 +96,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -180,7 +108,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -192,7 +120,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -204,7 +132,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -216,7 +144,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -228,7 +156,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -240,8 +168,80 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020488,
+      "timestamp": 1788022393,
       "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Why Is IonQ Stock Sinking?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/d3d64ef6-81ef-3c5d-b153-200c8a070060/why-is-ionq-stock-sinking%3F.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:17PM",
+      "timestamp": 1788022393,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "IonQ Appoints Dr. Eric Ball and Timothy Baxter to Board of Directors",
+      "summary": "",
+      "url": "/news/385328/ionq-appoints-dr-eric-ball-and-timothy-baxter-to-board-of-directors",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-25-26 09:05AM",
+      "timestamp": 1788022393,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "IonQ Makes Unexpected Move Beyond Quantum",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/articles/ionq-makes-unexpected-move-beyond-191115510.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-24-26 03:11PM",
+      "timestamp": 1788022393,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "IonQ's Skyloom Optical Communications Terminals Reach 84 On-Orbit Installations Following Latest Launch",
+      "summary": "",
+      "url": "/news/384789/ionqs-skyloom-optical-communications-terminals-reach-84-on-orbit-installations-following-latest-launch",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:05AM",
+      "timestamp": 1788022393,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "IonQ and CMC Microsystems Announce Collaboration to Expand Cloud Quantum Computing Access in Canada",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260818599586/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-18-26 04:05PM",
+      "timestamp": 1788022393,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Following IonQ and D-Wave Earnings, Don't Count Out These Smaller Quantum Stocks",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/horizon-xanadu-quantum-stocks-earnings-7682e4cb?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-10-26 11:58AM",
+      "timestamp": 1788022393,
+      "sourceType": "finviz",
       "timeAgo": "Just now"
     }
   ]

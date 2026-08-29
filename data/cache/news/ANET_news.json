@@ -1,93 +1,9 @@
 {
-  "timestamp": 1788020487.5315905,
+  "timestamp": 1788022391.981207,
   "ticker": "ANET",
   "country": "United States",
   "flag": "🇺🇸",
   "news": [
-    {
-      "title": "Arista's Price Assumes The Parts Arrive On Time",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/16d88ed6-9ddb-316d-95ed-fe054b29b0d4/arista%27s-price-assumes-the.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-28-26 05:25PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Decoding ANET Stock's Premium Valuation",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/f9f2c738-f934-31f0-9e9f-3574f061dd4c/decoding-anet-stock%27s-premium.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-26-26 05:25PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Arista Networks Inc. stock outperforms competitors on strong trading day",
-      "summary": "",
-      "url": "https://www.marketwatch.com/data-news/arista-networks-inc-stock-outperforms-competitors-on-strong-trading-day-44a5d52e-d47c25ef4b77?mod=mw_FV",
-      "publisher": "MarketWatch",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "04:30PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Arista Networks Stock Looks Strong. One Number Says Be Careful.",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/be6f9402-aa08-3d65-82b9-1d9832303697/arista-networks-stock-looks.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "04:12PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Arista Networks Is Buying Further Ahead Than It Can See",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/8f9340d2-8d0f-3580-a436-3dafc03a8bd2/arista-networks-is-buying.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "03:42PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Can ANET Stock Compound Its Way Higher?",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/0b5f9a5e-56bd-300f-a09f-933bf25eeed2/can-anet-stock-compound-its.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-20-26 07:43PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "What You Are Really Paying For In Arista Networks Stock",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/a8e3e8a5-9dc2-365d-a689-95d1fc2996ed/what-you-are-really-paying.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-19-26 07:44PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
     {
       "title": "Arista Introduces 1.6 Tbps AI Fabric Platforms in $3B Quarter - Stock Titan",
       "summary": "Arista Introduces 1.6 Tbps AI Fabric Platforms in $3B Quarter&nbsp;&nbsp;Stock Titan",
@@ -96,7 +12,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -108,7 +24,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -120,7 +36,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -132,7 +48,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -144,7 +60,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -156,7 +72,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -168,7 +84,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -180,7 +96,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -192,7 +108,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -204,7 +120,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -216,7 +132,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -228,7 +144,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -240,8 +156,92 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Arista's Price Assumes The Parts Arrive On Time",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/16d88ed6-9ddb-316d-95ed-fe054b29b0d4/arista%27s-price-assumes-the.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 05:25PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Decoding ANET Stock's Premium Valuation",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/f9f2c738-f934-31f0-9e9f-3574f061dd4c/decoding-anet-stock%27s-premium.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 05:25PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Arista Networks Inc. stock outperforms competitors on strong trading day",
+      "summary": "",
+      "url": "https://www.marketwatch.com/data-news/arista-networks-inc-stock-outperforms-competitors-on-strong-trading-day-44a5d52e-d47c25ef4b77?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:30PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Arista Networks Stock Looks Strong. One Number Says Be Careful.",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/be6f9402-aa08-3d65-82b9-1d9832303697/arista-networks-stock-looks.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:12PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Arista Networks Is Buying Further Ahead Than It Can See",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/8f9340d2-8d0f-3580-a436-3dafc03a8bd2/arista-networks-is-buying.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:42PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Can ANET Stock Compound Its Way Higher?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/0b5f9a5e-56bd-300f-a09f-933bf25eeed2/can-anet-stock-compound-its.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-20-26 07:43PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "What You Are Really Paying For In Arista Networks Stock",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/a8e3e8a5-9dc2-365d-a689-95d1fc2996ed/what-you-are-really-paying.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-19-26 07:44PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
       "timeAgo": "Just now"
     }
   ]

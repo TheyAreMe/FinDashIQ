@@ -1852,6 +1852,20 @@ function switchMainTab(tabKey) {
         pane.classList.toggle('active', pane.id === `tabPane-${tabKey}`);
     });
 
+    // Re-render or redraw charts when their tab becomes visible
+    if (tabKey === 'charts') {
+        const stock = state.stocksData[state.activeTicker];
+        if (stock && stock.timeseries) {
+            renderPrimaryChart(stock.timeseries);
+            renderStochChart(stock.timeseries);
+            renderRSIChart(stock.timeseries);
+            renderMACDChart(stock.timeseries);
+            renderCMFChart(stock.timeseries);
+        }
+    } else if (tabKey === 'backtest') {
+        renderBacktest();
+    }
+
     // Trigger resize for ApexCharts to render properly in newly visible tabs
     setTimeout(() => {
         window.dispatchEvent(new Event('resize'));

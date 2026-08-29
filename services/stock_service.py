@@ -737,6 +737,24 @@ class StockService:
                     sell_signal = True
                     sell_reason = 'MACD Contraction & Weak RSI'
 
+            elif strategy == 'rsi_oversold':
+                rsi_val = p.get('rsi', 50) or 50
+                if rsi_val <= 32:
+                    buy_signal = True
+                    buy_reason = f'RSI Oversold ({round(rsi_val, 1)})'
+                elif rsi_val >= 68:
+                    sell_signal = True
+                    sell_reason = f'RSI Overbought ({round(rsi_val, 1)})'
+
+            elif strategy == 'macd_crossover':
+                macd_hist = p.get('macdHist', 0) or 0
+                if macd_hist > 0:
+                    buy_signal = True
+                    buy_reason = 'MACD Positive Crossover'
+                elif macd_hist < 0:
+                    sell_signal = True
+                    sell_reason = 'MACD Negative Crossover'
+
             # Execution Engine
             if position == 0 and buy_signal:
                 shares = capital / close
@@ -825,6 +843,39 @@ class StockService:
             'equityCurve': equity_curve
         }
 
+    @staticmethod
+    def _patch_latest_bar_if_nan(ticker: str, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Ensures the latest active trading day is never dropped due to yfinance
+        returning NaN close for unfinalized daily settlement bars.
+        Patches Close, Open, High, Low, Volume using real-time fast_info.
+        """
+        if df is None or df.empty or 'Close' not in df.columns:
+            return df
+        try:
+            if pd.isna(df['Close'].iloc[-1]):
+                t = yf.Ticker(ticker)
+                fi = getattr(t, 'fast_info', None)
+                if fi:
+                    last_price = getattr(fi, 'last_price', None)
+                    if last_price is not None and not np.isnan(last_price) and last_price > 0:
+                        last_idx = df.index[-1]
+                        day_open = getattr(fi, 'open', last_price) or last_price
+                        day_high = getattr(fi, 'day_high', max(day_open, last_price)) or max(day_open, last_price)
+                        day_low = getattr(fi, 'day_low', min(day_open, last_price)) or min(day_open, last_price)
+                        vol = getattr(fi, 'last_volume', None)
+                        if vol is None or np.isnan(vol):
+                            vol = df['Volume'].iloc[-1] if 'Volume' in df.columns else 0
+                        df.loc[last_idx, 'Close'] = float(last_price)
+                        df.loc[last_idx, 'Open'] = float(day_open)
+                        df.loc[last_idx, 'High'] = float(day_high)
+                        df.loc[last_idx, 'Low'] = float(day_low)
+                        if 'Volume' in df.columns:
+                            df.loc[last_idx, 'Volume'] = int(vol) if (vol and not np.isnan(vol)) else 0
+        except Exception:
+            pass
+        return df
+
     def get_historical_dataframe(self, ticker: str, period: str = '6mo', interval: str = '1d', force_refresh: bool = False) -> pd.DataFrame:
         """
         Retrieves historical market data using persistent server-side disk caching
@@ -875,9 +926,11 @@ class StockService:
                     delta_df.columns = [col[0] for col in delta_df.columns]
 
                 if not delta_df.empty and 'Close' in delta_df.columns:
+                    delta_df = self._patch_latest_bar_if_nan(ticker, delta_df)
                     # Combine cached and delta, removing duplicate timestamps keeping the latest
                     combined_df = pd.concat([cached_df, delta_df])
                     combined_df = combined_df.loc[~combined_df.index.duplicated(keep='last')]
+                    combined_df = self._patch_latest_bar_if_nan(ticker, combined_df)
                     combined_df = combined_df.dropna(subset=['Close'])
                     combined_df.to_csv(cache_file)
                     return combined_df
@@ -896,6 +949,7 @@ class StockService:
                 full_df.columns = [col[0] for col in full_df.columns]
 
             if not full_df.empty and 'Close' in full_df.columns:
+                full_df = self._patch_latest_bar_if_nan(ticker, full_df)
                 full_df = full_df.dropna(subset=['Close'])
                 full_df.to_csv(cache_file)
                 return full_df
@@ -977,7 +1031,7 @@ class StockService:
                         return None
                     return round(float(val), decimals)
 
-                timeseries.append({
+                point = {
                     'time': time_str,
                     'timestamp': timestamp_ms,
                     'open': safe_val(row.get('Open')),
@@ -985,32 +1039,67 @@ class StockService:
                     'low': safe_val(row.get('Low')),
                     'close': safe_val(row.get('Close')),
                     'volume': int(row.get('Volume', 0)) if not pd.isna(row.get('Volume', 0)) else 0,
+                    # Frontend camelCase keys (ApexCharts & oscillators)
+                    'sma20': safe_val(row.get('SMA_20')),
+                    'sma50': safe_val(row.get('SMA_50')),
+                    'sma200': safe_val(row.get('SMA_200')),
+                    'ema20': safe_val(row.get('EMA_20')),
+                    'ema50': safe_val(row.get('EMA_50')),
+                    'ema200': safe_val(row.get('EMA_200')),
+                    'bbUpper': safe_val(row.get('BB_Upper')),
+                    'bbMiddle': safe_val(row.get('BB_Middle')),
+                    'bbLower': safe_val(row.get('BB_Lower')),
+                    'kcUpper': safe_val(row.get('KC_Upper')),
+                    'kcMiddle': safe_val(row.get('KC_Middle')),
+                    'kcLower': safe_val(row.get('KC_Lower')),
+                    'superTrend': safe_val(row.get('SuperTrend')),
+                    'superTrendDir': int(row.get('SuperTrend_Dir', row.get('SuperTrend_Direction', 1))),
+                    'vwap': safe_val(row.get('VWAP')),
+                    'ttmSqueeze': bool(row.get('TTM_Squeeze', False)),
+                    'rsi': safe_val(row.get('RSI'), 1),
+                    'macd': safe_val(row.get('MACD')),
+                    'macdSignal': safe_val(row.get('MACD_Signal') or row.get('Signal')),
+                    'macdHist': safe_val(row.get('MACD_Hist') or row.get('Hist')),
+                    'stochK': safe_val(row.get('Stoch_K') or row.get('Stochastic_K'), 1),
+                    'stochD': safe_val(row.get('Stoch_D') or row.get('Stochastic_D'), 1),
+                    'cmf': safe_val(row.get('CMF'), 3),
+                    'cci': safe_val(row.get('CCI')),
+                    'williamsR': safe_val(row.get('Williams_R')),
+                    'atr': safe_val(row.get('ATR')),
+                    'volumeSma': safe_val(row.get('Volume_SMA20'), 0),
+                    # Uppercase alias keys
                     'SMA_20': safe_val(row.get('SMA_20')),
                     'SMA_50': safe_val(row.get('SMA_50')),
                     'SMA_200': safe_val(row.get('SMA_200')),
-                    'EMA_12': safe_val(row.get('EMA_12')),
-                    'EMA_26': safe_val(row.get('EMA_26')),
                     'RSI': safe_val(row.get('RSI'), 1),
                     'MACD': safe_val(row.get('MACD')),
-                    'Signal': safe_val(row.get('Signal')),
-                    'Hist': safe_val(row.get('Hist')),
-                    'BB_Upper': safe_val(row.get('BB_Upper')),
-                    'BB_Middle': safe_val(row.get('BB_Middle')),
-                    'BB_Lower': safe_val(row.get('BB_Lower')),
-                    'ATR': safe_val(row.get('ATR')),
-                    'VWAP': safe_val(row.get('VWAP')),
-                    'Stochastic_K': safe_val(row.get('Stochastic_K'), 1),
-                    'Stochastic_D': safe_val(row.get('Stochastic_D'), 1),
+                    'Signal': safe_val(row.get('MACD_Signal') or row.get('Signal')),
+                    'Hist': safe_val(row.get('MACD_Hist') or row.get('Hist')),
                     'SuperTrend': safe_val(row.get('SuperTrend')),
-                    'SuperTrend_Direction': int(row.get('SuperTrend_Direction', 1)) if not pd.isna(row.get('SuperTrend_Direction', 1)) else 1,
+                    'VWAP': safe_val(row.get('VWAP')),
                     'CMF': safe_val(row.get('CMF'), 3)
-                })
+                }
+                timeseries.append(point)
+
+            # Slice timeseries to match the requested timeframe period
+            PERIOD_DAYS_MAP = {
+                '1mo': 22,
+                '3mo': 65,
+                '6mo': 130,
+                '1y': 252,
+                '2y': 504,
+                '5y': 1260,
+                'max': None
+            }
+            slice_limit = PERIOD_DAYS_MAP.get(period)
+            display_timeseries = timeseries[-slice_limit:] if (slice_limit and len(timeseries) > slice_limit) else timeseries
 
             backtests = {
-                'quant': self.simulate_backtest(timeseries, strategy='quant'),
-                'supertrend': self.simulate_backtest(timeseries, strategy='supertrend'),
-                'rsi_oversold': self.simulate_backtest(timeseries, strategy='rsi_oversold'),
-                'macd_crossover': self.simulate_backtest(timeseries, strategy='macd_crossover')
+                'quant': self.simulate_backtest(display_timeseries, strategy='quant'),
+                'supertrend': self.simulate_backtest(display_timeseries, strategy='supertrend'),
+                'momentum': self.simulate_backtest(display_timeseries, strategy='momentum'),
+                'rsi_oversold': self.simulate_backtest(display_timeseries, strategy='rsi_oversold'),
+                'macd_crossover': self.simulate_backtest(display_timeseries, strategy='macd_crossover')
             }
 
             news = self.fetch_stock_news(ticker, company_name=profile.get('name', ''), limit=35, force_refresh=force_refresh)
@@ -1018,10 +1107,12 @@ class StockService:
             stock_entry = {
                 'profile': profile,
                 'signals': signals,
-                'timeseries': timeseries,
+                'timeseries': display_timeseries,
+                'fullTimeseries': timeseries,
+                'period': period,
                 'backtests': backtests,
                 'news': news,
-                'dataPointsCount': len(timeseries)
+                'dataPointsCount': len(display_timeseries)
             }
 
             self._analysis_cache[cache_key] = {'timestamp': now, 'data': stock_entry}
@@ -1049,6 +1140,7 @@ class StockService:
                     ticker_df = pd.read_csv(cache_file, index_col=0, parse_dates=True)
                     if isinstance(ticker_df.columns, pd.MultiIndex):
                         ticker_df.columns = [col[0] for col in ticker_df.columns]
+                    ticker_df = self._patch_latest_bar_if_nan(ticker, ticker_df)
                 except Exception:
                     ticker_df = None
 
@@ -1057,6 +1149,9 @@ class StockService:
 
             if ticker_df.empty or 'Close' not in ticker_df.columns:
                 return ticker, {'error': f'No historical data found for {ticker}.'}
+
+            ticker_df = self._patch_latest_bar_if_nan(ticker, ticker_df)
+            ticker_df = ticker_df.dropna(subset=['Close'])
 
             # Use last 60 bars for instantaneous local indicator computation
             calc_df = ticker_df.tail(60).copy()

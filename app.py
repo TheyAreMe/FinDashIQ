@@ -28,7 +28,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_
 @app.context_processor
 def inject_asset_version():
     """Injects static asset version string for automatic client cache busting."""
-    return {'asset_version': '4.14.0'}
+    return {'asset_version': '4.16.0'}
 
 
 @app.after_request

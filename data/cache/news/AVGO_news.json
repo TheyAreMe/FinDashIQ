@@ -1,69 +1,9 @@
 {
-  "timestamp": 1788020487.4165158,
+  "timestamp": 1788022391.9001958,
   "ticker": "AVGO",
   "country": "United States",
   "flag": "🇺🇸",
   "news": [
-    {
-      "title": "Jobs report, Broadcom results pose next hurdles for stock market rally",
-      "summary": "",
-      "url": "https://finance.yahoo.com/markets/stocks/articles/jobs-report-broadcom-results-pose-100141778.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "04:22PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Broadcom's $16 Billion AI Quarter Faces the Marvell Timing Trap",
-      "summary": "",
-      "url": "https://finance.yahoo.com/technology/ai/articles/broadcoms-16-billion-ai-quarter-171054558.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "01:10PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Broadcom Is About to Face Nvidia's Impossible AI Bar",
-      "summary": "",
-      "url": "https://finance.yahoo.com/technology/ai/articles/broadcom-face-nvidias-impossible-ai-170436080.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "01:04PM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Mizuho is bullish on Broadcom ahead of Sept. 2 earnings, citing 30-quarter streak",
-      "summary": "",
-      "url": "https://finance.yahoo.com/markets/stocks/articles/mizuho-bullish-broadcom-ahead-sept-150020670.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "11:00AM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Kyndryl, Broadcom deepen partnership to build AI-ready private clouds",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/59f30196-fd39-35a4-a3b4-30823c074439/kyndryl%2C-broadcom-deepen.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "06:32AM",
-      "timestamp": 1788020488,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
     {
       "title": "Broadcom: Moving Big Into Vendor Financing (NASDAQ:AVGO) - Seeking Alpha",
       "summary": "Broadcom: Moving Big Into Vendor Financing (NASDAQ:AVGO)&nbsp;&nbsp;Seeking Alpha",
@@ -72,7 +12,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -84,7 +24,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -96,7 +36,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -108,7 +48,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -120,7 +60,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -132,7 +72,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -144,19 +84,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Is It Worth Investing in Broadcom Inc. (AVGO) Based on Wall Street's Bullish Views? - Yahoo Finance",
-      "summary": "Is It Worth Investing in Broadcom Inc. (AVGO) Based on Wall Street's Bullish Views?&nbsp;&nbsp;Yahoo Finance",
-      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPTmFlLXBZb1MzVXB6MjZhQ2JYUEhPZHlLUXFpNkd3dmtISXFxV1ZyNTVoenAwdTMwS2tuYmlURDNaZ0Q3b3drdWY2blFtTlUtZHRMSU1rUzM3ekx2RU5oYUsxVWtGLVhXcTJ5d0tlM2xBU1lYanF2VWdDSVV1dkI5cmRNZFIxbkVXcXpidEJtRjdXOU1BYzZsbDdfSFA5RHM?oc=5",
-      "publisher": "Google News Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -168,7 +96,19 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is It Worth Investing in Broadcom Inc. (AVGO) Based on Wall Street's Bullish Views? - Yahoo Finance",
+      "summary": "Is It Worth Investing in Broadcom Inc. (AVGO) Based on Wall Street's Bullish Views?&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPTmFlLXBZb1MzVXB6MjZhQ2JYUEhPZHlLUXFpNkd3dmtISXFxV1ZyNTVoenAwdTMwS2tuYmlURDNaZ0Q3b3drdWY2blFtTlUtZHRMSU1rUzM3ekx2RU5oYUsxVWtGLVhXcTJ5d0tlM2xBU1lYanF2VWdDSVV1dkI5cmRNZFIxbkVXcXpidEJtRjdXOU1BYzZsbDdfSFA5RHM?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -180,7 +120,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -192,7 +132,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -204,7 +144,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -216,8 +156,68 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788020487,
+      "timestamp": 1788022392,
       "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Jobs report, Broadcom results pose next hurdles for stock market rally",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/jobs-report-broadcom-results-pose-100141778.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:22PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Broadcom's $16 Billion AI Quarter Faces the Marvell Timing Trap",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/broadcoms-16-billion-ai-quarter-171054558.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:10PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Broadcom Is About to Face Nvidia's Impossible AI Bar",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/broadcom-face-nvidias-impossible-ai-170436080.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:04PM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Mizuho is bullish on Broadcom ahead of Sept. 2 earnings, citing 30-quarter streak",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/mizuho-bullish-broadcom-ahead-sept-150020670.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "11:00AM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Kyndryl, Broadcom deepen partnership to build AI-ready private clouds",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/59f30196-fd39-35a4-a3b4-30823c074439/kyndryl%2C-broadcom-deepen.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:32AM",
+      "timestamp": 1788022392,
+      "sourceType": "finviz",
       "timeAgo": "Just now"
     }
   ]

@@ -239,8 +239,11 @@
         window.__INITIAL_USER__ = {{ user | tojson | safe if user else 'null' }};
     </script>
 
-    <!-- Lucide Icons (Deferred Non-Blocking Load) -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- ApexCharts (Non-blocking deferred load) -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
 
     <!-- Application Logic (with cache-busting versioning) -->
     <script src="{{ url_for('static', filename='js/app.js') }}?v={{ asset_version }}"></script>
