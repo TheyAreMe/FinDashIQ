@@ -1,0 +1,55 @@
+<!-- Stock Selector Bar -->
+<div class="glass-card stock-selector-container">
+    <div class="selector-header-title">
+        <i data-lucide="layers" style="width: 15px; color: var(--accent-blue);"></i>
+        <span>Active Stock Selector:</span>
+    </div>
+    <div id="tickerTabsList" class="ticker-tabs-list">
+        <!-- Injected dynamically -->
+    </div>
+</div>
+
+<!-- Hero Quote Banner Card -->
+<div class="glass-card quote-header-card">
+    <div class="quote-main-info">
+        <div>
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+                <span id="quoteSymbol" class="ticker-title mono">AAPL</span>
+                <span id="quoteSector" class="badge-pill badge-neutral">Technology</span>
+            </div>
+            <div id="quoteName" class="company-name">Apple Inc.</div>
+        </div>
+
+        <div class="price-display-group">
+            <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                <span id="quotePrice" class="main-price mono">$0.00</span>
+                <span id="quoteNativePrice" style="display: none; font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;"></span>
+            </div>
+            <span id="quoteChangeBadge" class="change-badge badge-bullish mono">+0.00 (+0.00%)</span>
+        </div>
+    </div>
+
+    <!-- Fast Stats Ribbon -->
+    <div class="header-stat-group">
+        <div class="header-stat">
+            <span class="header-stat-label">Day Range</span>
+            <span id="quoteDayRange" class="header-stat-value mono">$0.00 - $0.00</span>
+        </div>
+        <div class="header-stat">
+            <span class="header-stat-label">Prev Close</span>
+            <span id="quotePrevClose" class="header-stat-value mono">$0.00</span>
+        </div>
+        <div class="header-stat">
+            <span class="header-stat-label">Volume</span>
+            <span id="quoteVolume" class="header-stat-value mono">0</span>
+        </div>
+        <div class="header-stat">
+            <span class="header-stat-label">VWAP</span>
+            <span id="quoteVWAP" class="header-stat-value mono" style="color: var(--accent-purple);">$0.00</span>
+        </div>
+        <div class="header-stat">
+            <span class="header-stat-label">ATR Volatility</span>
+            <span id="quoteATR" class="header-stat-value mono" style="color: var(--accent-cyan);">$0.00</span>
+        </div>
+    </div>
+</div>

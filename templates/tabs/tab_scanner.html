@@ -1,0 +1,265 @@
+<!-- ========================================================= -->
+<!-- TOP VIEW 3: AI QUANTITATIVE STOCK SCANNER & OPPORTUNITIES -->
+<!-- ========================================================= -->
+<div id="topView-scanner" class="top-view-pane">
+    <div class="scanner-hero-section">
+        <div class="scanner-hero-header">
+            <div>
+                <div class="scanner-badge-row">
+                    <span class="badge-pill badge-bullish"
+                        style="font-size: 1.1rem; padding: 3px 10px; display: inline-flex; align-items: center; gap: 5px;">
+                        <i data-lucide="radar" style="width: 13px; height: 13px;"></i>
+                        <span>Stock Scanner</span>
+                    </span>
+                </div>
+                <p class="scanner-hero-subtitle">
+                    Automated multi-factor screening across thematic universes. Uncover high-conviction buy setups
+                    <strong>outside your current watchlist</strong>.
+                </p>
+            </div>
+
+            <!-- Action Buttons Group -->
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button type="button" id="btnRunScanner" class="btn-scanner-run" onclick="handleRunScanner(false)">
+                    <i data-lucide="sparkles" style="width: 17px; height: 17px;"></i>
+                    <span>Run Scan</span>
+                </button>
+                <button type="button" id="btnForceScannerRefresh" class="btn-scanner-refresh"
+                    onclick="handleRunScanner(true)" title="Force download fresh market data from live exchange">
+                    <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                    <span>Force Update</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Thematic Preset Filters -->
+        <div class="scanner-presets-bar">
+            <span class="scanner-presets-label">
+                <i data-lucide="zap" style="width: 13px; height: 13px; color: var(--accent-amber);"></i> Quick Presets:
+            </span>
+            <button type="button" class="scanner-preset-chip active" onclick="applyScannerPreset('all')">
+                <span>🌐 All Sectors</span>
+            </button>
+            <button type="button" class="scanner-preset-chip" onclick="applyScannerPreset('eco')">
+                <span>🌿 Clean Energy &amp; ESG Alpha</span>
+            </button>
+            <button type="button" class="scanner-preset-chip" onclick="applyScannerPreset('ai')">
+                <span>⚡ AI &amp; Quantum Deep Tech</span>
+            </button>
+            <button type="button" class="scanner-preset-chip" onclick="applyScannerPreset('cmf')">
+                <span>🌊 Institutional Accumulation (CMF)</span>
+            </button>
+            <button type="button" class="scanner-preset-chip" onclick="applyScannerPreset('supertrend')">
+                <span>🚀 SuperTrend Momentum Reversals</span>
+            </button>
+            <button type="button" class="scanner-preset-chip" onclick="applyScannerPreset('dip')">
+                <span>🎯 Oversold Quality Dip Buys</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scanner Preferences & Criteria Control Panel -->
+    <div class="scanner-controls-card">
+        <div class="scanner-controls-grid">
+            <!-- Sector / Industry -->
+            <div class="scanner-field-group">
+                <label for="scannerSelectSector" class="scanner-field-label">
+                    <i data-lucide="layers" style="width: 13px; height: 13px; color: var(--accent-blue);"></i> Sector /
+                    Industry
+                </label>
+                <select id="scannerSelectSector" class="scanner-select" onchange="handleRunScanner(false)">
+                    <option value="all">🌐 All Sectors &amp; Industries</option>
+                    <option value="Clean Energy">🌿 Clean Energy &amp; Solar / Wind / Decarb</option>
+                    <option value="Technology">⚡ Technology, AI Silicon &amp; Quantum</option>
+                    <option value="Cybersecurity">🛡️ Cybersecurity &amp; Cloud Observability</option>
+                    <option value="Healthcare">🏥 Healthcare, Biotech &amp; Genomics</option>
+                    <option value="Fintech">💳 Fintech, Digital Assets &amp; Commerce</option>
+                    <option value="Consumer">🛍️ Consumer &amp; E-Commerce Leaders</option>
+                    <option value="Industrial">🏭 Industrial Automation &amp; Smart Grids</option>
+                </select>
+            </div>
+
+            <!-- Investment Theme & ESG Focus -->
+            <div class="scanner-field-group">
+                <label for="scannerSelectTheme" class="scanner-field-label">
+                    <i data-lucide="leaf" style="width: 13px; height: 13px; color: var(--accent-green);"></i> Investment
+                    Theme
+                </label>
+                <select id="scannerSelectTheme" class="scanner-select" onchange="handleRunScanner(false)">
+                    <option value="all">✨ All Investment Profiles</option>
+                    <option value="eco_esg">🌿 Clean &amp; Green / Ecological ESG Focus</option>
+                    <option value="ai_deeptech">⚡ Pure AI, Semiconductors &amp; Quantum</option>
+                    <option value="momentum">🚀 High Momentum &amp; Volatility Breakouts</option>
+                    <option value="value">💎 High Quality &amp; Cash Flow Leaders</option>
+                </select>
+            </div>
+
+            <!-- Market Cap -->
+            <div class="scanner-field-group">
+                <label for="scannerSelectMarketCap" class="scanner-field-label">
+                    <i data-lucide="pie-chart" style="width: 13px; height: 13px; color: var(--accent-purple);"></i>
+                    Market Capitalization
+                </label>
+                <select id="scannerSelectMarketCap" class="scanner-select" onchange="handleRunScanner(false)">
+                    <option value="all">All Market Caps</option>
+                    <option value="mega">Mega Cap ($200B+)</option>
+                    <option value="large">Large Cap ($10B – $200B)</option>
+                    <option value="mid">Mid Cap ($2B – $10B)</option>
+                </select>
+            </div>
+
+            <!-- Min AI Conviction -->
+            <div class="scanner-field-group">
+                <label for="scannerSelectMinConviction" class="scanner-field-label">
+                    <i data-lucide="target" style="width: 13px; height: 13px; color: var(--accent-cyan);"></i> Minimum
+                    Conviction
+                </label>
+                <select id="scannerSelectMinConviction" class="scanner-select" onchange="handleRunScanner(false)">
+                    <option value="50" selected>Any Score (&ge; 50%)</option>
+                    <option value="65">🟢 Bullish Setup (&ge; 65%)</option>
+                    <option value="75">🟢 Strong Bullish Setup (&ge; 75%)</option>
+                    <option value="85">⚡ Elite Institutional Alpha (&ge; 85%)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Technical Indicator Filter Checkboxes -->
+        <div class="scanner-indicators-row">
+            <div class="scanner-ind-title">
+                <i data-lucide="sliders" style="width: 13px; height: 13px; color: var(--accent-amber);"></i>
+                <span>Technical Signals Requirement:</span>
+            </div>
+            <div class="scanner-checkboxes-wrap">
+                <label class="scanner-check-label">
+                    <input type="checkbox" id="scanCheckSuperTrend" class="scanner-check"
+                        onchange="handleRunScanner(false)" checked>
+                    <span>SuperTrend Bullish</span>
+                </label>
+                <label class="scanner-check-label">
+                    <input type="checkbox" id="scanCheckRSI" class="scanner-check" onchange="handleRunScanner(false)">
+                    <span>RSI Oversold Bounce (&lt;55)</span>
+                </label>
+                <label class="scanner-check-label">
+                    <input type="checkbox" id="scanCheckCMF" class="scanner-check" onchange="handleRunScanner(false)">
+                    <span>CMF Inflow (&gt;0.0)</span>
+                </label>
+                <label class="scanner-check-label">
+                    <input type="checkbox" id="scanCheckVWAP" class="scanner-check" onchange="handleRunScanner(false)">
+                    <span>Price &gt; VWAP Benchmark</span>
+                </label>
+                <label class="scanner-check-label">
+                    <input type="checkbox" id="scanCheckMACD" class="scanner-check" onchange="handleRunScanner(false)">
+                    <span>MACD Bullish Histogram</span>
+                </label>
+            </div>
+
+            <!-- Exclude Watchlist Toggle -->
+            <label class="scanner-check-label highlight">
+                <input type="checkbox" id="scanCheckExcludeWatchlist" class="scanner-check"
+                    onchange="handleRunScanner(false)" checked>
+                <span style="font-weight: 700;">✨ Exclude stocks already on my Watchlist</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Scanner Stats / Summary Bar -->
+    <div id="scannerSummaryBar" class="scanner-summary-bar">
+        <div class="scanner-stat-box">
+            <span class="scanner-stat-label">Candidate Universe</span>
+            <span id="scanStatUniverse" class="scanner-stat-val mono">-- Assets</span>
+        </div>
+        <div class="scanner-stat-box">
+            <span class="scanner-stat-label">Buy Opportunities</span>
+            <span id="scanStatOpportunities" class="scanner-stat-val mono" style="color: var(--accent-green);">--
+                Found</span>
+        </div>
+        <div class="scanner-stat-box">
+            <span class="scanner-stat-label">Highest Conviction</span>
+            <span id="scanStatTopConviction" class="scanner-stat-val mono" style="color: var(--accent-cyan);">--%</span>
+        </div>
+        <div class="scanner-stat-box">
+            <span class="scanner-stat-label">Cache Status</span>
+            <span id="scanStatTimestamp" class="scanner-stat-val mono" style="font-size: 0.88rem; color: #60a5fa;">Not
+                Cached</span>
+        </div>
+    </div>
+
+    <!-- Scanner Results Header & View Mode Switcher -->
+    <div class="scanner-results-header">
+        <div class="scanner-results-title-group">
+            <h3 class="scanner-results-heading">
+                <i data-lucide="sparkles" style="width: 17px; height: 17px; color: var(--accent-green);"></i>
+                <span>Opportunities &amp; Setups</span>
+            </h3>
+        </div>
+
+        <div class="scanner-view-switcher" role="group" aria-label="Scanner View Mode">
+            <button type="button" id="btnScannerViewCards" class="btn-view-toggle active"
+                onclick="setScannerViewMode('cards')" title="Switch to Grid Card View">
+                <i data-lucide="layout-grid" style="width: 13px; height: 13px;"></i>
+                <span>Cards</span>
+            </button>
+            <button type="button" id="btnScannerViewTable" class="btn-view-toggle" onclick="setScannerViewMode('table')"
+                title="Switch to Table Data View">
+                <i data-lucide="table" style="width: 13px; height: 13px;"></i>
+                <span>Table</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Opportunities Cards Grid -->
+    <div id="scannerResultsGrid" class="scanner-results-grid">
+        <!-- Default State: Initial prompt or spinner -->
+        <div class="glass-card"
+            style="grid-column: 1 / -1; padding: 50px 20px; text-align: center; color: var(--text-muted);">
+            <div style="font-size: 2.2rem; margin-bottom: 12px;">🛰️</div>
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">Ready to Scan Thematic &amp;
+                Ecological Markets</div>
+            <div
+                style="font-size: 0.85rem; color: var(--text-secondary); max-width: 540px; margin: 8px auto 20px auto; line-height: 1.5;">
+                Click <strong>"Run Scan"</strong> or choose a quick preset above to evaluate
+                multi-factor technical setups, institutional money flows, and buy targets for stocks not yet in your
+                watchlist.
+            </div>
+            <button type="button" class="btn-scanner-run" style="margin: 0 auto;" onclick="handleRunScanner()">
+                <i data-lucide="radar" style="width: 15px; height: 15px;"></i>
+                <span>Run Scan</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Opportunities Table Data View (Active when viewMode is 'table') -->
+    <div id="scannerTableWrapper" class="scanner-table-wrapper" style="display: none;">
+        <div class="scanner-mobile-scroll-hint">
+            <i data-lucide="chevrons-left-right" style="width: 14px; height: 14px; flex-shrink: 0;"></i>
+            <span>Swipe table horizontally to inspect all scanner metrics</span>
+        </div>
+        <div class="glass-card scanner-table-card">
+            <div class="table-responsive">
+                <table class="scanner-table">
+                    <thead>
+                        <tr>
+                            <th class="col-sticky-drag"
+                                style="width: 32px; padding: 14px 4px 14px 12px; text-align: center;"></th>
+                            <th class="col-sticky-asset" style="min-width: 170px;">Asset / Company</th>
+                            <th style="min-width: 110px; text-align: right;">Price</th>
+                            <th style="min-width: 95px; text-align: right;">1D Change</th>
+                            <th style="min-width: 130px; text-align: center;">6M Trend</th>
+                            <th style="min-width: 95px; text-align: center;">SuperTrend</th>
+                            <th style="min-width: 80px; text-align: center;">RSI(14)</th>
+                            <th style="min-width: 80px; text-align: center;">CMF Flow</th>
+                            <th style="min-width: 90px; text-align: center;">VWAP</th>
+                            <th style="min-width: 110px; text-align: center;">AI Conviction</th>
+                            <th style="min-width: 190px; text-align: left;">Execution Matrix</th>
+                            <th style="min-width: 220px; text-align: left;">AI Thesis &amp; Catalyst</th>
+                            <th style="min-width: 130px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scannerTableBody">
+                        <!-- Dynamically populated in Scanner Table View -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

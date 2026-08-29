@@ -1,0 +1,62 @@
+<!-- AI Settings Modal -->
+<div id="aiSettingsModal" class="modal-overlay">
+    <div class="modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">
+                <i data-lucide="sparkles" style="color: var(--accent-purple);"></i>
+                Google Gemini AI Intelligence Configuration
+            </div>
+            <button type="button" onclick="closeAISettings()" style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+            By default, FinDashIQ runs a high-precision <strong>Built-in Quantitative AI</strong> engine with 100% uptime and full technical indicator synthesis.
+            Optionally provide your <strong>Google Gemini API Key</strong> for executive investment memos and context-aware conversational Q&A.
+        </p>
+
+        <form id="aiSettingsForm" onsubmit="event.preventDefault(); saveAISettings();" autocomplete="off" data-form-type="other">
+            <div style="margin-bottom: 14px;">
+                <label class="form-label">Gemini Model Version</label>
+                <select id="aiModelSelect" class="form-select" style="padding: 10px 14px; font-size: 0.9rem;">
+                    <option value="gemini-3.7-flash" selected>Google Gemini 3.7 Flash (Flagship &amp; Recommended)</option>
+                    <option value="gemini-3.6-flash">Google Gemini 3.6 Flash (High Speed &amp; High Quota)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Google Gemini API Key (Optional)</label>
+                <div style="display: flex; gap: 8px;">
+                    <input 
+                        type="password" 
+                        id="aiApiKeyInput" 
+                        name="gemini_api_auth_token"
+                        class="search-input" 
+                        placeholder="AIzaSy..." 
+                        autocomplete="new-password"
+                        data-lpignore="true"
+                        data-1p-ignore="true"
+                        data-form-type="other"
+                        style="padding: 10px 14px; font-size: 0.9rem; flex: 1;"
+                    >
+                    <button type="button" id="btnTestAI" class="btn-toggle" onclick="testAIConnection()" style="white-space: nowrap; font-size: 0.8rem; padding: 0 14px;">
+                        <i data-lucide="activity" style="width: 13px;"></i> Test Key
+                    </button>
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Keys are stored locally in your browser.</span>
+                    <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-blue); text-decoration: none; font-weight: 600;">Get Free Key at Google AI Studio &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Connection Test Status Alert -->
+            <div id="aiTestStatus" style="display: none; padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 16px; line-height: 1.4;"></div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn-toggle" onclick="closeAISettings()">Cancel</button>
+                <button type="submit" class="btn-analyze" style="padding: 10px 20px; font-size: 0.85rem;">Save Settings</button>
+            </div>
+        </form>
+    </div>
+</div>

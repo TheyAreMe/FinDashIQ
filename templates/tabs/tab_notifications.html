@@ -1,0 +1,242 @@
+<!-- ========================================================= -->
+<!-- TOP TAB 3: SIGNAL ALERTS & NOTIFICATIONS HUB -->
+<!-- ========================================================= -->
+<div id="topView-notifications" class="top-view-pane">
+    <div class="notifications-layout">
+        <!-- Left: Advanced Alert Rule Configurator -->
+        <div class="notifications-left-col">
+            <div class="glass-card" style="padding: 24px;">
+                <div class="card-header-styled" style="padding: 0 0 16px 0; margin-bottom: 18px;">
+                    <div class="card-header-title">
+                        <i data-lucide="bell-plus" style="color: var(--accent-purple);"></i>
+                        <span>Configure Quantitative Signal Trigger Alert</span>
+                    </div>
+                    <span class="badge-pill badge-neutral" style="font-size: 0.72rem;">Multi-Factor Engine</span>
+                </div>
+
+                <form id="createAlertForm" onsubmit="event.preventDefault(); handleCreateAlert();">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <!-- 1. Target Asset -->
+                        <div>
+                            <label class="form-label" style="display: flex; justify-content: space-between;">
+                                <span>Target Asset / Stock</span>
+                                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">Select tracked asset or enter symbol</span>
+                            </label>
+                            <div style="display: flex; gap: 8px;">
+                                <select id="alertTickerSelect" class="form-select" style="flex: 1;" onchange="updateAlertPreview()">
+                                    <optgroup label="Tracked Portfolio Assets">
+                                        <option value="NVDA" selected>NVDA — NVIDIA Corporation</option>
+                                        <option value="MSFT">MSFT — Microsoft Corporation</option>
+                                        <option value="IFX.DE">IFX.DE — Infineon Technologies AG</option>
+                                        <option value="TSM">TSM — Taiwan Semiconductor</option>
+                                        <option value="SPCX">SPCX — SPCX Acquisition Corp</option>
+                                        <option value="EXXT.DE">EXXT.DE — iShares NASDAQ 100 ETF</option>
+                                        <option value="XDWT.DE">XDWT.DE — Xtrackers MSCI World Tech</option>
+                                    </optgroup>
+                                    <optgroup label="Global Technology &amp; Growth Leaders">
+                                        <option value="AAPL">AAPL — Apple Inc.</option>
+                                        <option value="AMZN">AMZN — Amazon.com Inc.</option>
+                                        <option value="GOOGL">GOOGL — Alphabet Inc.</option>
+                                        <option value="META">META — Meta Platforms Inc.</option>
+                                        <option value="TSLA">TSLA — Tesla Inc.</option>
+                                        <option value="AMD">AMD — Advanced Micro Devices</option>
+                                        <option value="PLTR">PLTR — Palantir Technologies</option>
+                                        <option value="SAP.DE">SAP.DE — SAP SE</option>
+                                    </optgroup>
+                                </select>
+                                <input type="text" id="alertCustomTicker" class="form-input" style="width: 120px; text-transform: uppercase;" placeholder="Custom..." oninput="updateAlertPreview()">
+                            </div>
+                        </div>
+
+                        <!-- 2. Signal Trigger Indicator Category & Definition -->
+                        <div>
+                            <label class="form-label">Quantitative Signal Indicator</label>
+                            <select id="alertSignalType" class="form-select" onchange="handleSignalTypeChange()">
+                                <optgroup label="📈 Trend &amp; Dynamic Volatility Filters">
+                                    <option value="supertrend_bull" data-cat="Trend &amp; Volatility" data-cond="direction_flip" data-thresh="Bullish Uptrend Confirmation" data-desc="Triggers when market close crosses above trailing SuperTrend resistance, turning the indicator green.">SuperTrend Direction Flip ➔ Bullish Uptrend</option>
+                                    <option value="supertrend_bear" data-cat="Trend &amp; Volatility" data-cond="direction_flip" data-thresh="Bearish Breakdown Confirmation" data-desc="Triggers when price falls below trailing SuperTrend support, switching trend to bearish.">SuperTrend Direction Flip ➔ Bearish Breakdown</option>
+                                    <option value="sma_golden_cross" data-cat="Trend &amp; Volatility" data-cond="direction_flip" data-thresh="SMA 50 > SMA 200" data-desc="Classic institutional Golden Cross: 50-day Moving Average crosses above the 200-day Moving Average.">SMA Golden Cross (50-Day crosses above 200-Day)</option>
+                                    <option value="sma_death_cross" data-cat="Trend &amp; Volatility" data-cond="direction_flip" data-thresh="SMA 50 < SMA 200" data-desc="Death Cross breakdown: 50-day Moving Average drops below the 200-day Moving Average.">SMA Death Cross (50-Day crosses below 200-Day)</option>
+                                    <option value="bollinger_upper" data-cat="Trend &amp; Volatility" data-cond="crosses_above" data-thresh="Upper Band Breakout" data-desc="Volatility expansion trigger: Price closes above the Upper 2.0-StdDev Bollinger Band.">Bollinger Bands Upper Expansion Breakout</option>
+                                    <option value="bollinger_lower" data-cat="Trend &amp; Volatility" data-cond="crosses_below" data-thresh="Lower Band Reversal" data-desc="Oversold dip trigger: Price tags or breaches below the Lower 2.0-StdDev Bollinger Band.">Bollinger Bands Lower Band Reversal Zone</option>
+                                </optgroup>
+
+                                <optgroup label="⚡ Momentum &amp; Reversal Oscillators">
+                                    <option value="rsi_oversold" data-cat="Momentum &amp; Oscillators" data-cond="crosses_below" data-thresh="RSI(14) < 30.0" data-desc="Mean reversion opportunity: 14-period Relative Strength Index drops into oversold territory below 30.">RSI (14) Deep Oversold (RSI &lt; 30.0)</option>
+                                    <option value="rsi_overbought" data-cat="Momentum &amp; Oscillators" data-cond="crosses_above" data-thresh="RSI(14) > 70.0" data-desc="Momentum exhaustion warning: 14-period RSI climbs into overbought territory above 70.">RSI (14) Overbought Exhaustion (RSI &gt; 70.0)</option>
+                                    <option value="macd_bull_cross" data-cat="Momentum &amp; Oscillators" data-cond="direction_flip" data-thresh="MACD Line > Signal Line" data-desc="Bullish momentum shift: Fast MACD Line (12, 26) crosses above the 9-period Signal Line.">MACD Bullish Histogram Cross (12, 26, 9)</option>
+                                    <option value="macd_bear_cross" data-cat="Momentum &amp; Oscillators" data-cond="direction_flip" data-thresh="MACD Line < Signal Line" data-desc="Bearish momentum shift: Fast MACD Line drops below the Signal Line.">MACD Bearish Signal Cross (12, 26, 9)</option>
+                                    <option value="stoch_oversold_cross" data-cat="Momentum &amp; Oscillators" data-cond="direction_flip" data-thresh="%K crosses %D (< 20)" data-desc="Fast Stochastic %K line crosses above %D trigger line in the oversold zone (< 20).">Stochastic Oscillator Bullish Cross (&lt; 20)</option>
+                                </optgroup>
+
+                                <optgroup label="🌊 Institutional Volume &amp; Capital Flow">
+                                    <option value="cmf_inflow" data-cat="Institutional Flow" data-cond="crosses_above" data-thresh="CMF > +0.15" data-desc="Institutional accumulation: Chaikin Money Flow surges above +0.15 with high close-location volume.">Chaikin Money Flow (CMF) Heavy Inflow (&gt; +0.15)</option>
+                                    <option value="cmf_outflow" data-cat="Institutional Flow" data-cond="crosses_below" data-thresh="CMF < -0.15" data-desc="Institutional distribution: CMF plunges below -0.15, signaling large capital outflow.">Chaikin Money Flow (CMF) Heavy Outflow (&lt; -0.15)</option>
+                                    <option value="vwap_cross_above" data-cat="Institutional Flow" data-cond="crosses_above" data-thresh="Price > Daily VWAP" data-desc="Intraday institutional benchmark: Asset price breaks out and holds above Volume-Weighted Average Price.">Price Crosses Above Daily VWAP</option>
+                                    <option value="vwap_cross_below" data-cat="Institutional Flow" data-cond="crosses_below" data-thresh="Price < Daily VWAP" data-desc="Asset price drops below Volume-Weighted Average Price benchmark.">Price Drops Below Daily VWAP</option>
+                                </optgroup>
+
+                                <optgroup label="📰 Breaking News &amp; Catalyst Events">
+                                    <option value="news_breaking_catalyst" data-cat="News &amp; Catalyst" data-cond="news_event" data-thresh="High-Impact Breaking News" data-desc="Triggers instantly when high-impact corporate, regulatory, or macroeconomic breaking news is published, delivering the headline, summary, and direct article link.">🚨 Breaking High-Impact News Event</option>
+                                    <option value="news_sentiment_bullish" data-cat="News &amp; Catalyst" data-cond="sentiment_positive" data-thresh="Sentiment: Bullish Catalyst" data-desc="Triggers when new positive earnings beats, upgraded guidance, or bullish market catalysts are published, providing the full news snippet and direct link.">📈 Bullish Catalyst News Wire (Earnings / Upgrades)</option>
+                                    <option value="news_sentiment_bearish" data-cat="News &amp; Catalyst" data-cond="sentiment_negative" data-thresh="Sentiment: Bearish / Adverse" data-desc="Triggers when adverse corporate developments, earnings misses, downgrades, or negative headlines occur with full context and article link.">📉 Adverse Event Wire (Downgrades / Headwinds)</option>
+                                    <option value="news_tier1_source" data-cat="News &amp; Catalyst" data-cond="tier1_publish" data-thresh="Tier-1 Wire (Reuters/Bloomberg/WSJ/CNBC)" data-desc="Triggers whenever a premier Tier-1 global financial news wire (Reuters, Bloomberg, WSJ, CNBC, Handelsblatt, Nikkei) publishes an article.">🏛️ Tier-1 Publisher Breaking Headline</option>
+                                </optgroup>
+
+                                <optgroup label="🧠 Quantitative AI &amp; Risk Execution Levels">
+                                    <option value="ai_conviction_high" data-cat="Quantitative AI" data-cond="crosses_above" data-thresh="Conviction Score ≥ 80%" data-desc="Multi-factor algorithmic rating upgrades to Strong Bullish conviction (≥ 80.0%).">AI Conviction Score Upgrades to Strong Bullish (≥ 80%)</option>
+                                    <option value="ai_conviction_drop" data-cat="Quantitative AI" data-cond="crosses_below" data-thresh="Conviction Score < 45%" data-desc="AI algorithmic score deteriorates below 45%, signaling caution or defensive positioning.">AI Conviction Drops Below Neutral (&lt; 45%)</option>
+                                    <option value="take_profit_target1" data-cat="Risk &amp; Execution" data-cond="reaches_level" data-thresh="Take-Profit Target 1 Reached" data-desc="Asset hits dynamically calculated algorithmic Take-Profit Target 1 (1.5x ATR Expansion).">Take-Profit Target 1 (TP1) Reached</option>
+                                    <option value="stop_loss_breach" data-cat="Risk &amp; Execution" data-cond="crosses_below" data-thresh="Stop-Loss Level Breached" data-desc="Capital protection trigger: Price falls below the multi-factor Volatility Stop-Loss barrier.">Volatility Stop-Loss (SL) Level Breached</option>
+                                    <option value="daily_spike_pct" data-cat="Price Volatility" data-cond="crosses_above" data-thresh="Daily Change > +3.5%" data-desc="Abnormal single-day price spike exceeding +3.5% in daily session.">Intraday Volatility Spike (&gt; +3.5% Day Change)</option>
+                                    <option value="daily_drop_pct" data-cat="Price Volatility" data-cond="crosses_below" data-thresh="Daily Change < -3.5%" data-desc="Abnormal single-day price drop exceeding -3.5% in daily session.">Intraday Volatility Drop (&lt; -3.5% Day Change)</option>
+                                </optgroup>
+                            </select>
+
+                            <!-- Dynamic Indicator Helper Description Callout -->
+                            <div id="signalDescBox" style="margin-top: 8px; padding: 10px 14px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.18); border-left: 3px solid var(--accent-blue); border-radius: var(--radius-sm); font-size: 0.76rem; color: var(--text-secondary); line-height: 1.5;">
+                                Triggers when market close crosses above trailing SuperTrend resistance, turning the indicator green.
+                            </div>
+                        </div>
+
+                        <!-- 3. Condition & Threshold Configurator -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label class="form-label">Evaluation Logic</label>
+                                <select id="alertCondition" class="form-select" onchange="updateAlertPreview()">
+                                    <option value="direction_flip">Direction / State Flip</option>
+                                    <option value="crosses_above">Crosses Above (&gt;=)</option>
+                                    <option value="crosses_below">Crosses Below (&lt;=)</option>
+                                    <option value="reaches_level">Reaches Exact Price ($)</option>
+                                    <option value="news_event">🚨 Breaking News Event</option>
+                                    <option value="sentiment_positive">📈 Bullish Sentiment Catalyst</option>
+                                    <option value="sentiment_negative">📉 Bearish / Adverse Catalyst</option>
+                                    <option value="tier1_publish">🏛️ Tier-1 Publisher Wire</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Trigger Threshold Parameter</label>
+                                <input type="text" id="alertThreshold" class="form-input" value="Bullish Uptrend Confirmation" placeholder="e.g. 75%, Bullish Flip, $185.00" oninput="updateAlertPreview()">
+                            </div>
+                        </div>
+
+                        <!-- 4. Communication Channel & Dispatch Target Configuration -->
+                        <div style="background: var(--bg-card-hover); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                            <div>
+                                <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
+                                    <i data-lucide="send" style="width: 14px; color: var(--accent-cyan);"></i>
+                                    <span>Dispatch Channel &amp; Delivery Destination</span>
+                                </label>
+                                <select id="alertChannel" class="form-select" onchange="handleChannelChange()">
+                                    <option value="Telegram Bot">📱 Telegram Bot &amp; Push Notification</option>
+                                    <option value="Email Webhook">📧 Email Notification Webhook</option>
+                                    <option value="Discord Webhook">💬 Discord Trading Channel Webhook</option>
+                                    <option value="Browser Push">🔔 In-App &amp; Desktop Sound Alert</option>
+                                    <option value="Custom API Webhook">🌐 Custom Webhook (JSON POST Endpoint)</option>
+                                </select>
+                            </div>
+
+                            <!-- Channel-Specific Target Field -->
+                            <div>
+                                <label id="channelTargetLabel" class="form-label" style="font-size: 0.75rem;">Telegram Chat ID / Channel</label>
+                                <input type="text" id="alertChannelTarget" class="form-input" placeholder="e.g. @quant_trader or 123456789" value="@quant_desk" oninput="updateAlertPreview()">
+                                <div id="channelTargetHelp" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">
+                                    Sends instant markdown-formatted signal messages to your configured Telegram Chat ID.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Live Alert Trigger Preview Card -->
+                        <div style="background: rgba(124, 58, 237, 0.04); border: 1px dashed rgba(124, 58, 237, 0.35); border-radius: var(--radius-sm); padding: 14px 16px;">
+                            <div style="font-size: 0.72rem; font-weight: 700; color: var(--accent-purple); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                                <i data-lucide="eye" style="width: 13px;"></i>
+                                <span>Live Rule Dispatch Preview</span>
+                            </div>
+                            <div id="alertLivePreviewText" style="font-size: 0.82rem; color: var(--text-primary); line-height: 1.5;">
+                                ⚡ When <strong>NVDA</strong> triggers <strong>SuperTrend Bullish Flip</strong> (<em>Bullish Uptrend Confirmation</em>), dispatch alert via <strong>Telegram Bot</strong> to <code>@quant_desk</code>.
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 2px;">
+                            <button type="submit" class="btn-alert-create" style="padding: 13px; font-size: 0.90rem;">
+                                <i data-lucide="bell-plus" style="width: 16px;"></i> Create Signal Alert Trigger
+                            </button>
+                            <button type="button" class="btn-alert-test" style="padding: 13px; font-size: 0.90rem;" onclick="handleTestTriggerFromForm()" title="Dispatch a simulated trigger notification immediately">
+                                <i data-lucide="send" style="width: 16px;"></i> Trigger Test Message
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Active Trigger Rules List -->
+            <div class="glass-card" style="padding: 24px; margin-top: 22px;">
+                <div class="card-header-styled" style="padding: 0 0 16px 0; margin-bottom: 14px;">
+                    <div class="card-header-title">
+                        <i data-lucide="shield-check" style="color: var(--accent-green);"></i>
+                        <span>Active Signal Trigger Rules</span>
+                    </div>
+                    <span id="activeAlertsBadge" class="badge-pill badge-neutral">3 Rules Active</span>
+                </div>
+
+                <div id="activeAlertsList" class="active-alerts-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Real-Time Alert Stream & Delivery Log -->
+        <div class="notifications-right-col">
+            <div class="glass-card" style="padding: 24px; height: 100%; display: flex; flex-direction: column;">
+                <div class="card-header-styled" style="padding: 0 0 16px 0; margin-bottom: 14px;">
+                    <div class="card-header-title">
+                        <i data-lucide="activity" style="color: var(--accent-cyan);"></i>
+                        <span>Live Signal Message Activity Log</span>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn-toggle" style="font-size: 0.72rem; padding: 4px 10px; color: var(--accent-cyan); border-color: rgba(6, 182, 212, 0.35);" onclick="handleTestTriggerFromForm()" title="Simulate trigger message now">
+                            <i data-lucide="send" style="width: 12px;"></i> Trigger Test Message
+                        </button>
+                        <button type="button" class="btn-toggle" style="font-size: 0.72rem; padding: 4px 10px;" onclick="clearAlertHistory()">
+                            <i data-lucide="trash-2" style="width: 12px;"></i> Clear Log
+                        </button>
+                    </div>
+                </div>
+
+                <div id="alertHistoryLog" class="alert-history-container" style="flex: 1;">
+                    <div class="alert-log-item">
+                        <div class="alert-log-header">
+                            <span class="badge-pill badge-bullish" style="font-size: 0.7rem;">NVDA • SUPERTREND</span>
+                            <span class="alert-log-time">Just now</span>
+                        </div>
+                        <div class="alert-log-title">🚨 NVDA Signal Triggered: SuperTrend Uptrend Flip</div>
+                        <div class="alert-log-body">
+                            Quantitative multi-factor engine detected a major technical trigger for NVDA. SuperTrend flipped to Bullish support at $175.40 with surging Chaikin Money Flow (+0.185).
+                        </div>
+                        <div class="alert-log-footer">
+                            <span>Channel: 📱 Telegram Bot (<code>@quant_desk</code>)</span>
+                            <span style="color: var(--accent-green);">✔ Delivered</span>
+                        </div>
+                    </div>
+
+                    <div class="alert-log-item">
+                        <div class="alert-log-header">
+                            <span class="badge-pill badge-bullish" style="font-size: 0.7rem;">MSFT • AI CONVICTION</span>
+                            <span class="alert-log-time">15 mins ago</span>
+                        </div>
+                        <div class="alert-log-title">🧠 MSFT Signal Triggered: AI Conviction Exceeded 80%</div>
+                        <div class="alert-log-body">
+                            Multi-factor AI Conviction Score for MSFT climbed to 85.0% (Strong Bullish), confirming upside expansion target toward $518.50.
+                        </div>
+                        <div class="alert-log-footer">
+                            <span>Channel: 📧 Email Webhook (<code>usermail@googlemail.com</code>)</span>
+                            <span style="color: var(--accent-green);">✔ Delivered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

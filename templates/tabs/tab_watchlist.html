@@ -1,0 +1,110 @@
+<!-- ========================================================= -->
+<!-- TOP TAB 1: WATCHLIST & MARKET INTELLIGENCE HUB (DEFAULT) -->
+<!-- ========================================================= -->
+<div id="topView-watchlist" class="top-view-pane active">
+    <!-- Watchlist Control Bar -->
+    <div class="glass-card watchlist-header-card">
+        <div class="watchlist-controls-row">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <h2
+                        style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="layout-grid" style="color: var(--accent-cyan); width: 20px; height: 20px;"></i>
+                        <span>Watchlist Hub</span>
+                    </h2>
+                    <div id="watchlistSyncBadge" class="sync-status-badge synced" title="Data synchronization status">
+                        <span id="watchlistSyncDot" class="sync-status-dot synced"></span>
+                        <span id="watchlistSyncStatusText">Live &amp; Synced</span>
+                    </div>
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
+                    Live multi-factor scoring, trend sparklines, and AI synthesis for your tracked assets.
+                </div>
+            </div>
+
+            <!-- Controls & Actions Group -->
+            <div class="watchlist-header-right-controls">
+                <!-- Add to Watchlist Actions -->
+                <div class="watchlist-actions-group">
+                    <button type="button" class="btn-watchlist-add" onclick="openAddStockModal()"
+                        title="Search companies and tickers to add to watchlist">
+                        <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i>
+                        <span>Add Stock</span>
+                    </button>
+
+                    <button type="button" class="btn-watchlist-refresh" onclick="refreshWatchlistData()"
+                        title="Reload real-time market data for all watchlist stocks">
+                        <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i>
+                        <span>Refresh</span>
+                    </button>
+
+                    <button type="button" class="btn-watchlist-reset" onclick="resetWatchlistDefaults()"
+                        title="Reset watchlist to default asset basket">
+                        <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+                        <span>Defaults</span>
+                    </button>
+                </div>
+
+                <!-- View Switcher (Cards vs Table) located below action buttons -->
+                <div class="watchlist-view-switcher" role="group" aria-label="Watchlist View Mode">
+                    <button type="button" id="btnWatchlistViewCards" class="btn-view-toggle active"
+                        onclick="setWatchlistViewMode('cards')" title="Switch to Grid Card View">
+                        <i data-lucide="layout-grid" style="width: 13px; height: 13px;"></i>
+                        <span>Cards</span>
+                    </button>
+                    <button type="button" id="btnWatchlistViewTable" class="btn-view-toggle"
+                        onclick="setWatchlistViewMode('table')" title="Switch to Table Data View">
+                        <i data-lucide="table" style="width: 13px; height: 13px;"></i>
+                        <span>Table</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendation Cards Grid (Active when viewMode is 'cards') -->
+    <div id="watchlistCardsGrid" class="watchlist-cards-grid">
+        <!-- Dynamically populated with rich recommendation mini-cards -->
+        <div class="glass-card"
+            style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted);">
+            <div class="spinner" style="margin: 0 auto 16px auto;"></div>
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">Loading Watchlist
+                Recommendations &amp; Quantitative Syntheses...</div>
+            <div style="font-size: 0.8rem; margin-top: 4px;">Analyzing multi-factor technical indicators, real-time news
+                catalysts, and AI conviction scores.</div>
+        </div>
+    </div>
+
+    <!-- Table Data View (Active when viewMode is 'table') -->
+    <div id="watchlistTableWrapper" class="watchlist-table-wrapper" style="display: none;">
+        <div class="watchlist-mobile-scroll-hint">
+            <i data-lucide="chevrons-left-right" style="width: 14px; height: 14px; flex-shrink: 0;"></i>
+            <span>Swipe table horizontally to inspect all indicators</span>
+        </div>
+        <div class="glass-card watchlist-table-card">
+            <div class="table-responsive">
+                <table class="watchlist-table">
+                    <thead>
+                        <tr>
+                            <th class="col-sticky-drag"
+                                style="width: 32px; padding: 14px 4px 14px 12px; text-align: center;"></th>
+                            <th class="col-sticky-asset" style="min-width: 160px;">Asset / Company</th>
+                            <th style="min-width: 110px; text-align: right;">Price</th>
+                            <th style="min-width: 100px; text-align: right;">1D Change</th>
+                            <th style="min-width: 130px; text-align: center;">6M Trend</th>
+                            <th style="min-width: 100px; text-align: center;">SuperTrend</th>
+                            <th style="min-width: 85px; text-align: center;">RSI(14)</th>
+                            <th style="min-width: 85px; text-align: center;">CMF Flow</th>
+                            <th style="min-width: 120px; text-align: center;">AI Conviction</th>
+                            <th style="min-width: 110px; text-align: center;">News Catalyst</th>
+                            <th style="min-width: 110px; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="watchlistTableBody">
+                        <!-- Dynamically populated in Table View -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

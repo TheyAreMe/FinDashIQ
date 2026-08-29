@@ -1,0 +1,64 @@
+<!-- ========================================================= -->
+<!-- GLOBAL BREAKING NEWS & REAL-TIME WIRE MODAL -->
+<!-- ========================================================= -->
+<div id="globalNewsModal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closeGlobalNewsModal();">
+    <div class="modal-card global-news-modal-card">
+        <!-- Modal Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="auth-icon-badge" style="background: linear-gradient(135deg, #06b6d4, #3b82f6); width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i data-lucide="globe" style="width: 22px; height: 22px; color: #fff;"></i>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 6px;">
+                            <span>Global Breaking News Wire</span>
+                        </h2>
+                        <span id="newsModalStockBadge" class="badge-pill badge-neutral mono" style="font-size: 0.72rem; padding: 2px 8px;">AAPL (Apple Inc.)</span>
+                        <span class="badge-pill badge-bullish" style="font-size: 0.68rem; padding: 2px 7px;">Translated to English</span>
+                    </div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;">
+                        Real-time multi-source breaking news, corporate filings, regulatory updates, and macroeconomic catalyst wire.
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closeGlobalNewsModal()" aria-label="Close modal" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 6px;">
+                <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+            </button>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;">
+            <div class="stock-search-input-wrapper" style="flex: 1; min-width: 220px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 6px 12px; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="search" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+                <input 
+                    type="search" 
+                    id="globalNewsSearchInput" 
+                    placeholder="Filter news by headline, publisher, or keywords..." 
+                    style="background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 0.82rem; width: 100%;"
+                    oninput="filterGlobalNewsModal(this.value)"
+                >
+            </div>
+            <div class="control-group" style="display: flex; gap: 6px;">
+                <button type="button" class="btn-toggle active" id="newsFilterAllBtn" onclick="setNewsModalFilter('all')">All Wires</button>
+                <button type="button" class="btn-toggle" id="newsFilterCatalystsBtn" onclick="setNewsModalFilter('catalysts')">🚀 High Impact</button>
+                <button type="button" class="btn-toggle" id="newsFilterTier1Btn" onclick="setNewsModalFilter('tier1')">🏛️ Tier 1 Sources</button>
+            </div>
+        </div>
+
+        <!-- Modal News Stream Body -->
+        <div id="globalNewsModalList" class="global-news-modal-list">
+            <!-- Populated dynamically via app.js -->
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+            <span id="globalNewsModalFooterCount" style="font-size: 0.74rem; color: var(--text-muted);">
+                Showing 0 articles
+            </span>
+            <button type="button" class="btn-toggle" onclick="closeGlobalNewsModal()" style="padding: 6px 16px; font-size: 0.8rem;">
+                Close Window
+            </button>
+        </div>
+    </div>
+</div>

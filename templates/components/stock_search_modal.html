@@ -1,0 +1,93 @@
+<!-- Add Stock & Company Search Modal -->
+<div id="addStockModal" class="modal-overlay" onclick="if(event.target === this) closeAddStockModal();">
+    <div class="modal-card stock-search-modal-card">
+        <!-- Header -->
+        <div class="stock-search-modal-header">
+            <div class="stock-search-modal-title-group">
+                <div id="stockSearchModalIcon" class="stock-search-modal-icon">
+                    <i data-lucide="plus-circle" style="color: var(--accent-cyan); width: 22px; height: 22px;"></i>
+                </div>
+                <div>
+                    <h3 id="stockSearchModalTitle" class="stock-search-modal-title">Add Stock to Watchlist</h3>
+                    <div id="stockSearchModalSubtitle" class="stock-search-modal-subtitle">Search by company name or ticker symbol with exchange disambiguation</div>
+                </div>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closeAddStockModal()" aria-label="Close modal">
+                <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+            </button>
+        </div>
+
+        <!-- Search Bar Input Box -->
+        <form id="stockSearchModalForm" class="stock-search-input-container" onsubmit="event.preventDefault();" autocomplete="off" data-form-type="other">
+            <div class="stock-search-input-wrapper">
+                <i data-lucide="search" class="stock-search-icon"></i>
+                <input 
+                    type="search" 
+                    id="stockSearchModalInput" 
+                    name="stock_search_query"
+                    class="stock-search-input" 
+                    placeholder="e.g. Apple, PayPal, Infineon, SAP, NVDA, TSLA..."
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    data-lpignore="true"
+                    data-1p-ignore="true"
+                    data-form-type="other"
+                    oninput="handleStockSearchInput(this.value)"
+                    onkeydown="if(event.key === 'Escape') closeAddStockModal();"
+                >
+                <div id="stockSearchSpinner" class="stock-search-spinner" style="display: none;">
+                    <div class="spinner-sm"></div>
+                </div>
+                <button 
+                    type="button" 
+                    id="stockSearchClearBtn" 
+                    class="stock-search-clear-btn" 
+                    style="display: none;" 
+                    onclick="clearStockSearchInput()"
+                    title="Clear search"
+                >
+                    <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                </button>
+            </div>
+        </form>
+
+        <!-- Quick Filter Suggestion Chips -->
+        <div id="stockSearchSuggestionsRow" class="stock-search-suggestions">
+            <span class="stock-search-suggestions-label">Popular:</span>
+            <button type="button" class="stock-search-chip" onclick="setStockSearchQuery('Apple')">Apple</button>
+            <button type="button" class="stock-search-chip" onclick="setStockSearchQuery('NVIDIA')">NVIDIA</button>
+            <button type="button" class="stock-search-chip" onclick="setStockSearchQuery('PayPal')">PayPal</button>
+            <button type="button" class="stock-search-chip" onclick="setStockSearchQuery('Infineon')">Infineon</button>
+            <button type="button" class="stock-search-chip" onclick="setStockSearchQuery('SAP')">SAP</button>
+            <button type="button" class="stock-search-chip" onclick="setStockSearchQuery('Microsoft')">Microsoft</button>
+            <button type="button" class="stock-search-chip" onclick="setStockSearchQuery('Clean Energy')">Clean Energy</button>
+        </div>
+
+        <!-- Results / Disambiguation Container -->
+        <div class="stock-search-results-wrapper">
+            <div id="stockSearchResultsList" class="stock-search-results-list">
+                <!-- Dynamically populated or default prompt state -->
+                <div class="stock-search-empty-state">
+                    <div class="stock-search-empty-icon">
+                        <i data-lucide="search" style="width: 32px; height: 32px; color: var(--text-muted);"></i>
+                    </div>
+                    <div class="stock-search-empty-text">Type a company name or ticker symbol to begin searching</div>
+                    <div class="stock-search-empty-subtext">If multiple listings or international exchanges exist (e.g. Frankfurt, XETRA, NASDAQ), all matching options will be presented for disambiguation.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="stock-search-modal-footer">
+            <div class="stock-search-footer-hint">
+                <i data-lucide="info" style="width: 14px; height: 14px; color: var(--accent-blue);"></i>
+                <span id="stockSearchModalFooterNote">Added stocks immediately sync to your personalized profile and compute quantitative indicators.</span>
+            </div>
+            <button type="button" class="btn-stock-search-done" onclick="closeAddStockModal()">
+                Done
+            </button>
+        </div>
+    </div>
+</div>

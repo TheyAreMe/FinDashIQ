@@ -1,0 +1,67 @@
+<!-- Search & Ticker Inputs Card -->
+<div class="glass-card search-section">
+    <form id="searchForm" class="search-form" onsubmit="event.preventDefault(); handleAnalyze();">
+        <div id="deepDiveSearchWrapper" class="input-wrapper search-input-wrapper-dynamic">
+            <i data-lucide="search" class="input-icon"></i>
+            <input 
+                type="search" 
+                id="tickerInput" 
+                name="stock_deep_dive_search"
+                class="search-input mono"
+                placeholder="Search company name or ticker (e.g. Apple, PayPal, Infineon, SAP, NVDA)..." 
+                value="AAPL, NVDA, MSFT"
+                autocomplete="off" 
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-form-type="other"
+                oninput="handleDeepDiveSearchInput(this.value)"
+                onkeydown="handleDeepDiveSearchKeyDown(event)"
+                onfocus="handleDeepDiveSearchFocus()"
+            >
+            <div id="deepDiveSearchSpinner" class="stock-search-spinner" style="display: none; position: absolute; right: 40px;">
+                <div class="spinner-sm"></div>
+            </div>
+            <button type="button" id="tickerInputClearBtn" class="stock-search-clear-btn" style="display: none; position: absolute; right: 12px;" onclick="clearDeepDiveSearchInput()" title="Clear search input">
+                <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+            </button>
+
+            <!-- Dynamic Autocomplete & Disambiguation Dropdown -->
+            <div id="deepDiveSearchDropdown" class="deep-dive-search-dropdown" style="display: none;">
+                <div class="deep-dive-dropdown-header">
+                    <span class="deep-dive-dropdown-title">Company &amp; Ticker Suggestions</span>
+                    <span class="deep-dive-dropdown-hint">Press <kbd>&uarr;</kbd> <kbd>&darr;</kbd> to navigate, <kbd>Enter</kbd> to select</span>
+                </div>
+                <div id="deepDiveSearchResultsList" class="deep-dive-results-list"></div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Presets -->
+    <div class="preset-container">
+        <span class="preset-label">Quick Watchlists:</span>
+        <button type="button" class="preset-chip" onclick="setPreset('AAPL, NVDA, MSFT, GOOGL')">
+            <i data-lucide="sparkles" style="width: 13px;"></i> Big Tech
+        </button>
+        <button type="button" class="preset-chip" onclick="setPreset('NVDA, TSM, AMD, AVGO, IFNNY')">
+            <i data-lucide="cpu" style="width: 13px;"></i> Semiconductors
+        </button>
+        <button type="button" class="preset-chip" onclick="setPreset('RKLB, SPCX, LMT, PL, ASTS')">
+            <i data-lucide="rocket" style="width: 13px;"></i> Space Industry
+        </button>
+        <button type="button" class="preset-chip" onclick="setPreset('ENPH, FSLR, NEE, PLUG')">
+            <i data-lucide="sun" style="width: 13px;"></i> Clean Energy
+        </button>
+        <button type="button" class="preset-chip" onclick="setPreset('WM, XYL, ECL, BEP')">
+            <i data-lucide="leaf" style="width: 13px;"></i> Ecologic Companies
+        </button>
+        <button type="button" class="preset-chip" onclick="setPreset('SPY, QQQ, DIA, IWM')">
+            <i data-lucide="pie-chart" style="width: 13px;"></i> Major ETFs
+        </button>
+        <button type="button" class="preset-chip" onclick="setPreset('COIN, MSTR, SQ, PYPL')">
+            <i data-lucide="wallet" style="width: 13px;"></i> Fintech & Crypto
+        </button>
+    </div>
+</div>

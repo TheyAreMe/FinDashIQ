@@ -1,0 +1,126 @@
+<!-- ========================================================= -->
+<!-- TAB 4: FUNDAMENTALS & MULTI-FACTOR CONSENSUS -->
+<!-- ========================================================= -->
+<div id="tabPane-fundamentals" class="tab-pane">
+    <div class="bottom-grid">
+        <!-- Technical Analysis Signals Panel -->
+        <div class="glass-card">
+            <div class="card-header-styled">
+                <div class="card-header-title">
+                    <i data-lucide="shield-check" style="color: var(--accent-green);"></i>
+                    <div>
+                        <span>Quantitative Multi-Factor Consensus</span>
+                        <div id="fundamentalsSubtitle" style="font-size: 0.74rem; color: var(--text-secondary); font-weight: 500; margin-top: 1px;"></div>
+                    </div>
+                </div>
+                <span id="signalsCountBadge" class="badge-pill badge-bullish">Bullish Bias</span>
+            </div>
+
+            <!-- Rating Hero & Meter -->
+            <div class="rating-hero">
+                <div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">Algorithmic Consensus Rating</div>
+                    <div id="overallRatingBadge" class="overall-rating-badge badge-bullish">
+                        <i data-lucide="thumbs-up"></i>
+                        <span id="overallRatingText">Strong Buy</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="signal-counts">
+                        <span style="color: var(--accent-green);"><strong id="bullishCount">0</strong> Bullish</span>
+                        <span style="color: var(--neutral);"><strong id="neutralCount">0</strong> Neutral</span>
+                        <span style="color: var(--accent-red);"><strong id="bearishCount">0</strong> Bearish</span>
+                    </div>
+                    <div class="signal-meter-bar">
+                        <div id="meterBullish" class="meter-fill-bullish" style="width: 50%;"></div>
+                        <div id="meterNeutral" class="meter-fill-neutral" style="width: 25%;"></div>
+                        <div id="meterBearish" class="meter-fill-bearish" style="width: 25%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signals Breakdown List -->
+            <div id="signalsList" class="signals-list">
+                <!-- Injected dynamically -->
+            </div>
+        </div>
+
+        <!-- Key Financial & Valuation Metrics -->
+        <div class="glass-card">
+            <div class="card-header-styled">
+                <div class="card-header-title">
+                    <i data-lucide="layers" style="color: var(--accent-blue);"></i>
+                    <div>
+                        <span>Fundamental & Market Statistics</span>
+                        <div id="valuationSubtitle" style="font-size: 0.74rem; color: var(--text-secondary); font-weight: 500; margin-top: 1px;"></div>
+                    </div>
+                </div>
+                <span id="stockCurrencyBadge" class="badge-pill badge-neutral mono">USD</span>
+            </div>
+
+            <div class="stats-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Market Capitalization</span>
+                        <span id="statMarketCap" class="stat-value mono">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Trailing P/E Ratio</span>
+                        <span id="statPE" class="stat-value mono">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Forward P/E Ratio</span>
+                        <span id="statForwardPE" class="stat-value mono">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">ATR Volatility ($)</span>
+                        <span id="statATR" class="stat-value mono" style="color: var(--accent-cyan);">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Institutional CMF Flow</span>
+                        <span id="statCMF" class="stat-value mono">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Beta (Volatility)</span>
+                        <span id="statBeta" class="stat-value mono">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Dividend Yield</span>
+                        <span id="statDivYield" class="stat-value mono">--</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Avg Daily Volume</span>
+                        <span id="statAvgVolume" class="stat-value mono">--</span>
+                    </div>
+                </div>
+
+                <!-- 52-Week Range Visual Slider -->
+                <div class="stat-card" style="margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span class="stat-label">52-Week Price Range</span>
+                        <span id="stat52Position" class="stat-label mono" style="color: var(--accent-blue);">Position: --%</span>
+                    </div>
+                    <div class="range-slider-container">
+                        <div class="range-bar">
+                            <div id="stat52Progress" class="range-progress" style="width: 50%;"></div>
+                        </div>
+                        <div class="range-labels">
+                            <span id="stat52Low">Low: $0.00</span>
+                            <span id="stat52High">High: $0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indicator Definitions Reference Card -->
+                <div style="margin-top: 20px; padding: 14px 18px; background: rgba(255, 255, 255, 0.02); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-size: 0.78rem; color: var(--text-secondary); line-height: 1.6;">
+                    <strong style="color: var(--text-primary); display: block; margin-bottom: 4px;">Dynamic Technical Indicators Reference:</strong>
+                    • <strong>SuperTrend (10, 3):</strong> Trailing stop indicator dynamically tracking volatility support/resistance.<br>
+                    • <strong>Stochastic (14, 3, 3):</strong> Faster reversal oscillator. &gt;80 overbought, &lt;20 oversold.<br>
+                    • <strong>CMF (20):</strong> Chaikin Money Flow measuring institutional accumulation (&gt;0) vs distribution (&lt;0).<br>
+                    • <strong>VWAP:</strong> Volume-Weighted Average Price used by institutional liquidity desks.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

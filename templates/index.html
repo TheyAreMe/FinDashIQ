@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinDashIQ | Quantitative AI Intelligence & Dynamic Terminal</title>
+    
+    <!-- Meta Description & SEO Best Practices -->
+    <meta name="description" content="FinDashIQ is an institutional-grade quantitative financial dashboard offering AI market intelligence, technical indicators (SuperTrend, CMF, Stochastic, VWAP), algorithmic backtesting simulation, and real-time news analytics.">
+    <meta name="keywords" content="quantitative finance, algorithmic trading, AI stock analysis, SuperTrend, backtesting, technical analysis, stock scanner, financial dashboard">
+    <meta name="author" content="FinDashIQ">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0a0e17">
+
+    <!-- Open Graph / Social Sharing Metadata -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="FinDashIQ | Quantitative AI Intelligence & Dynamic Terminal">
+    <meta property="og:description" content="Institutional-grade quantitative intelligence, backtesting simulation, and algorithmic indicators.">
+    <meta property="og:image" content="{{ url_for('static', filename='favicon.svg') }}">
+
+    <!-- Twitter Card Metadata -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="FinDashIQ | Quantitative AI Financial Terminal">
+    <meta name="twitter:description" content="Institutional-grade quantitative intelligence, backtesting simulation, and algorithmic indicators.">
+
+    <!-- Google Fonts (Optimized Non-Blocking Asynchronous Load with preconnect & display=swap) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    </noscript>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+
+    <!-- Custom CSS Stylesheet (with cache-busting versioning) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ asset_version }}">
+</head>
+
+<body>
+
+    <!-- Full-Screen Initial Login Screen (Visible when NOT logged in) -->
+    <div id="authScreen" class="auth-fullscreen-container" style="display: {{ 'none' if is_authenticated else 'flex' }};">
+        <div class="auth-card-institutional">
+            <div class="auth-card-header">
+                <div class="auth-card-logo">
+                    <i data-lucide="brain" style="width: 32px; height: 32px; color: #fff;"></i>
+                </div>
+                <h1 class="auth-card-title">FinDashIQ</h1>
+                <div class="auth-card-subtitle">Quantitative AI Financial Dashboard</div>
+            </div>
+
+            <div class="auth-card-body">
+                <div
+                    style="font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin-bottom: 20px; line-height: 1.5;">
+                    Enter your credentials to access quantitative indicators, AI intelligence, and personalized
+                    watchlists.
+                </div>
+
+                <form id="screenLoginForm" onsubmit="event.preventDefault(); handleLogin();">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem;">Username</label>
+                            <div style="position: relative;">
+                                <input type="text" id="loginUsername" class="form-input" placeholder="Your Username"
+                                    required autofocus autocomplete="username"
+                                    style="padding: 12px 14px; font-size: 0.9rem;">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="form-label" style="font-size: 0.8rem;">Password</label>
+                            <div style="position: relative;">
+                                <input type="password" id="loginPassword" class="form-input" placeholder="Your Password"
+                                    required autocomplete="current-password"
+                                    style="padding: 12px 14px; font-size: 0.9rem;">
+                            </div>
+                        </div>
+
+                        <!-- Status / Error Banner -->
+                        <div id="authStatusMessage"
+                            style="display: none; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 0.82rem;">
+                        </div>
+
+                        <button type="submit" id="btnLoginSubmit" class="btn-auth-submit"
+                            style="padding: 13px; font-size: 0.92rem; margin-top: 6px;">
+                            <i data-lucide="log-in" style="width: 18px;"></i> Sign In to Dashboard
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Auth Screen Legal Disclaimer & Impressum Trigger -->
+                <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle); text-align: center;">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 8px;">
+                        ⚠️ For educational and research purposes only. The creator assumes no liability for financial losses.
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="auth-legal-btn" onclick="openImpressumModal('impressum')">
+                            <i data-lucide="scale" style="width: 12px; height: 12px;"></i> Impressum
+                        </button>
+                        <span style="color: var(--border-medium); font-size: 0.7rem;">&bull;</span>
+                        <button type="button" class="auth-legal-btn" onclick="openImpressumModal('disclaimer')">
+                            <i data-lucide="shield-alert" style="width: 12px; height: 12px;"></i> Disclaimer
+                        </button>
+                        <span style="color: var(--border-medium); font-size: 0.7rem;">&bull;</span>
+                        <button type="button" class="auth-legal-btn" onclick="openImpressumModal('privacy')">
+                            <i data-lucide="lock" style="width: 12px; height: 12px;"></i> Privacy
+                        </button>
+                    </div>
+
+                    <!-- Creator Support / Official Donation Badges -->
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+                        <button type="button" class="auth-badge-btn" onclick="openKofiWidget()"
+                            title="Support with Ko-Fi">
+                            <img src="https://storage.ko-fi.com/cdn/kofi5.png" alt="Support with Ko-Fi" style="height: 28px; border-radius: 6px; display: block;">
+                        </button>
+                        <button type="button" class="auth-badge-btn" onclick="openBmacWidget()"
+                            title="Support on Buy Me a Coffee">
+                            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 28px; border-radius: 6px; display: block;">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application Workspace (Visible ONLY when logged in) -->
+    <div id="mainAppContainer" class="app-container" style="display: {{ 'block' if is_authenticated else 'none' }};">
+        <!-- Header -->
+        {% include 'components/header.html' %}
+
+        <!-- Top-Level Multi-Tab Navigation Bar -->
+        {% include 'components/top_nav.html' %}
+
+        <!-- Alert / Error Banner -->
+        <div id="errorAlert" class="alert-box alert-error"></div>
+
+        <!-- Loading State -->
+        <div id="loadingOverlay" class="loading-overlay glass-card">
+            <div class="spinner"></div>
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;">Synthesizing Quantitative AI
+                Intelligence...</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem;">Calculating SuperTrend, Stochastic, CMF, VWAP,
+                running backtests, and generating AI investment scenarios.</p>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TOP VIEW 1: WATCHLIST & RECOMMENDATION HUB (DEFAULT) -->
+        <!-- ========================================================= -->
+        {% include 'tabs/tab_watchlist.html' %}
+
+        <!-- ========================================================= -->
+        <!-- TOP VIEW 2: INDIVIDUAL STOCK DEEP-DIVE -->
+        <!-- ========================================================= -->
+        <div id="topView-terminal" class="top-view-pane">
+            <!-- Search Bar & Presets -->
+            {% include 'components/search_bar.html' %}
+
+            <!-- Dashboard Content Area -->
+            <div id="dashboardContent">
+                <!-- Stock Selector Bar & Hero Quote Banner -->
+                {% include 'components/stock_header.html' %}
+
+                <!-- Main Navigation Tabs Bar -->
+                {% include 'components/nav_tabs.html' %}
+
+                <!-- Sub-Tab 1: AI Financial Intelligence & News -->
+                {% include 'tabs/tab_ai.html' %}
+
+                <!-- Sub-Tab 2: Charts & Technical Oscillators -->
+                {% include 'tabs/tab_charts.html' %}
+
+                <!-- Sub-Tab 3: Strategy Backtesting & Simulation -->
+                {% include 'tabs/tab_backtest.html' %}
+
+                <!-- Sub-Tab 4: Fundamentals & Multi-Factor Consensus -->
+                {% include 'tabs/tab_fundamentals.html' %}
+            </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TOP VIEW 3: AI QUANTITATIVE STOCK SCANNER -->
+        <!-- ========================================================= -->
+        {% include 'tabs/tab_scanner.html' %}
+
+        <!-- ========================================================= -->
+        <!-- TOP VIEW 4: SIGNAL ALERTS & NOTIFICATIONS HUB -->
+        <!-- ========================================================= -->
+        {% include 'tabs/tab_notifications.html' %}
+
+        <!-- Global Persistent Footer -->
+        {% include 'components/footer.html' %}
+    </div>
+
+    <!-- Modals -->
+    {% include 'components/stock_search_modal.html' %}
+    {% include 'components/ai_modal.html' %}
+    {% include 'components/profile_modal.html' %}
+    {% include 'components/help_modal.html' %}
+    {% include 'components/impressum_modal.html' %}
+    {% include 'components/global_news_modal.html' %}
+
+    <!-- Direct Official Ko-fi Widget Overlay (Pure Official Embed) -->
+    <div id="kofiDirectOverlay" class="vendor-direct-overlay" style="display: none;">
+        <div class="vendor-direct-container">
+            <button type="button" class="vendor-direct-close-btn" onclick="closeKofiWidget()" title="Close Ko-fi">
+                &times;
+            </button>
+            <iframe id="kofiOfficialFrame"
+                src="about:blank"
+                data-src="https://ko-fi.com/theyareme/?hidefeed=true&widget=true&embed=true"
+                class="vendor-direct-iframe"
+                title="Ko-fi Widget">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Direct Official Buy Me a Coffee Widget Overlay (Pure Official Embed) -->
+    <div id="bmacDirectOverlay" class="vendor-direct-overlay" style="display: none;">
+        <div class="vendor-direct-container bmac-container">
+            <button type="button" class="vendor-direct-close-btn" onclick="closeBmacWidget()" title="Close Buy Me a Coffee">
+                &times;
+            </button>
+            <iframe id="bmacOfficialFrame"
+                src="about:blank"
+                data-src="https://www.buymeacoffee.com/widget/page/theyareme?custom_height=560&color=%23f59e0b"
+                class="vendor-direct-iframe"
+                title="Buy Me a Coffee Widget">
+            </iframe>
+        </div>
+    </div>
+
+    <!-- Server-Hydrated Auth Bootstrap State -->
+    <script>
+        window.__INITIAL_AUTH__ = {{ 'true' if is_authenticated else 'false' }};
+        window.__INITIAL_USER__ = {{ user | tojson | safe if user else 'null' }};
+    </script>
+
+    <!-- Lucide Icons (Deferred Non-Blocking Load) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Application Logic (with cache-busting versioning) -->
+    <script src="{{ url_for('static', filename='js/app.js') }}?v={{ asset_version }}"></script>
+
+</body>
+
+</html>

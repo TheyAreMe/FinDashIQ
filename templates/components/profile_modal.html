@@ -1,0 +1,246 @@
+<!-- User Profile & Account Management Modal -->
+<div id="profileModal" class="modal-overlay">
+    <div class="modal-card profile-modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div id="profileModalAvatarIcon" class="profile-avatar-large">
+                    <i data-lucide="user" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h2 id="profileModalDisplayName" class="profile-modal-title">Lead Administrator</h2>
+                        <span id="profileModalRoleBadge" class="badge-pill badge-bullish"
+                            style="font-size: 0.68rem;">ADMIN</span>
+                    </div>
+                    <div id="profileModalUsernameSub" style="font-size: 0.76rem; color: var(--text-muted);">@admin</div>
+                </div>
+            </div>
+            <button type="button" onclick="closeProfileModal()"
+                style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <!-- Profile Navigation Tabs -->
+        <div class="profile-tabs-header">
+            <button type="button" id="tabBtnProfileDetails" class="profile-tab-btn active"
+                onclick="switchProfileModalTab('details')">
+                <i data-lucide="user-check" style="width: 14px;"></i> Profile &amp; Preferences
+            </button>
+            <button type="button" id="tabBtnProfileSecurity" class="profile-tab-btn"
+                onclick="switchProfileModalTab('security')">
+                <i data-lucide="key" style="width: 14px;"></i> Password &amp; Security
+            </button>
+            <button type="button" id="tabBtnProfileUsers" class="profile-tab-btn admin-only-tab"
+                onclick="switchProfileModalTab('users')" style="display: none;">
+                <i data-lucide="users" style="width: 14px;"></i> User Management
+            </button>
+        </div>
+
+        <!-- Status Message Banner -->
+        <div id="profileStatusMessage"
+            style="display: none; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 0.82rem; margin-bottom: 16px;">
+        </div>
+
+        <!-- TAB 1: Profile & Preferences -->
+        <div id="profileTabPaneDetails" class="profile-tab-pane active">
+            <form id="updateProfileForm" onsubmit="event.preventDefault(); handleUpdateProfile();">
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="form-grid-2">
+                        <div>
+                            <label class="form-label">Display Name</label>
+                            <input type="text" id="profileInputDisplayName" class="form-input"
+                                placeholder="e.g. Lead Analyst">
+                        </div>
+                        <div>
+                            <label class="form-label">Email Address</label>
+                            <input type="email" id="profileInputEmail" class="form-input"
+                                placeholder="analyst@domain.com">
+                        </div>
+                    </div>
+
+                    <div class="form-grid-3">
+                        <div>
+                            <label class="form-label">Investment Risk Tolerance</label>
+                            <select id="profileSelectRisk" class="form-select">
+                                <option value="Conservative">Conservative (Capital Preservation Focus)</option>
+                                <option value="Balanced" selected>Balanced (Growth &amp; Risk Managed)</option>
+                                <option value="Aggressive Quant">Aggressive Quant (High Momentum &amp; Alpha)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Base Reporting Currency</label>
+                            <select id="profileSelectCurrency" class="form-select">
+                                <option value="USD" selected>USD ($) — US Dollar</option>
+                                <option value="EUR">EUR (€) — Euro</option>
+                                <option value="GBP">GBP (£) — British Pound</option>
+                                <option value="CHF">CHF (Fr) — Swiss Franc</option>
+                                <option value="NOK">NOK (kr) — Norwegian Krone</option>
+                                <option value="JPY">JPY (¥) — Japanese Yen</option>
+                                <option value="CAD">CAD (C$) — Canadian Dollar</option>
+                                <option value="AUD">AUD (A$) — Australian Dollar</option>
+                                <option value="SEK">SEK (kr) — Swedish Krona</option>
+                                <option value="DKK">DKK (kr) — Danish Krone</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Theme Mode</label>
+                            <select id="profileSelectTheme" class="form-select">
+                                <option value="dark" selected>🌙 Dark Mode (Default)</option>
+                                <option value="bright">☀️ Bright Mode</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Avatar Icon</label>
+                        <div class="avatar-selection-grid">
+                            <label class="avatar-option">
+                                <input type="radio" name="avatarIcon" value="shield" checked>
+                                <div class="avatar-option-icon"><i data-lucide="shield"></i></div>
+                            </label>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatarIcon" value="brain">
+                                <div class="avatar-option-icon"><i data-lucide="brain"></i></div>
+                            </label>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatarIcon" value="trending-up">
+                                <div class="avatar-option-icon"><i data-lucide="trending-up"></i></div>
+                            </label>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatarIcon" value="user">
+                                <div class="avatar-option-icon"><i data-lucide="user"></i></div>
+                            </label>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatarIcon" value="cpu">
+                                <div class="avatar-option-icon"><i data-lucide="cpu"></i></div>
+                            </label>
+                            <label class="avatar-option">
+                                <input type="radio" name="avatarIcon" value="zap">
+                                <div class="avatar-option-icon"><i data-lucide="zap"></i></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                        <button type="submit" class="btn-watchlist-add" style="padding: 9px 20px;">
+                            <i data-lucide="save" style="width: 15px;"></i> Save Preferences
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB 2: Password & Security -->
+        <div id="profileTabPaneSecurity" class="profile-tab-pane">
+            <form id="changePasswordForm" onsubmit="event.preventDefault(); handleChangePassword();">
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div>
+                        <label class="form-label">Current Password</label>
+                        <input type="password" id="passInputCurrent" class="form-input"
+                            placeholder="Enter current password" required autocomplete="current-password">
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div>
+                            <label class="form-label">New Password</label>
+                            <input type="password" id="passInputNew" class="form-input"
+                                placeholder="At least 4 characters" required autocomplete="new-password">
+                        </div>
+                        <div>
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" id="passInputConfirm" class="form-input"
+                                placeholder="Confirm new password" required autocomplete="new-password">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                        <button type="submit" class="btn-watchlist-add" style="padding: 9px 20px;">
+                            <i data-lucide="lock" style="width: 15px;"></i> Update Password
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB 3: Admin User Management (Visible Only to Admins) -->
+        <div id="profileTabPaneUsers" class="profile-tab-pane">
+            <div style="display: flex; flex-direction: column; gap: 18px;">
+                <!-- Create New User Box -->
+                <div
+                    style="background: var(--bg-card-hover); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 16px;">
+                    <div
+                        style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="user-plus" style="width: 16px; color: var(--accent-purple);"></i>
+                        Create New User Account
+                    </div>
+
+                    <form id="adminCreateUserForm" onsubmit="event.preventDefault(); handleAdminCreateUser();">
+                        <div class="form-grid-4">
+                            <div>
+                                <label class="form-label">Username</label>
+                                <input type="text" id="newAccUsername" class="form-input" placeholder="e.g. john_doe"
+                                    required>
+                            </div>
+                            <div>
+                                <label class="form-label">Initial Password</label>
+                                <input type="password" id="newAccPassword" class="form-input"
+                                    placeholder="Temporary password" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Display Name</label>
+                                <input type="text" id="newAccDisplayName" class="form-input"
+                                    placeholder="e.g. John Doe">
+                            </div>
+                            <div>
+                                <label class="form-label">Role</label>
+                                <select id="newAccRole" class="form-select">
+                                    <option value="user" selected>Standard User</option>
+                                    <option value="admin">Administrator</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+                            <button type="submit" class="btn-watchlist-add" style="padding: 8px 16px;">
+                                <i data-lucide="plus" style="width: 14px;"></i> Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Existing Users Directory Table -->
+                <div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div
+                            style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="users" style="width: 16px; color: var(--accent-blue);"></i>
+                            Registered Accounts Directory
+                        </div>
+                        <button type="button" class="btn-watchlist-refresh" onclick="loadAdminUsersList()"
+                            style="padding: 4px 10px; font-size: 0.72rem;">
+                            <i data-lucide="refresh-cw" style="width: 12px;"></i> Refresh
+                        </button>
+                    </div>
+
+                    <div class="user-directory-table-wrapper">
+                        <table class="user-directory-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Display Name</th>
+                                    <th>Role</th>
+                                    <th>Created</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUsersTableBody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

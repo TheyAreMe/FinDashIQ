@@ -1,0 +1,106 @@
+<!-- ========================================================= -->
+<!-- TAB 3: STRATEGY BACKTESTING & SIMULATION -->
+<!-- ========================================================= -->
+<div id="tabPane-backtest" class="tab-pane">
+    <div class="glass-card backtest-section">
+        <div class="backtest-header">
+            <div>
+                <div class="card-header-title">
+                    <i data-lucide="play-circle" style="color: var(--accent-cyan); width: 22px; height: 22px;"></i>
+                    <div>
+                        <span>Indicator Strategy Backtesting & Order Execution Simulation</span>
+                        <div id="backtestSubtitle" style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 500; margin-top: 1px;"></div>
+                    </div>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
+                    Simulation of following indicator-generated <strong>BUY</strong>, <strong>SELL</strong>, and <strong>HOLD</strong> orders over the selected historical period.
+                </div>
+            </div>
+
+            <!-- Strategy & Capital Controls -->
+            <div class="control-group">
+                <span class="control-label">Strategy:</span>
+                <button type="button" id="stratQuantBtn" class="btn-toggle active" onclick="setBacktestStrategy('quant')">
+                    <i data-lucide="sparkles" style="width: 13px;"></i> Multi-Factor Quant
+                </button>
+                <button type="button" id="stratSuperBtn" class="btn-toggle" onclick="setBacktestStrategy('supertrend')">
+                    <i data-lucide="trending-up" style="width: 13px;"></i> SuperTrend
+                </button>
+                <button type="button" id="stratMomBtn" class="btn-toggle" onclick="setBacktestStrategy('momentum')">
+                    <i data-lucide="zap" style="width: 13px;"></i> MACD + RSI
+                </button>
+            </div>
+        </div>
+
+        <!-- Performance Scorecards Ribbon -->
+        <div class="backtest-score-grid">
+            <div class="score-card">
+                <span class="score-label">Strategy Return vs Benchmark</span>
+                <span id="btReturnVal" class="score-value mono" style="color: var(--accent-green);">+0.00%</span>
+                <span id="btBenchVal" class="score-sub mono">Buy & Hold: +0.00% (Alpha: +0.00%)</span>
+            </div>
+
+            <div class="score-card">
+                <span class="score-label">Portfolio Growth ($10k Start)</span>
+                <span id="btCapitalVal" class="score-value mono">$10,000.00</span>
+                <span id="btHoldingStatus" class="score-sub">Position: In Cash</span>
+            </div>
+
+            <div class="score-card">
+                <span class="score-label">Win Rate & Trades</span>
+                <span id="btWinRateVal" class="score-value mono">0.0%</span>
+                <span id="btTradesCount" class="score-sub">0 Closed Trades (0 Wins / 0 Losses)</span>
+            </div>
+
+            <div class="score-card">
+                <span class="score-label">Risk & Profit Factor</span>
+                <span id="btProfitFactor" class="score-value mono">0.0x</span>
+                <span id="btMaxDrawdown" class="score-sub mono">Max Drawdown: 0.00%</span>
+            </div>
+        </div>
+
+        <!-- Equity Curve Comparison Chart -->
+        <div style="padding: 20px 24px 10px 24px;">
+            <div class="chart-box-header">
+                <div class="chart-title">
+                    <i data-lucide="trending-up" style="color: var(--accent-green);"></i>
+                    <span>Equity Curve: Strategy Portfolio Growth vs Buy & Hold Benchmark</span>
+                </div>
+                <div class="chart-legend-custom">
+                    <span class="legend-item"><span class="indicator-dot" style="background: #10b981;"></span> Strategy Equity</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #64748b;"></span> Buy & Hold Benchmark</span>
+                </div>
+            </div>
+            <div id="equityChartContainer"></div>
+        </div>
+
+        <!-- Executed Orders History Table -->
+        <div class="card-header-styled" style="border-top: 1px solid var(--border-subtle);">
+            <div class="card-header-title" style="font-size: 0.95rem;">
+                <i data-lucide="list" style="color: var(--accent-blue);"></i>
+                <span>Simulated Order Execution & Trade Log</span>
+            </div>
+            <span id="totalOrdersBadge" class="badge-pill badge-neutral">0 Orders</span>
+        </div>
+
+        <div class="trades-table-container">
+            <table class="trades-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Action</th>
+                        <th>Date</th>
+                        <th>Execution Price</th>
+                        <th>Trade PnL ($)</th>
+                        <th>Trade Return (%)</th>
+                        <th>Portfolio Capital</th>
+                        <th>Indicator Trigger Reason</th>
+                    </tr>
+                </thead>
+                <tbody id="tradesTableBody">
+                    <!-- Injected dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

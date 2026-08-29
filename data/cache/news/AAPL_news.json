@@ -1,0 +1,104 @@
+{
+  "timestamp": 1788019187.7563176,
+  "ticker": "AAPL",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Tim Cook wasn't a 'product guy' - so he re-engineered Apple instead",
+      "summary": "",
+      "url": "https://www.marketwatch.com/story/tim-cook-wasnt-a-product-guy-so-he-re-engineered-apple-instead-03ca53f4?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Today 08:30AM",
+      "timestamp": 1788019189,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Apple implements price hikes for its TV streaming service and 'One' subscription bundle",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/5cbf94c9-41e3-3158-beb5-cdd15d235bf7/apple-implements-price-hikes.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 10:09PM",
+      "timestamp": 1788019189,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Apple Makes Costly Move Subscribers Won't Miss",
+      "summary": "",
+      "url": "https://finance.yahoo.com/media-advertising/articles/apple-makes-costly-move-subscribers-222454691.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:24PM",
+      "timestamp": 1788019189,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "How Much Upside Can AAPL Stock's Growth Deliver?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/f71ad446-1f7b-3fd7-9a31-767c245e765e/how-much-upside-can-aapl.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "05:53PM",
+      "timestamp": 1788019189,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Apple's Mac Is 'Hostile' to AI Agents, Legendary Coder Warns: Could It Hurt Apple's AI Future?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/c8ae92b2-b298-3382-adb5-057d26c9ee21/apple%27s-mac-is-%27hostile%27-to.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "02:04PM",
+      "timestamp": 1788019189,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Apple TV+ price increase to $14.99 per month in 2026",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/c08a4b67-85ae-31b5-bdd4-a391cc1c1a0f/apple-tv%2B-price-increase-to.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:48PM",
+      "timestamp": 1788019189,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Apple is hiking its streaming service subscription price to $14.99 a month",
+      "summary": "",
+      "url": "https://qz.com/apple-tv-streaming-price-hike-1499-082826",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:48PM",
+      "timestamp": 1788019189,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Apple Just Raised the Price of Streaming Again",
+      "summary": "",
+      "url": "https://finance.yahoo.com/media-advertising/articles/apple-just-raised-price-streaming-174551981.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:45PM",
+      "timestamp": 1788019189,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

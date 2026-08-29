@@ -1,0 +1,28 @@
+<!-- Top-Level Multi-Tab Navigation Bar -->
+<div class="top-nav-container">
+    <div class="top-nav-bar">
+        <button type="button" class="top-nav-btn active" data-top-tab="watchlist" onclick="switchTopTab('watchlist')">
+            <i data-lucide="layout-grid" style="width: 17px; height: 17px;"></i>
+            <span>Watchlist</span>
+            <span id="topWatchlistCount" class="top-badge">7 Stocks</span>
+        </button>
+
+        <button type="button" class="top-nav-btn" data-top-tab="terminal" onclick="switchTopTab('terminal')">
+            <i data-lucide="search" style="width: 17px; height: 17px;"></i>
+            <span>Stock Deep-Dive</span>
+            <span class="top-badge" style="background: rgba(139, 92, 246, 0.2); color: #c084fc;">Detailed Analysis</span>
+        </button>
+
+        <button type="button" class="top-nav-btn" data-top-tab="scanner" onclick="switchTopTab('scanner')">
+            <i data-lucide="radar" style="width: 17px; height: 17px;"></i>
+            <span>Stock Scanner</span>
+            <span id="topScannerBadge" class="top-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">Discover</span>
+        </button>
+
+        <button type="button" class="top-nav-btn" data-top-tab="notifications" onclick="switchTopTab('notifications')">
+            <i data-lucide="bell-ring" style="width: 17px; height: 17px;"></i>
+            <span>Signal Alerts</span>
+            <span id="topAlertsCount" class="top-badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">3 Active</span>
+        </button>
+    </div>
+</div>

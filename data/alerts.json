@@ -1,0 +1,35 @@
+[
+  {
+    "id": "alert-1787507337245",
+    "ticker": "NVDA",
+    "signalType": "supertrend_bull",
+    "signalName": "SuperTrend Bullish Flip",
+    "category": "Trend & Volatility",
+    "condition": "direction_flip",
+    "threshold": "Bullish Uptrend Confirmation",
+    "channel": "Telegram Bot",
+    "channelTarget": "@quant_trader",
+    "active": true,
+    "createdAt": "2026-08-23T19:48:57.245246"
+  },
+  {
+    "id": "alert-1",
+    "ticker": "NVDA",
+    "signalType": "supertrend",
+    "condition": "direction_flip",
+    "threshold": "Bullish Uptrend",
+    "channel": "Telegram Bot & Browser Alert",
+    "active": true,
+    "createdAt": "2026-08-23T10:00:00Z"
+  },
+  {
+    "id": "alert-2",
+    "ticker": "MSFT",
+    "signalType": "conviction",
+    "condition": "greater_than",
+    "threshold": "80%",
+    "channel": "Email Notification",
+    "active": true,
+    "createdAt": "2026-08-23T10:15:00Z"
+  }
+]

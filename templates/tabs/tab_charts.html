@@ -1,0 +1,154 @@
+<!-- ========================================================= -->
+<!-- TAB 2: CHARTS & TECHNICAL OSCILLATORS -->
+<!-- ========================================================= -->
+<div id="tabPane-charts" class="tab-pane">
+    <!-- Chart Controls Tooling Bar -->
+    <div class="glass-card chart-controls-bar">
+        <!-- Timeframe Selector -->
+        <div class="control-group">
+            <span class="control-label">Period:</span>
+            <button type="button" class="btn-toggle" data-period="1mo" onclick="setTimeframe('1mo')">1M</button>
+            <button type="button" class="btn-toggle" data-period="3mo" onclick="setTimeframe('3mo')">3M</button>
+            <button type="button" class="btn-toggle active" data-period="6mo" onclick="setTimeframe('6mo')">6M</button>
+            <button type="button" class="btn-toggle" data-period="1y" onclick="setTimeframe('1y')">1Y</button>
+            <button type="button" class="btn-toggle" data-period="2y" onclick="setTimeframe('2y')">2Y</button>
+            <button type="button" class="btn-toggle" data-period="5y" onclick="setTimeframe('5y')">5Y</button>
+            <button type="button" class="btn-toggle" data-period="max" onclick="setTimeframe('max')">MAX</button>
+        </div>
+
+        <!-- Chart Type Selector -->
+        <div class="control-group">
+            <span class="control-label">Type:</span>
+            <button type="button" id="typeCandleBtn" class="btn-toggle active" onclick="setChartType('candlestick')">
+                <i data-lucide="candlestick-chart" style="width: 14px;"></i> Candles
+            </button>
+            <button type="button" id="typeLineBtn" class="btn-toggle" onclick="setChartType('area')">
+                <i data-lucide="line-chart" style="width: 14px;"></i> Line / Area
+            </button>
+        </div>
+
+        <!-- Indicator Overlay Toggles -->
+        <div class="control-group">
+            <span class="control-label">Overlays:</span>
+            <button type="button" id="toggleSuperTrend" class="btn-indicator active" onclick="toggleOverlay('superTrend')" style="color: #10b981;">
+                <span class="indicator-dot" style="background: #10b981;"></span> SuperTrend (10,3)
+            </button>
+            <button type="button" id="toggleSMA20" class="btn-indicator active" onclick="toggleOverlay('sma20')" style="color: #06b6d4;">
+                <span class="indicator-dot" style="background: #06b6d4;"></span> SMA 20
+            </button>
+            <button type="button" id="toggleSMA50" class="btn-indicator active" onclick="toggleOverlay('sma50')" style="color: #f59e0b;">
+                <span class="indicator-dot" style="background: #f59e0b;"></span> SMA 50
+            </button>
+            <button type="button" id="toggleVWAP" class="btn-indicator active" onclick="toggleOverlay('vwap')" style="color: #8b5cf6;">
+                <span class="indicator-dot" style="background: #8b5cf6;"></span> VWAP
+            </button>
+            <button type="button" id="toggleBB" class="btn-indicator active" onclick="toggleOverlay('bb')" style="color: #38bdf8;">
+                <span class="indicator-dot" style="background: #38bdf8;"></span> Bollinger Bands
+            </button>
+            <button type="button" id="toggleKC" class="btn-indicator" onclick="toggleOverlay('kc')" style="color: #ec4899;">
+                <span class="indicator-dot" style="background: #ec4899;"></span> Keltner Channels
+            </button>
+        </div>
+    </div>
+
+    <!-- Dynamic Chart Area -->
+    <div class="chart-section">
+        <!-- Primary Price & Overlay Chart -->
+        <div class="glass-card chart-box">
+            <!-- Loading Indicator Overlay -->
+            <div id="chartLoadingOverlay" class="chart-loading-overlay" style="display: none;">
+                <div class="chart-loading-spinner-box">
+                    <div class="chart-spinner-ring"></div>
+                    <div class="chart-loading-text">
+                        <span id="chartLoadingTimeframe" class="chart-loading-title">Loading Chart Data...</span>
+                        <span class="chart-loading-subtext">Fetching historical bars & calculating quantitative overlays</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-box-header">
+                <div class="chart-title">
+                    <i data-lucide="bar-chart-2" style="color: var(--accent-blue);"></i>
+                    <div>
+                        <span id="mainChartTitle">Price Action & Quantitative Overlays</span>
+                        <div id="mainChartSubtitle" style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 500; margin-top: 1px;"></div>
+                    </div>
+                </div>
+                <div class="chart-legend-custom">
+                    <span class="legend-item"><span class="indicator-dot" style="background: #10b981;"></span> SuperTrend Bull</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #ef4444;"></span> SuperTrend Bear</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #8b5cf6;"></span> VWAP</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #06b6d4;"></span> SMA 20</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #f59e0b;"></span> SMA 50</span>
+                </div>
+            </div>
+            <div id="primaryChartContainer"></div>
+        </div>
+
+        <!-- Sub-Chart 1: Stochastic Oscillator (14, 3, 3) -->
+        <div class="glass-card sub-chart-box">
+            <div class="chart-box-header">
+                <div class="chart-title">
+                    <i data-lucide="activity" style="color: var(--accent-cyan);"></i>
+                    <span>Stochastic Oscillator (14, 3, 3)</span>
+                </div>
+                <div class="chart-legend-custom">
+                    <span class="legend-item"><span class="indicator-dot" style="background: #06b6d4;"></span> %K Fast Line</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #f59e0b;"></span> %D Trigger Line</span>
+                    <span class="legend-item" style="color: var(--accent-red); font-weight: 600;">Overbought &gt; 80</span>
+                    <span class="legend-item" style="color: var(--accent-green); font-weight: 600;">Oversold &lt; 20</span>
+                    <span class="legend-item" id="currentStochLabel" style="font-weight: 700; color: var(--text-primary);">Stoch: --</span>
+                </div>
+            </div>
+            <div id="stochChartContainer"></div>
+        </div>
+
+        <!-- Sub-Chart 2: RSI (14) -->
+        <div class="glass-card sub-chart-box">
+            <div class="chart-box-header">
+                <div class="chart-title">
+                    <i data-lucide="gauge" style="color: var(--accent-purple);"></i>
+                    <span>Relative Strength Index (RSI 14)</span>
+                </div>
+                <div class="chart-legend-custom">
+                    <span class="legend-item" style="color: var(--accent-red); font-weight: 600;">Overbought &gt; 70</span>
+                    <span class="legend-item" style="color: var(--accent-green); font-weight: 600;">Oversold &lt; 30</span>
+                    <span class="legend-item" id="currentRsiLabel" style="font-weight: 700; color: var(--text-primary);">RSI: --</span>
+                </div>
+            </div>
+            <div id="rsiChartContainer"></div>
+        </div>
+
+        <!-- Sub-Chart 3: MACD (12, 26, 9) -->
+        <div class="glass-card sub-chart-box">
+            <div class="chart-box-header">
+                <div class="chart-title">
+                    <i data-lucide="git-commit" style="color: var(--accent-blue);"></i>
+                    <span>MACD Momentum (12, 26, 9)</span>
+                </div>
+                <div class="chart-legend-custom">
+                    <span class="legend-item"><span class="indicator-dot" style="background: #3b82f6;"></span> MACD Line</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #f97316;"></span> Signal Line</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #10b981;"></span> Momentum Histogram</span>
+                </div>
+            </div>
+            <div id="macdChartContainer"></div>
+        </div>
+
+        <!-- Sub-Chart 4: Chaikin Money Flow (CMF 20) -->
+        <div class="glass-card sub-chart-box">
+            <div class="chart-box-header">
+                <div class="chart-title">
+                    <i data-lucide="bar-chart" style="color: var(--accent-green);"></i>
+                    <span>Chaikin Money Flow (CMF 20) - Institutional Accumulation / Distribution</span>
+                </div>
+                <div class="chart-legend-custom">
+                    <span class="legend-item"><span class="indicator-dot" style="background: #10b981;"></span> Net Inflow (&gt; 0)</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #ef4444;"></span> Net Outflow (&lt; 0)</span>
+                    <span class="legend-item" id="currentCmfLabel" style="font-weight: 700; color: var(--text-primary);">CMF: --</span>
+                </div>
+            </div>
+            <div id="cmfChartContainer"></div>
+        </div>
+    </div>
+</div>

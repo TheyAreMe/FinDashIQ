@@ -1,0 +1,41 @@
+<!-- Header -->
+<header>
+    <div class="logo-area" onclick="switchTopTab('watchlist')" title="Return to Watchlist Hub">
+        <div class="logo-icon">
+            <i data-lucide="brain"></i>
+        </div>
+        <div>
+            <h1 class="logo-title">FinDashIQ</h1>
+            <div class="logo-subtitle">Quantitative AI Financial Intelligence & Dynamic Dashboard</div>
+        </div>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+        <!-- Quick Currency Selector (Commented out)
+        <div class="header-currency-container">
+            <i data-lucide="globe" style="width: 14px; height: 14px; color: var(--accent-blue);"></i>
+            <select id="headerCurrencySelect" class="header-currency-select" onchange="handleCurrencyChange(this.value)" title="Change Base Currency">
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="CHF">CHF (Fr.)</option>
+                <option value="NOK">NOK (kr)</option>
+                <option value="JPY">JPY (¥)</option>
+                <option value="CAD">CAD (C$)</option>
+                <option value="AUD">AUD (A$)</option>
+                <option value="SEK">SEK (kr)</option>
+                <option value="DKK">DKK (kr)</option>
+            </select>
+        </div>
+        -->
+
+        <div id="headerAIBadge" class="live-badge">
+            <span class="live-dot"></span>
+            <span id="headerAIBadgeText">No AI models active</span>
+        </div>
+
+        <!-- User Profile & Auth Trigger Container -->
+        <div id="headerUserContainer" class="user-header-container">
+            <!-- Dynamically rendered by app.js: Logged in avatar / dropdown or Sign In button -->
+        </div>
+    </div>
+</header>

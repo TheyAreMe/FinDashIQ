@@ -1,0 +1,57 @@
+<!-- Authentication Modal (Sign In) -->
+<div id="authModal" class="modal-overlay">
+    <div class="modal-card auth-modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <div
+                style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.15rem; color: #fff;">
+                <div class="auth-icon-badge">
+                    <i data-lucide="lock" style="width: 18px; height: 18px; color: #fff;"></i>
+                </div>
+                <span>FinDashIQ Access</span>
+            </div>
+            <button type="button" onclick="closeAuthModal()"
+                style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+            Sign in to access your private quantitative watchlists, customized alert triggers, and AI intelligence
+            configurations.
+        </p>
+
+        <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label class="form-label">Username</label>
+                    <div style="position: relative;">
+                        <input type="text" id="loginUsername" class="form-input" placeholder="Your Username" required
+                            autofocus autocomplete="username">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Password</label>
+                    <div style="position: relative;">
+                        <input type="password" id="loginPassword" class="form-input" placeholder="Your Password"
+                            required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <!-- Error / Status Message -->
+                <div id="authStatusMessage"
+                    style="display: none; padding: 9px 12px; border-radius: var(--radius-sm); font-size: 0.8rem; margin-top: 4px;">
+                </div>
+
+                <button type="submit" id="btnLoginSubmit" class="btn-auth-submit" style="margin-top: 8px;">
+                    <i data-lucide="log-in" style="width: 16px;"></i> Sign-In to the Dashboard
+                </button>
+            </div>
+        </form>
+
+        <div
+            style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle); font-size: 0.76rem; color: var(--text-muted); text-align: center;">
+            <span>🔒 Secure Session Authentication • Authorized Access Only</span>
+        </div>
+    </div>
+</div>

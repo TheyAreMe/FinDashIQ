@@ -1,0 +1,63 @@
+<!-- Main Navigation Tabs Bar -->
+<div class="glass-card main-navigation-tabs-container">
+    <!-- Desktop Horizontal Subtab Bar (Big Screens) -->
+    <div class="nav-tabs-wrapper">
+        <button type="button" class="nav-tab-btn active" data-tab="ai" onclick="switchMainTab('ai')">
+            <i data-lucide="sparkles"></i>
+            <span>AI Intelligence</span>
+            <span id="tabBadgeAI" class="tab-mini-badge badge-bullish">--%</span>
+        </button>
+        <button type="button" class="nav-tab-btn" data-tab="charts" onclick="switchMainTab('charts')">
+            <i data-lucide="line-chart"></i>
+            <span>Charts & Technicals</span>
+        </button>
+        <button type="button" class="nav-tab-btn" data-tab="backtest" onclick="switchMainTab('backtest')">
+            <i data-lucide="play-circle"></i>
+            <span>Backtesting & Strategy</span>
+            <span id="tabBadgeBacktest" class="tab-mini-badge badge-bullish">+0.0%</span>
+        </button>
+        <button type="button" class="nav-tab-btn" data-tab="fundamentals" onclick="switchMainTab('fundamentals')">
+            <i data-lucide="layers"></i>
+            <span>Fundamentals & Consensus</span>
+            <span id="tabBadgeSignals" class="tab-mini-badge badge-neutral">Neutral</span>
+        </button>
+    </div>
+
+    <!-- Mobile Custom Dropdown Menu (Small Screens) -->
+    <div class="nav-tabs-dropdown-wrapper">
+        <div class="custom-tab-dropdown" id="mobileCustomTabDropdown">
+            <button type="button" class="custom-tab-dropdown-btn" id="mobileCustomTabDropdownBtn" onclick="toggleMobileSubtabMenu(event)">
+                <div class="custom-tab-btn-left">
+                    <i id="mobileActiveTabIcon" data-lucide="sparkles" class="mobile-tab-icon"></i>
+                    <span id="mobileActiveTabLabel" class="mobile-tab-label">AI Intelligence</span>
+                </div>
+                <div class="custom-tab-btn-right">
+                    <i data-lucide="chevron-down" id="mobileActiveTabArrow" class="mobile-tab-arrow"></i>
+                </div>
+            </button>
+            <div class="custom-tab-dropdown-menu" id="mobileCustomTabMenu">
+                <button type="button" class="custom-tab-dropdown-item active" data-tab="ai" onclick="selectMobileSubtab('ai')">
+                    <i data-lucide="sparkles" class="tab-item-icon tab-icon-ai"></i>
+                    <span class="tab-item-text">AI Intelligence</span>
+                    <span id="mobileBadgeAI" class="tab-mini-badge badge-bullish" style="margin-left: auto;">--%</span>
+                </button>
+                <button type="button" class="custom-tab-dropdown-item" data-tab="charts" onclick="selectMobileSubtab('charts')">
+                    <i data-lucide="line-chart" class="tab-item-icon tab-icon-charts"></i>
+                    <span class="tab-item-text">Charts &amp; Technicals</span>
+                </button>
+                <button type="button" class="custom-tab-dropdown-item" data-tab="backtest" onclick="selectMobileSubtab('backtest')">
+                    <i data-lucide="play-circle" class="tab-item-icon tab-icon-backtest"></i>
+                    <span class="tab-item-text">Backtesting &amp; Strategy</span>
+                    <span id="mobileBadgeBacktest" class="tab-mini-badge badge-bullish" style="margin-left: auto;">+0.0%</span>
+                </button>
+                <button type="button" class="custom-tab-dropdown-item" data-tab="fundamentals" onclick="selectMobileSubtab('fundamentals')">
+                    <i data-lucide="layers" class="tab-item-icon tab-icon-fundamentals"></i>
+                    <span class="tab-item-text">Fundamentals &amp; Consensus</span>
+                    <span id="mobileBadgeSignals" class="tab-mini-badge badge-neutral" style="margin-left: auto;">Neutral</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,72 @@
+{
+  "admin": {
+    "username": "admin",
+    "passwordHash": "scrypt:32768:8:1$pN5dqnLObndn0TqW$c48550cf9773efa9a205a77493a52710d9e07103c8939e01d00f98aa99476113965a0534735140adb6d24ce19a016ac0b23e2dbe5a0c30fee8625b1904596799",
+    "role": "admin",
+    "displayName": "Administrator",
+    "email": "admin@findashiq.internal",
+    "avatar": "shield",
+    "riskProfile": "Aggressive Quant",
+    "baseCurrency": "USD",
+    "createdAt": "2026-08-23T14:35:26.286702",
+    "watchlist": [
+      "NVDA",
+      "MSFT",
+      "IFX.DE",
+      "TSM",
+      "SPCX",
+      "EXXT.DE",
+      "XDWT.DE",
+      "NEL.OL"
+    ],
+    "alerts": [],
+    "aiSettings": {
+      "apiKey": "",
+      "model": "gemini-3.7-flash"
+    },
+    "theme": "dark",
+    "watchlistViewMode": "cards"
+  },
+  "user": {
+    "username": "user",
+    "passwordHash": "scrypt:32768:8:1$QfIRXe0G2iZa6RTz$2c8aa4120bf916656bb8aa810ee3d7ac0d4c95225dba708ef3524b4cba253445c334d6ea4a6f4cd50c3e40e35573ba025ffaae38d6637c43b34a5c850131013e",
+    "role": "user",
+    "displayName": "user",
+    "email": "usermail@googlemail.com",
+    "avatar": "user",
+    "riskProfile": "Balanced",
+    "baseCurrency": "USD",
+    "createdAt": "2026-08-23T14:38:06.884755",
+    "watchlist": [
+      "NVDA",
+      "MSFT",
+      "IFX.DE",
+      "TSM",
+      "SPCX",
+      "EXXT.DE",
+      "XDWT.DE",
+      "NEL.OL"
+    ],
+    "alerts": [
+      {
+        "id": "alert-1788014520516",
+        "ticker": "NVDA",
+        "signalType": "supertrend_bull",
+        "signalName": "SuperTrend Direction Flip \u2794 Bullish Uptrend",
+        "category": "Trend & Volatility",
+        "condition": "direction_flip",
+        "threshold": "Bullish Uptrend Confirmation",
+        "channel": "Telegram Bot",
+        "channelTarget": "@quant_desk",
+        "active": true,
+        "createdAt": "2026-08-29T16:42:00.516143"
+      }
+    ],
+    "aiSettings": {
+      "apiKey": "",
+      "model": "gemini-3.7-flash"
+    },
+    "theme": "bright",
+    "watchlistViewMode": "cards"
+  }
+}

@@ -1,0 +1,264 @@
+<!-- ========================================================= -->
+<!-- TAB 1: AI FINANCIAL INTELLIGENCE & CONVICTION HUB -->
+<!-- ========================================================= -->
+<div id="tabPane-ai" class="tab-pane active">
+    <div class="ai-tab-layout">
+        <!-- Main Left Column: Thesis, Trade Matrix, Scenarios, Copilot -->
+        <div class="ai-tab-main">
+            <div class="glass-card ai-section">
+                <div class="ai-header">
+                    <div class="card-header-title">
+                        <i data-lucide="sparkles" style="color: #c084fc; width: 22px; height: 22px;"></i>
+                        <div>
+                            <span>AI Investment Synthesis & Quantitative Thesis</span>
+                            <div id="aiHeaderSubtitle" style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 500; margin-top: 1px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-main-grid">
+                    <!-- Left: Conviction & Thesis Narrative -->
+                    <div class="ai-thesis-box">
+                        <div class="ai-conviction-row">
+                            <div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">AI Conviction Score</div>
+                                <div class="ai-conviction-pill">
+                                    <span id="aiConvictionScore" class="ai-conviction-score mono" style="color: var(--accent-green);">0.0%</span>
+                                    <span id="aiDirectionalBias" class="badge-pill badge-bullish" style="font-size: 0.85rem; padding: 4px 10px;">Strong Bullish</span>
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar & Multi-Factor Inputs -->
+                            <div style="flex: 1; max-width: 320px;">
+                                <div style="height: 10px; background: #1e293b; border-radius: 5px; overflow: hidden;">
+                                    <div id="aiConvictionBar" style="height: 100%; width: 50%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 0.4s ease;"></div>
+                                </div>
+                                <div id="aiConvictionBreakdown" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Thesis Text -->
+                        <div id="aiThesisText" class="ai-thesis-text">
+                            Generating quantitative AI investment thesis...
+                        </div>
+
+                        <!-- Catalysts & Risks -->
+                        <div class="ai-bullet-group">
+                            <div class="ai-bullet-card">
+                                <div class="ai-bullet-card-title" style="color: var(--accent-green);">
+                                    <i data-lucide="check-circle" style="width: 14px;"></i> Key Catalysts & Tailwinds
+                                </div>
+                                <ul id="aiCatalystsList" class="ai-bullet-list">
+                                    <li>Analyzing institutional momentum...</li>
+                                </ul>
+                            </div>
+
+                            <div class="ai-bullet-card">
+                                <div class="ai-bullet-card-title" style="color: var(--accent-red);">
+                                    <i data-lucide="alert-triangle" style="width: 14px;"></i> Key Invalidation & Risks
+                                </div>
+                                <ul id="aiRisksList" class="ai-bullet-list">
+                                    <li>Monitoring critical volatility stops...</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: AI Trade Target & Risk/Reward Matrix -->
+                    <div>
+                        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="target" style="width: 14px; color: var(--accent-cyan);"></i>
+                            Tactical Execution & Price Levels
+                        </div>
+
+                        <div class="trade-matrix-grid">
+                            <div class="trade-level-card">
+                                <span class="trade-level-label">Recommended Entry Zone</span>
+                                <span id="aiEntryZone" class="trade-level-value mono" style="color: var(--text-primary);">$0.00 - $0.00</span>
+                            </div>
+
+                            <div class="trade-level-card">
+                                <span class="trade-level-label">Dynamic Stop-Loss</span>
+                                <span id="aiStopLoss" class="trade-level-value mono" style="color: var(--accent-red);">$0.00</span>
+                            </div>
+
+                            <div class="trade-level-card">
+                                <span class="trade-level-label">Take-Profit Target 1</span>
+                                <span id="aiTarget1" class="trade-level-value mono" style="color: var(--accent-green);">$0.00</span>
+                            </div>
+
+                            <div class="trade-level-card">
+                                <span class="trade-level-label">Take-Profit Target 2 (Expansion)</span>
+                                <span id="aiTarget2" class="trade-level-value mono" style="color: var(--accent-cyan);">$0.00</span>
+                            </div>
+
+                            <div class="trade-level-card" style="grid-column: span 2; background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3);">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <span class="trade-level-label" style="color: var(--accent-purple);">Asymmetric Risk / Reward Profile</span>
+                                        <div id="aiRiskReward" class="trade-level-value mono" style="color: var(--text-primary); font-size: 1.4rem;">2.5:1</div>
+                                    </div>
+                                    <div class="mono" style="font-size: 0.8rem; text-align: right; color: var(--text-secondary);">
+                                        Risk: <span id="aiRiskAmt" style="color: var(--accent-red);">$0.00</span> | Reward: <span id="aiRewardAmt" style="color: var(--accent-green);">$0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 30-Day Probabilistic Scenario Projections -->
+                <div style="padding: 16px 24px 8px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                    <span class="preset-label">Probabilistic 30-Day Scenario Modeling:</span>
+                </div>
+                <div class="scenario-grid">
+                    <div class="scenario-card bull">
+                        <div class="scenario-header">
+                            <span class="scenario-title" style="color: var(--accent-green);">🟢 Bull Case Target</span>
+                            <span id="scenarioBullProb" class="badge-pill badge-bullish">55% Prob</span>
+                        </div>
+                        <div id="scenarioBullPrice" class="scenario-target mono" style="color: var(--accent-green);">$0.00</div>
+                        <div id="scenarioBullReturn" class="scenario-prob">+0.0% Expected Upside</div>
+                    </div>
+
+                    <div class="scenario-card base">
+                        <div class="scenario-header">
+                            <span class="scenario-title" style="color: var(--accent-blue);">⚪ Base Case Target</span>
+                            <span id="scenarioBaseProb" class="badge-pill badge-neutral">25% Prob</span>
+                        </div>
+                        <div id="scenarioBasePrice" class="scenario-target mono" style="color: var(--accent-blue);">$0.00</div>
+                        <div id="scenarioBaseReturn" class="scenario-prob">+0.0% Expected Drift</div>
+                    </div>
+
+                    <div class="scenario-card bear">
+                        <div class="scenario-header">
+                            <span class="scenario-title" style="color: var(--accent-red);">🔴 Bear Case Target</span>
+                            <span id="scenarioBearProb" class="badge-pill badge-bearish">20% Prob</span>
+                        </div>
+                        <div id="scenarioBearPrice" class="scenario-target mono" style="color: var(--accent-red);">$0.00</div>
+                        <div id="scenarioBearReturn" class="scenario-prob">-0.0% Downside Exposure</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTERACTIVE AI FINANCIAL COPILOT -->
+            <div class="glass-card copilot-section">
+                <div class="card-header-styled copilot-header">
+                    <div class="card-header-title">
+                        <i data-lucide="message-square" style="color: var(--accent-purple);"></i>
+                        <span>Ask AI Financial Copilot</span>
+                    </div>
+                    <div class="copilot-header-actions">
+                        <span class="badge-pill badge-neutral copilot-status-badge" title="Context-Aware AI Assistant">
+                            <span class="copilot-badge-full">Context-Aware AI Assistant</span>
+                            <span class="copilot-badge-short">Context-Aware</span>
+                        </span>
+                        <button type="button" onclick="clearCopilotChat()" class="btn-toggle btn-copilot-clear" title="Reset chat conversation">
+                            <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+                            <span>Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="copilotMessages" class="copilot-messages-container">
+                    <div class="chat-bubble chat-bubble-ai">
+                        👋 Hello! I am your <strong>FinDashIQ AI Copilot</strong>. I analyze real-time technical indicators, momentum oscillators, institutional capital flow, and historical backtests. Ask me anything about the selected stock!
+                    </div>
+                </div>
+
+                <!-- Quick Questions Prompt Chips -->
+                <div class="copilot-chips-container">
+                    <button type="button" class="copilot-chip" onclick="askCopilotPrompt('Is this a good time to buy, and what is the risk/reward setup?')">
+                        💡 Is this a good time to buy?
+                    </button>
+                    <button type="button" class="copilot-chip" onclick="askCopilotPrompt('What are the critical price targets and stop-loss levels?')">
+                        🎯 Key Targets & Stop-Loss
+                    </button>
+                    <button type="button" class="copilot-chip" onclick="askCopilotPrompt('Explain why the AI conviction score is at its current level.')">
+                        🧠 Why this Conviction Score?
+                    </button>
+                    <button type="button" class="copilot-chip" onclick="askCopilotPrompt('What are the RSI, MACD, and Stochastic indicators showing right now?')">
+                        📊 RSI & Momentum Oscillators
+                    </button>
+                    <button type="button" class="copilot-chip" onclick="askCopilotPrompt('Is institutional money flowing in or out (Chaikin Money Flow)?')">
+                        🏦 Institutional Flow (CMF)
+                    </button>
+                    <button type="button" class="copilot-chip" onclick="askCopilotPrompt('How did the indicator backtest perform over the last 6 months?')">
+                        📈 Backtest Win Rate & Alpha
+                    </button>
+                    <button type="button" class="copilot-chip" onclick="askCopilotPrompt('What is the valuation, P/E ratio, and fundamental profile?')">
+                        🏢 Valuation & P/E Profile
+                    </button>
+                    <button type="button" class="copilot-chip" onclick="askCopilotPrompt('What are the 30-day Bull, Base, and Bear case scenario projections?')">
+                        🔮 30-Day Scenario Projections
+                    </button>
+                </div>
+
+                <!-- Chat Input Form -->
+                <form id="copilotForm" class="copilot-input-area" onsubmit="event.preventDefault(); handleCopilotSubmit();">
+                    <input 
+                        type="text" 
+                        id="copilotInput" 
+                        class="copilot-input" 
+                        placeholder="Ask AI Copilot about price targets, risk levels, momentum, or backtests..." 
+                        autocomplete="off"
+                    >
+                    <button type="submit" id="copilotSendBtn" class="btn-copilot-send">
+                        <i data-lucide="send" style="width: 15px;"></i>
+                        <span>Ask AI</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Side: Global Multi-Source News & AI Catalyst Synthesis Sidebar -->
+        <div class="ai-tab-sidebar">
+            <div class="glass-card ai-news-box">
+                <div class="card-header-styled" style="padding: 14px 16px;">
+                    <div class="card-header-title">
+                        <i data-lucide="globe" style="color: var(--accent-cyan); width: 18px; height: 18px;"></i>
+                        <div>
+                            <span style="font-size: 0.95rem;">Global News & Catalysts</span>
+                            <div id="aiNewsSidebarSubtitle" style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 500; margin-top: 1px;"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                        <span id="aiNewsSentimentBadge" class="badge-pill badge-bullish" style="font-size: 0.72rem;">Bullish (75%)</span>
+                        <span id="aiNewsDeltaBadge" class="badge-pill badge-neutral" style="font-size: 0.72rem; color: var(--accent-cyan);">+0.0% Conviction</span>
+                    </div>
+                </div>
+
+                <!-- AI News Executive Catalyst Synthesis Card -->
+                <div class="ai-news-summary-section">
+                    <div class="ai-news-summary-header">
+                        <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.82rem; color: #c084fc;">
+                            <i data-lucide="sparkles" style="width: 15px; height: 15px;"></i>
+                            AI Market Catalyst Synthesis
+                        </div>
+                    </div>
+                    <div id="aiNewsSummaryText" class="ai-news-summary-content" style="margin-bottom: 10px;">
+                        Synthesizing global breaking headlines, corporate earnings, and macroeconomic catalyst impact...
+                    </div>
+                    <div id="aiNewsCatalystBulletsContainer" style="display: none; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                        <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; letter-spacing: 0.5px;">
+                            <i data-lucide="zap" style="width: 13px; height: 13px; color: var(--accent-cyan);"></i>
+                            <span>Key Global Catalyst Takeaways</span>
+                        </div>
+                        <div id="aiNewsCatalystBullets" class="catalyst-takeaways-grid"></div>
+                    </div>
+
+                    <!-- Read Full Wire Action Bar -->
+                    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <span id="aiNewsCountBadge" class="badge-pill badge-neutral" style="font-size: 0.72rem; padding: 3px 8px;">
+                            <span id="aiNewsCount">0</span> Wire Articles
+                        </span>
+                        <button type="button" id="btnOpenNewsModal" class="btn-toggle" style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2)); border: 1px solid rgba(6, 182, 212, 0.4); color: var(--accent-cyan); font-weight: 800; font-size: 0.76rem; padding: 6px 14px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" onclick="openGlobalNewsModal()">
+                            <i data-lucide="newspaper" style="width: 13px; height: 13px;"></i>
+                            <span>READ MORE</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

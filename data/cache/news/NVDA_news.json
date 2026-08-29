@@ -1,0 +1,104 @@
+{
+  "timestamp": 1788018844.6246006,
+  "ticker": "NVDA",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Tom Lee Says Nvidia Just Broke Wall Street's Most Unusual Pattern",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/d4f0fd0d-29d1-3a1c-be80-fab47044aa8c/tom-lee-says-nvidia-just.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Today 11:04AM",
+      "timestamp": 1788018845,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Nvidias AI advantage is moving beyond the GPU",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/nvidia-ai-advantage-moving-beyond-130000412.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:00AM",
+      "timestamp": 1788018845,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Wall Street is turning Nvidia's AI chips into a new futures market: Chart of the Day",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/article/wall-street-is-turning-nvidias-ai-chips-into-a-new-futures-market-chart-of-the-day-115118331.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "07:51AM",
+      "timestamp": 1788018845,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Nvidia Drops 3.3% as $315 Target Meets a $108 Billion Test",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/nvidia-drops-3-3-315-222706659.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:27PM",
+      "timestamp": 1788018845,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Nvidia Quietly Became Its Own Market Category",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/nvidia-quietly-became-own-market-222531285.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:25PM",
+      "timestamp": 1788018845,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Nvidia's revenue forecast is so huge that Wall Street wonders if SpaceX is the reason",
+      "summary": "",
+      "url": "https://www.marketwatch.com/story/nvidias-revenue-forecast-is-so-huge-that-wall-street-wonders-if-spacex-is-the-reason-1ee7a8a9?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:58PM",
+      "timestamp": 1788018845,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "NVIDIA Announces Financial Results for Second Quarter Fiscal 2027 - NVIDIA Newsroom",
+      "summary": "NVIDIA Announces Financial Results for Second Quarter Fiscal 2027&nbsp;&nbsp;NVIDIA Newsroom",
+      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxOcjZPeVV6eC01Z2tWOHlyVEhmMG9uZDgyaXdvVTV3MVVMWGdKVVhJdlNiRHBvejd0UnlSNFJfTFA4dXAxUk9fVi1RQ2h2VU1kd2FkSUoydEJheDVMNWRnYUdMa2RFcG8zcTROTl9ZX1lJQ0tRU1VZR2pkQjFRdEtkM0tpUUlOcXhsYTFGcGY5RHFQYWZyNkh6LXVCSmN0Y1J3WWc?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788018845,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "NVIDIA Corporation $NVDA Stock Position Decreased by Range Financial Group LLC - MarketBeat",
+      "summary": "NVIDIA Corporation $NVDA Stock Position Decreased by Range Financial Group LLC&nbsp;&nbsp;MarketBeat",
+      "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxQUnU0YmhETlFpYXpSa01TbFNoV3ZtMWFsTFk2QmxQOHlXX2MtZ1l2OWZXb3VFdE41T2lwWldZNzk2MW5taFMxRXFKcVhRQTFXNlV0bWI4OUc3OE1PTTlkTm9wNXJoejdqNkVVTmhWQWJTYzdRZmluUVpYQXF0YkNBa01DT2RKcWJhekdzRVJzdzRVNF92QnBBNjlMcEV2TjNzUFR2MnVNeUVnWVFOUkJaOV83eXlqWmp1VkdVWWFaOGRTYVJQUGYyQTMtZ0M1dWp4bkF1Sw?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788018845,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    }
+  ]
+}

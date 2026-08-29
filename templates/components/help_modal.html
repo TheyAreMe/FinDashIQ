@@ -1,0 +1,529 @@
+<!-- Help & Documentation Wiki Modal -->
+<div id="helpModal" class="modal-overlay">
+    <div class="modal-card help-modal-card">
+        <!-- Modal Header -->
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="auth-icon-badge" style="background: linear-gradient(135deg, #06b6d4, #3b82f6);">
+                    <i data-lucide="book-open" style="width: 20px; height: 20px; color: #fff;"></i>
+                </div>
+                <div>
+                    <h2 class="profile-modal-title" style="display: flex; align-items: center; gap: 8px;">
+                        <span>FinDashIQ Help &amp; Documentation Hub</span>
+                        <span class="badge-pill badge-neutral" style="font-size: 0.68rem;">Wiki v2.5</span>
+                    </h2>
+                    <div style="font-size: 0.76rem; color: var(--text-muted);">Institutional trading platform guides,
+                        quantitative indicators, multi-currency engine, alert configuration, and architecture</div>
+                </div>
+            </div>
+            <button type="button" onclick="closeHelpModal()"
+                style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px;"
+                title="Close Documentation">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Dropdown Topic Selector (Visible on <= 768px) -->
+        <div class="help-mobile-select-wrapper">
+            <label for="helpModalMobileSelect" class="help-mobile-select-label">
+                <i data-lucide="book-open" style="width: 15px; color: var(--accent-cyan);"></i>
+                <span>Documentation Topic:</span>
+            </label>
+            <div class="help-select-box">
+                <select id="helpModalMobileSelect" class="help-mobile-select" onchange="switchHelpTab(this.value)"
+                    aria-label="Select Guide Topic">
+                    <optgroup label="⚡ Core Platform Guides">
+                        <option value="overview" selected>⚡ Getting Started with FinDashIQ</option>
+                        <option value="watchlist">📊 Watchlist Hub &amp; Live Quotes</option>
+                        <option value="terminal">🔍 Stock Deep-Dive Terminal</option>
+                        <option value="scanner">🛰️ AI Stock Scanner &amp; Discovery</option>
+                        <option value="backtest">🧪 Quantitative Strategy Backtesting</option>
+                    </optgroup>
+                    <optgroup label="🌐 Market Intelligence &amp; Forex">
+                        <option value="news">📰 Global Breaking News &amp; Catalysts</option>
+                        <option value="currency">💱 Multi-Currency &amp; Dynamic Forex</option>
+                    </optgroup>
+                    <optgroup label="🔔 Alerts &amp; Notification Rules">
+                        <option value="notifications">🔔 Signal Alerts &amp; Trigger Engine</option>
+                        <option value="webhooks">📱 Telegram &amp; Discord Dispatch</option>
+                        <option value="api">🌐 Custom Webhooks &amp; REST API</option>
+                    </optgroup>
+                    <optgroup label="⚙️ Administration &amp; Legal">
+                        <option value="auth">👤 Authentication, Roles &amp; Isolation</option>
+                        <option value="architecture">⚡ Performance Caching &amp; Security</option>
+                        <option value="legal">⚖️ Legal Disclaimer &amp; Impressum</option>
+                    </optgroup>
+                </select>
+                <div class="help-select-arrow-wrapper">
+                    <i data-lucide="chevron-down" class="help-select-arrow"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Layout: Left Navigation Sidebar & Right Content Pane -->
+        <div class="help-modal-layout">
+            <!-- Sidebar Navigation -->
+            <div class="help-sidebar-nav">
+                <div class="help-nav-category">Core Platform</div>
+                <button type="button" class="help-nav-btn active" onclick="switchHelpTab('overview')">
+                    <i data-lucide="zap" style="width: 14px; color: var(--accent-amber);"></i>
+                    <span>Getting Started</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('watchlist')">
+                    <i data-lucide="layout-grid" style="width: 14px; color: var(--accent-blue);"></i>
+                    <span>Watchlist Hub</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('terminal')">
+                    <i data-lucide="line-chart" style="width: 14px; color: var(--accent-cyan);"></i>
+                    <span>Stock Deep-Dive</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('scanner')">
+                    <i data-lucide="radar" style="width: 14px; color: var(--accent-green);"></i>
+                    <span>AI Stock Scanner</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('backtest')">
+                    <i data-lucide="flask-conical" style="width: 14px; color: var(--accent-purple);"></i>
+                    <span>Strategy Backtesting</span>
+                </button>
+
+                <div class="help-nav-category" style="margin-top: 12px;">Market Intelligence</div>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('news')">
+                    <i data-lucide="globe" style="width: 14px; color: var(--accent-cyan);"></i>
+                    <span>Global News Wire</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('currency')">
+                    <i data-lucide="circle-dollar-sign" style="width: 14px; color: var(--accent-amber);"></i>
+                    <span>Multi-Currency Forex</span>
+                </button>
+
+                <div class="help-nav-category" style="margin-top: 12px;">Alerts &amp; Dispatch</div>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('notifications')">
+                    <i data-lucide="bell" style="width: 14px; color: var(--accent-green);"></i>
+                    <span>Notifications &amp; Triggers</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('webhooks')">
+                    <i data-lucide="send" style="width: 14px; color: var(--accent-orange);"></i>
+                    <span>Telegram &amp; Discord</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('api')">
+                    <i data-lucide="code" style="width: 14px; color: var(--accent-cyan);"></i>
+                    <span>Custom APIs &amp; REST</span>
+                </button>
+
+                <div class="help-nav-category" style="margin-top: 12px;">Administration &amp; Legal</div>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('auth')">
+                    <i data-lucide="shield" style="width: 14px; color: var(--accent-purple);"></i>
+                    <span>Roles &amp; Isolation</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('architecture')">
+                    <i data-lucide="cpu" style="width: 14px; color: var(--accent-blue);"></i>
+                    <span>Caching &amp; Security</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('legal')">
+                    <i data-lucide="scale" style="width: 14px; color: var(--accent-cyan);"></i>
+                    <span>Legal &amp; Impressum</span>
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="help-content-pane">
+                <!-- TAB: Overview -->
+                <div id="helpTabOverview" class="help-doc-section active">
+                    <div class="help-doc-title">⚡ Getting Started with FinDashIQ</div>
+                    <p class="help-doc-lead">
+                        FinDashIQ is an institutional-grade financial analytics terminal combining multi-factor
+                        quantitative indicators, persistent watchlist intelligence, dynamic strategy backtesting,
+                        automated AI investment synthesis, real-time multi-currency conversion, and multi-channel signal notification rules.
+                    </p>
+
+                    <div class="help-callout">
+                        <strong>💡 Key Architecture:</strong> FinDashIQ operates with <strong>zero external
+                            setup</strong> using its built-in offline quantitative heuristics engine, while supporting
+                        Google Gemini AI integration for natural language investment synthesis and live forex rate caching.
+                    </div>
+
+                    <div class="help-section-sub">Navigation &amp; Views</div>
+                    <div class="help-grid-cards">
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="layout-grid"
+                                    style="color: var(--accent-blue);"></i> Top Tab 1: Watchlist Hub</div>
+                            <div>Command center for monitoring portfolio securities, drag-and-drop ordering, dual Card/Table views, dynamic currency display, sparklines, and news syntheses.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="line-chart"
+                                    style="color: var(--accent-cyan);"></i> Top Tab 2: Terminal</div>
+                            <div>4 specialized sub-tabs: AI Thesis &amp; Copilot, Technical Candlestick Charts &amp;
+                                Oscillators, Strategy Backtesting, and Multi-Factor Consensus.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="radar"
+                                    style="color: var(--accent-green);"></i> Top Tab 3: AI Scanner</div>
+                            <div>Thematic market radar discovering ESG, Clean Energy, AI Silicon, and high-conviction opportunities outside your watchlist.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="bell" style="color: var(--accent-amber);"></i>
+                                Top Tab 4: Alerts Hub</div>
+                            <div>Configure quantitative trigger conditions and dispatch real-time alerts to Telegram,
+                                Discord, Email, or custom REST Webhooks.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Watchlist Hub -->
+                <div id="helpTabWatchlist" class="help-doc-section">
+                    <div class="help-doc-title">📊 Watchlist &amp; Market Intelligence Hub</div>
+                    <p class="help-doc-lead">
+                        Track live market quotes, institutional flows, and AI conviction scores with persistent
+                        server-side storage, drag-and-drop reordering, dual viewing modes, and live base currency conversion.
+                    </p>
+
+                    <div class="help-section-sub">Card &amp; Table View Features</div>
+                    <ul class="help-list">
+                        <li><strong>Dual View Modes (Cards vs. Table):</strong> Toggle seamlessly between the visual <em>Grid Card View</em> and compact <em>Data Table View</em> with sticky columns and mobile horizontal swipe support. Persisted in user preferences.</li>
+                        <li><strong>Drag-and-Drop Reordering:</strong> Easily rearrange the order of stocks by dragging cards or table drag handles (<i data-lucide="grip-vertical" style="width:12px; vertical-align:middle;"></i>). New positions are immediately saved to the server.</li>
+                        <li><strong>Dynamic Multi-Currency Display:</strong> All prices, quotes, and ranges convert in real-time to your chosen base currency (USD, EUR, GBP, CHF, JPY, etc.).</li>
+                        <li><strong>Live Price, Sparklines &amp; Timeframe Axis:</strong> Real-time pricing with 1D change, smooth SVG gradient trajectory curves, start/end date markers, and multi-week period return badges (e.g. <code>30D Trend: +12.85%</code>).</li>
+                        <li><strong>AI Conviction Gauge:</strong> Multi-factor momentum rating (0–100%) and directional stance (<em>Strong Bullish</em>, <em>Bullish</em>, <em>Neutral</em>, <em>Bearish</em>) calibrated with market downturn damping.</li>
+                        <li><strong>RSI (14), SuperTrend, CMF (20), VWAP:</strong> Multi-factor quantitative health indicators displayed in high-contrast badges.</li>
+                        <li><strong>AI News Catalyst Synthesis:</strong> Real-time summary of corporate developments, macro events, and sentiment with breaking news weighting.</li>
+                        <li><strong>Company Search Modal:</strong> Click <strong>"+ Add Stock"</strong> to open the search modal with real-time company name and symbol lookups across international exchanges.</li>
+                        <li><strong>Inline Removal:</strong> Click the <strong>✕</strong> button directly on any card or table row to remove an asset.</li>
+                    </ul>
+
+                    <div class="help-callout">
+                        <strong>⚡ Quick Action:</strong> Click <strong>"Open Deep-Dive Terminal &rarr;"</strong> on any
+                        card or row to instantly route into the full terminal with that stock loaded.
+                    </div>
+                </div>
+
+                <!-- TAB: Stock Deep-Dive -->
+                <div id="helpTabTerminal" class="help-doc-section">
+                    <div class="help-doc-title">🔍 Stock Deep-Dive Terminal</div>
+                    <p class="help-doc-lead">
+                        4 dedicated sub-tabs for complete institutional analysis on any global stock or ETF basket:
+                    </p>
+
+                    <div class="help-section-sub">Sub-Tab Breakdown</div>
+                    <div class="help-table-wrapper">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Sub-Tab</th>
+                                    <th>Key Components</th>
+                                    <th>Core Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>1. AI Intelligence &amp; Copilot</strong></td>
+                                    <td>AI Conviction Engine, Executive Thesis, 30-Day Bull/Base/Bear Scenarios, Execution Matrix (Entry, Volatility SL, TP1, R:R), Dynamic AI Catalyst Synthesis, Interactive AI Copilot chat.</td>
+                                    <td>Actionable trade setups, scenario modeling, and conversational market queries.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2. Charts &amp; Oscillators</strong></td>
+                                    <td>Interactive Candlestick/Area charts, SuperTrend (10,3), VWAP, SMA/EMA 20/50/200, Bollinger Bands (20,2), Keltner Channels (20,1.5,10), Stochastic (14,3,3), RSI (14), MACD (12,26,9), CMF (20), Volume.</td>
+                                    <td>Institutional technical charting across 1M to MAX timeframes.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>3. Strategy Backtesting</strong></td>
+                                    <td>Multi-Factor Quant, SuperTrend Breakout, MACD+RSI strategies, Alpha (vs. $10k Benchmark), Win Rate, Profit Factor, Max Drawdown, Dynamic Equity Curve, Order Execution Ledger.</td>
+                                    <td>Historical validation against Buy &amp; Hold with customizable timeframes.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>4. Fundamentals &amp; Consensus</strong></td>
+                                    <td>Composite Consensus Verdict (Strong Buy to Strong Sell), Consensus Signal Meter, Market Cap, P/E, Forward P/E, Beta, Dividend Yield, 52-Week Range Slider.</td>
+                                    <td>Fundamental health, valuation multiples, and multi-factor indicator consensus.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB: AI Stock Scanner -->
+                <div id="helpTabScanner" class="help-doc-section">
+                    <div class="help-doc-title">🛰️ AI Quantitative Stock Scanner &amp; Opportunity Discovery</div>
+                    <p class="help-doc-lead">
+                        Multi-factor market radar designed to discover high-conviction buy recommendations across
+                        thematic sectors and ecological investments for stocks <strong>not currently in your
+                            watchlist</strong>.
+                    </p>
+
+                    <div class="help-grid-cards">
+                        <div class="help-feature-card">
+                            <div class="help-card-head">
+                                <i data-lucide="leaf" style="width: 14px; color: var(--accent-green);"></i>
+                                <span>Thematic &amp; ESG Screener</span>
+                            </div>
+                            <div>Filter by Clean Energy, Decarbonization, AI Silicon, Cybersecurity, Biotech, and
+                                Fintech with Elite ESG ratings (85–98/100).</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head">
+                                <i data-lucide="target" style="width: 14px; color: var(--accent-cyan);"></i>
+                                <span>Asymmetric Execution Setup</span>
+                            </div>
+                            <div>Automated Entry Zones, Volatility-calibrated Stop-Losses, Take-Profit 1 targets, and
+                                Risk/Reward ratios in your chosen base currency.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head">
+                                <i data-lucide="plus-circle" style="width: 14px; color: var(--accent-amber);"></i>
+                                <span>1-Click Watchlist Tracking</span>
+                            </div>
+                            <div>Instantly add newly discovered opportunities directly to your server-persisted
+                                watchlist with one click.</div>
+                        </div>
+                    </div>
+
+                    <div class="help-section-sub">Quick Presets &amp; Multi-Factor Filters</div>
+                    <ul class="help-list">
+                        <li><strong>🌿 Clean Energy &amp; ESG Alpha:</strong> Screens solar, wind, and storage leaders
+                            with positive CMF institutional inflows.</li>
+                        <li><strong>⚡ AI &amp; Quantum Deep Tech:</strong> Screens leading AI custom silicon, optical
+                            networking, and quantum computing hardware.</li>
+                        <li><strong>🌊 Institutional Accumulation:</strong> Flags stocks experiencing strong Chaikin
+                            Money Flow accumulation (&gt;+0.02).</li>
+                        <li><strong>🚀 SuperTrend Breakouts:</strong> Identifies fresh momentum reversals with confirmed
+                            trendline support.</li>
+                    </ul>
+                </div>
+
+                <!-- TAB: Strategy Backtesting -->
+                <div id="helpTabBacktest" class="help-doc-section">
+                    <div class="help-doc-title">🧪 Quantitative Strategy Backtesting</div>
+                    <p class="help-doc-lead">
+                        Simulate algorithmic execution strategies on historical market data and benchmark performance
+                        against a $10,000 Buy &amp; Hold investment across multiple selectable timeframes (1M, 3M, 6M, 1Y, 2Y, 5Y, MAX).
+                    </p>
+
+                    <div class="help-section-sub">Strategy Types</div>
+                    <ul class="help-list">
+                        <li><strong>Multi-Factor Quant:</strong> Combines SuperTrend trend confirmation, Chaikin Money
+                            Flow accumulation, and RSI momentum filters.</li>
+                        <li><strong>SuperTrend Breakout:</strong> Follows trailing volatility breakout bands to capture
+                            major trend expansions while cutting downside risk.</li>
+                        <li><strong>MACD + RSI Momentum:</strong> Mean-reversion strategy triggering on MACD signal line
+                            crosses exiting oversold RSI zones.</li>
+                    </ul>
+
+                    <div class="help-section-sub">Scorecard Metrics</div>
+                    <ul class="help-list">
+                        <li><strong>Alpha (Excess Return):</strong> Total Strategy Return (%) minus Buy &amp; Hold
+                            Benchmark (%).</li>
+                        <li><strong>Win Rate:</strong> Percentage of profitable completed round-trip trades.</li>
+                        <li><strong>Profit Factor:</strong> Ratio of gross profits to gross losses.</li>
+                        <li><strong>Maximum Drawdown:</strong> Peak-to-trough capital drawdown during the backtest
+                            period.</li>
+                        <li><strong>Order Execution Ledger:</strong> Comprehensive trade-by-trade log with date, type, price, volume, realized PnL, and trigger reason.</li>
+                    </ul>
+                </div>
+
+                <!-- TAB: Global News Wire -->
+                <div id="helpTabNews" class="help-doc-section">
+                    <div class="help-doc-title">📰 Global Breaking News &amp; Market Catalysts</div>
+                    <p class="help-doc-lead">
+                        Real-time financial intelligence feed streaming headlines, regulatory filings, earnings reports, and macroeconomic updates from premier worldwide wire services.
+                    </p>
+
+                    <div class="help-grid-cards">
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="globe" style="color: var(--accent-cyan);"></i> Multi-Language Wires</div>
+                            <div>Aggregates international feeds from Reuters, Bloomberg, CNBC, Handelsblatt, Tagesschau, Nikkei, and financial wires, automatically translated to English.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="sparkles" style="color: var(--accent-amber);"></i> AI Catalyst Scoring</div>
+                            <div>Filters breaking stories by high-impact catalysts, weighting corporate news sentiment directly into AI conviction calculations.</div>
+                        </div>
+                    </div>
+
+                    <div class="help-section-sub">News Modal Features</div>
+                    <ul class="help-list">
+                        <li><strong>Search &amp; Filter:</strong> Filter headlines by keyword, company name, or publisher. Toggle between <em>All Wires</em>, <em>🚀 High Impact Catalysts</em>, and <em>🏛️ Tier 1 Sources</em>.</li>
+                        <li><strong>Stock Attribution:</strong> View company-specific news streams directly from any stock's deep-dive terminal or watchlist card.</li>
+                    </ul>
+                </div>
+
+                <!-- TAB: Multi-Currency Forex -->
+                <div id="helpTabCurrency" class="help-doc-section">
+                    <div class="help-doc-title">💱 Multi-Currency &amp; Dynamic Forex Engine</div>
+                    <p class="help-doc-lead">
+                        FinDashIQ features dynamic multi-currency conversion supporting 10 major global fiat currencies.
+                    </p>
+
+                    <div class="help-section-sub">Supported Base Currencies</div>
+                    <div class="help-grid-cards">
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><strong>Americas &amp; Asia-Pacific</strong></div>
+                            <div>USD ($), CAD ($), AUD ($), JPY (¥)</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><strong>Europe &amp; Nordic</strong></div>
+                            <div>EUR (€), GBP (£), CHF (Fr), NOK (kr), SEK (kr), DKK (kr)</div>
+                        </div>
+                    </div>
+
+                    <div class="help-section-sub">How Forex Conversion Works</div>
+                    <ul class="help-list">
+                        <li><strong>Real-Time Conversion:</strong> When you change your base currency in the Profile Modal, all stock prices, sparkline ranges, entry zones, stop-losses, and portfolio totals recalculate instantaneously.</li>
+                        <li><strong>Exchange Rate Caching:</strong> Live forex rates are fetched and cached locally with automatic background refresh to maintain sub-10ms response times.</li>
+                    </ul>
+                </div>
+
+                <!-- TAB: Notifications & Triggers -->
+                <div id="helpTabNotifications" class="help-doc-section">
+                    <div class="help-doc-title">🔔 Signal Alerts &amp; Notifications Hub</div>
+                    <p class="help-doc-lead">
+                        Configure multi-factor trigger rules that continuously evaluate quantitative indicators and
+                        dispatch instant alerts to your trading desk.
+                    </p>
+
+                    <div class="help-section-sub">Supported Trigger Indicators</div>
+                    <ul class="help-list">
+                        <li><strong>Trend &amp; Volatility:</strong> SuperTrend Bullish/Bearish Direction Flips, SMA
+                            50/200 Golden &amp; Death Crosses, Bollinger Band Upper Breakouts &amp; Lower Reversals.
+                        </li>
+                        <li><strong>Momentum Oscillators:</strong> RSI Deep Oversold (&lt;30) &amp; Overbought (&gt;70),
+                            MACD Signal Crosses, Stochastic Oscillator Crosses (&lt;20).</li>
+                        <li><strong>Institutional Flow:</strong> Chaikin Money Flow Inflow (&gt;+0.15) &amp; Outflow
+                            (&lt;-0.15), VWAP Intraday Crosses.</li>
+                        <li><strong>AI &amp; Risk Levels:</strong> AI Conviction Upgrades (&ge;80%) &amp; Drops
+                            (&lt;45%), Dynamic TP1 Reached, Volatility Stop-Loss Breaches, Intraday Volatility
+                            Spikes/Drops (&plusmn;3.5%).</li>
+                    </ul>
+
+                    <div class="help-callout">
+                        <strong>⚡ Testing Triggers:</strong> Use the <strong>"Trigger Test Message"</strong> button in
+                        the form or click <strong>"Test"</strong> on any active rule card to simulate immediate message
+                        delivery.
+                    </div>
+                </div>
+
+                <!-- TAB: Webhooks -->
+                <div id="helpTabWebhooks" class="help-doc-section">
+                    <div class="help-doc-title">📱 Telegram &amp; Discord Webhook Setup</div>
+
+                    <div class="help-section-sub">📱 Telegram Bot Setup</div>
+                    <ol class="help-list">
+                        <li>Message <strong>@BotFather</strong> on Telegram and create a new bot via
+                            <code>/newbot</code>.
+                        </li>
+                        <li>Start a chat with your bot and obtain your Chat ID (using <code>@userinfobot</code>) or
+                            public channel username (e.g. <code>@quant_desk</code>).</li>
+                        <li>In FinDashIQ, select <strong>Telegram Bot</strong> and enter your Chat ID/Username.</li>
+                        <li>Click <strong>Trigger Test Message</strong> to verify delivery.</li>
+                    </ol>
+
+                    <div class="help-section-sub">💬 Discord Webhook Setup</div>
+                    <ol class="help-list">
+                        <li>Open your Discord channel settings ➔ <strong>Integrations</strong> ➔
+                            <strong>Webhooks</strong> ➔ <strong>New Webhook</strong>.
+                        </li>
+                        <li>Copy the Webhook URL (e.g. <code>https://discord.com/api/webhooks/...</code>).</li>
+                        <li>In FinDashIQ, select <strong>Discord Webhook</strong> and paste the URL.</li>
+                        <li>Click <strong>Trigger Test Message</strong> to push an embed card into your channel.</li>
+                    </ol>
+                </div>
+
+                <!-- TAB: Custom APIs -->
+                <div id="helpTabApi" class="help-doc-section">
+                    <div class="help-doc-title">🌐 Custom Webhooks &amp; REST API</div>
+                    <p class="help-doc-lead">
+                        Connect FinDashIQ signal alerts to custom trading execution bots, Python/Node.js endpoints, or
+                        automation hubs (Zapier, n8n, Make).
+                    </p>
+
+                    <div class="help-section-sub">JSON Webhook POST Payload</div>
+                    <pre class="help-code-block"><code>{
+  "event": "QUANT_SIGNAL_TRIGGER",
+  "ticker": "NVDA",
+  "signal": {
+    "key": "supertrend_bull",
+    "name": "SuperTrend Direction Flip ➔ Bullish Uptrend",
+    "threshold": "Bullish Uptrend Confirmation"
+  },
+  "metrics": {
+    "price": 175.40,
+    "currency": "USD",
+    "rsi14": 58.4,
+    "cmf": 0.185,
+    "vwap": 173.20,
+    "aiConviction": 84.0
+  },
+  "channel": "Custom API Webhook"
+}</code></pre>
+                </div>
+
+                <!-- TAB: Authentication & Roles -->
+                <div id="helpTabAuth" class="help-doc-section">
+                    <div class="help-doc-title">👤 Authentication, Roles &amp; Data Isolation</div>
+                    <p class="help-doc-lead">
+                        Role-based access control keeps watchlists, notification rules, currency choices, and visual theme preferences
+                        completely isolated per user account.
+                    </p>
+
+                    <div class="help-section-sub">Account Privileges</div>
+                    <ul class="help-list">
+                        <li><strong>Administrator (<code>admin</code>):</strong> Full platform access + User Management
+                            tab in profile modal to create/delete accounts and assign roles.</li>
+                        <li><strong>Standard User (<code>user</code>):</strong> Private watchlists, personalized alert
+                            triggers, base currency configuration, and profile customization.</li>
+                    </ul>
+                </div>
+
+                <!-- TAB: Performance & Security Architecture -->
+                <div id="helpTabArchitecture" class="help-doc-section">
+                    <div class="help-doc-title">⚡ Performance Caching &amp; Infrastructure Security</div>
+                    <p class="help-doc-lead">
+                        FinDashIQ achieves <strong>sub-10ms response times</strong> via multi-tier server-side caching
+                        and incremental delta synchronization, backed by hardened reverse proxy security headers.
+                    </p>
+
+                    <div class="help-section-sub">Performance &amp; Cache Highlights</div>
+                    <ul class="help-list">
+                        <li><strong>Persistent Disk Cache (<code>data/cache/</code>):</strong> Historical bars are saved
+                            locally in CSV format.</li>
+                        <li><strong>Delta Downloads:</strong> On reload, the engine downloads only missing recent bars
+                            (1–2 days) rather than full multi-year histories, reducing network bandwidth by &gt;98%.
+                        </li>
+                        <li><strong>Security Headers:</strong> Enforces HSTS, restrictive CSP, X-Frame-Options: SAMEORIGIN, X-Content-Type-Options: nosniff, and ProxyFix headers for reverse proxies.</li>
+                        <li><strong>Force Refresh:</strong> Click <strong>"Force Refresh"</strong> in any tab to bypass
+                            cached data and perform a live query.</li>
+                    </ul>
+                </div>
+
+                <!-- TAB: Legal Disclaimer & Impressum -->
+                <div id="helpTabLegal" class="help-doc-section">
+                    <div class="help-doc-title">⚖️ Legal Disclaimer &amp; Impressum</div>
+                    <p class="help-doc-lead">
+                        Important regulatory, educational, and liability provisions governing the use of FinDashIQ.
+                    </p>
+
+                    <div class="help-callout" style="border-left-color: var(--accent-amber);">
+                        <strong>⚠️ Educational &amp; Research Purpose:</strong> FinDashIQ is provided exclusively for educational, technical demonstration, and quantitative research purposes. Nothing on this platform constitutes financial, investment, legal, or tax advice.
+                    </div>
+
+                    <div class="help-section-sub">Legal Summary</div>
+                    <ul class="help-list">
+                        <li><strong>No Financial Liability:</strong> The creator and contributors assume no liability for any trading losses or financial decisions made based on platform metrics or AI synthesis.</li>
+                        <li><strong>Data Privacy &amp; GDPR:</strong> User accounts and preferences are stored securely on your server instance with zero tracking cookies and no third-party telemetry.</li>
+                        <li><strong>Full Impressum:</strong> Click <strong>"Impressum &amp; Legal"</strong> in the footer or auth screen to review complete provider details and privacy disclaimers.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div
+            style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.76rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="file-text" style="width: 14px; color: var(--accent-cyan);"></i>
+                <span>Complete offline markdown documentation available in <code>/wiki</code> directory.</span>
+            </div>
+            <button type="button" class="btn-toggle" style="padding: 6px 16px; font-size: 0.82rem;"
+                onclick="closeHelpModal()">
+                Close Help
+            </button>
+        </div>
+    </div>
+</div>

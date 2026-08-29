@@ -1,0 +1,55 @@
+<!-- Global Glassmorphism Footer with Highlighted Disclaimer Bullet & Modal Popup -->
+<footer class="app-footer glass-card">
+    <div class="footer-left">
+        <div class="footer-brand">
+            <i data-lucide="brain" style="width: 18px; height: 18px; color: var(--accent-blue);"></i>
+            <span style="font-weight: 700; color: var(--text-primary);">FinDashIQ</span>
+            <span class="badge-pill badge-neutral" style="font-size: 0.65rem;">v0.1.0</span>
+        </div>
+        <div class="footer-copyright">
+            &copy; 2026 FinDashIQ &bull; Quantitative AI Financial Terminal
+        </div>
+
+        <!-- Creator Support / Official Donation Badges (Triggers Official Floating Widgets) -->
+        <div class="footer-donate-group">
+            <button type="button" class="footer-badge-btn" onclick="openKofiWidget()"
+                title="Support with Ko-Fi">
+                <img src="https://storage.ko-fi.com/cdn/kofi5.png" alt="Support with Ko-Fi" class="footer-donate-badge kofi-badge" height="32">
+            </button>
+            <button type="button" class="footer-badge-btn" onclick="openBmacWidget()"
+                title="Support on Buy Me a Coffee">
+                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" class="footer-donate-badge bmac-badge" height="32">
+            </button>
+        </div>
+    </div>
+
+    <div class="footer-right">
+        <!-- Highlighted Disclaimer Bullet Button (Opens Disclaimer Modal Popup) -->
+        <button type="button" class="footer-disclaimer-badge" onclick="openImpressumModal('disclaimer')"
+            title="Click to view regulatory &amp; financial liability disclaimer">
+            <span class="disclaimer-dot"></span>
+            <i data-lucide="shield-alert" style="width: 14px; height: 14px;"></i>
+            <span>Disclaimer: No Liability</span>
+        </button>
+
+        <button type="button" class="footer-nav-btn" onclick="openImpressumModal('impressum')">
+            <i data-lucide="scale" style="width: 14px; height: 14px;"></i>
+            <span>Impressum</span>
+        </button>
+
+        <button type="button" class="footer-nav-btn" onclick="openImpressumModal('privacy')">
+            <i data-lucide="lock" style="width: 14px; height: 14px;"></i>
+            <span>Privacy</span>
+        </button>
+
+        <button type="button" class="footer-nav-btn" onclick="openImpressumModal('attributions')">
+            <i data-lucide="layers" style="width: 14px; height: 14px;"></i>
+            <span>Attributions</span>
+        </button>
+
+        <button type="button" class="footer-nav-btn" onclick="openHelpModal('overview')">
+            <i data-lucide="book-open" style="width: 14px; height: 14px;"></i>
+            <span>Wiki &amp; Docs</span>
+        </button>
+    </div>
+</footer>

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sqBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#0b0f19" />
+    </linearGradient>
+    <linearGradient id="sqNeonBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+    <linearGradient id="sqNeonGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="sqGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Base Container -->
+  <rect width="128" height="128" rx="28" fill="url(#sqBgGrad)" stroke="#3b82f6" stroke-width="2.5" stroke-opacity="0.35" />
+
+  <!-- Background Subtle Grid Mesh -->
+  <path d="M24 64 H104 M64 24 V104" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.12" stroke-dasharray="3 3" />
+  <circle cx="64" cy="64" r="38" stroke="#8b5cf6" stroke-width="1" stroke-opacity="0.15" fill="none" />
+
+  <!-- Candlestick / Quant Graph Behind -->
+  <g opacity="0.35">
+    <!-- Bar 1 -->
+    <line x1="38" y1="52" x2="38" y2="88" stroke="#38bdf8" stroke-width="1.5" />
+    <rect x="35" y="58" width="6" height="18" rx="1.5" fill="#38bdf8" />
+    <!-- Bar 2 -->
+    <line x1="90" y1="40" x2="90" y2="82" stroke="#34d399" stroke-width="1.5" />
+    <rect x="87" y="46" width="6" height="24" rx="1.5" fill="#34d399" />
+  </g>
+
+  <!-- Central Quant Neural Brain / Dynamic Pulse Node Group -->
+  <g filter="url(#sqGlow)">
+    <!-- Dynamic AI Wave / Quantitative Trend Arc -->
+    <path d="M 28 82 Q 46 92, 58 64 T 92 42 T 102 36" fill="none" stroke="url(#sqNeonGreen)" stroke-width="4" stroke-linecap="round" />
+    
+    <!-- Stylized Neural Brain Core / Hex-Polygon Nodes -->
+    <!-- Center Node -->
+    <circle cx="64" cy="64" r="9" fill="#0f172a" stroke="url(#sqNeonBlue)" stroke-width="3" />
+    <circle cx="64" cy="64" r="4.5" fill="#38bdf8" />
+
+    <!-- Top Left Node -->
+    <line x1="64" y1="64" x2="44" y2="44" stroke="url(#sqNeonBlue)" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="44" cy="44" r="6" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+    <circle cx="44" cy="44" r="2.5" fill="#38bdf8" />
+
+    <!-- Top Right Node -->
+    <line x1="64" y1="64" x2="84" y2="44" stroke="url(#sqNeonBlue)" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="84" cy="44" r="6" fill="#0f172a" stroke="#8b5cf6" stroke-width="2" />
+    <circle cx="84" cy="44" r="2.5" fill="#a855f7" />
+
+    <!-- Bottom Left Node -->
+    <line x1="64" y1="64" x2="44" y2="84" stroke="url(#sqNeonBlue)" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="44" cy="84" r="6" fill="#0f172a" stroke="#34d399" stroke-width="2" />
+    <circle cx="44" cy="84" r="2.5" fill="#10b981" />
+
+    <!-- Bottom Right Node -->
+    <line x1="64" y1="64" x2="84" y2="84" stroke="url(#sqNeonBlue)" stroke-width="2.5" stroke-linecap="round" />
+    <circle cx="84" cy="84" r="6" fill="#0f172a" stroke="#38bdf8" stroke-width="2" />
+    <circle cx="84" cy="84" r="2.5" fill="#38bdf8" />
+
+    <!-- Inter-node Connections -->
+    <line x1="44" y1="44" x2="84" y2="44" stroke="#8b5cf6" stroke-width="1.8" stroke-dasharray="3 3" stroke-opacity="0.8" />
+    <line x1="44" y1="84" x2="84" y2="84" stroke="#34d399" stroke-width="1.8" stroke-dasharray="3 3" stroke-opacity="0.8" />
+  </g>
+
+  <!-- Accent Sparkles -->
+  <circle cx="94" cy="34" r="2" fill="#fff" />
+  <circle cx="34" cy="94" r="1.5" fill="#34d399" />
+</svg>

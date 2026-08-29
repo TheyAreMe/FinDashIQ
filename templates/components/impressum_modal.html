@@ -1,0 +1,355 @@
+<!-- Impressum, Legal Notice & Financial Risk Disclaimer Modal -->
+<div id="impressumModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card impressum-modal-card">
+        <!-- Modal Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="auth-icon-badge" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+                    <i data-lucide="scale" style="width: 20px; height: 20px; color: #fff;"></i>
+                </div>
+                <div>
+                    <h2 class="profile-modal-title" style="display: flex; align-items: center; gap: 8px;">
+                        <span>Impressum &amp; Legal Compliance Hub</span>
+                        <span class="badge-pill badge-warning" style="font-size: 0.68rem;">Legal Notice</span>
+                    </h2>
+                    <div style="font-size: 0.76rem; color: var(--text-muted);">Statutory disclosure, exclusion of liability, risk warnings, and data protection notice</div>
+                </div>
+            </div>
+            <button type="button" onclick="closeImpressumModal()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px;" title="Close Legal Notice">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+
+        <!-- Navigation Tabs Header -->
+        <div class="profile-tabs-header">
+            <button type="button" id="tabBtnImpressumLegal" class="profile-tab-btn active" onclick="switchImpressumTab('impressum')">
+                <i data-lucide="scale" style="width: 14px;"></i> Impressum
+            </button>
+            <button type="button" id="tabBtnImpressumDisclaimer" class="profile-tab-btn" onclick="switchImpressumTab('disclaimer')">
+                <i data-lucide="shield-alert" style="width: 14px; color: var(--accent-red);"></i> Risk &amp; Liability Disclaimer
+            </button>
+            <button type="button" id="tabBtnImpressumPrivacy" class="profile-tab-btn" onclick="switchImpressumTab('privacy')">
+                <i data-lucide="lock" style="width: 14px;"></i> Privacy &amp; Data Security
+            </button>
+            <button type="button" id="tabBtnImpressumAttributions" class="profile-tab-btn" onclick="switchImpressumTab('attributions')">
+                <i data-lucide="layers" style="width: 14px; color: var(--accent-cyan);"></i> Attributions &amp; Tools
+            </button>
+            <button type="button" id="tabBtnImpressumTerms" class="profile-tab-btn" onclick="switchImpressumTab('terms')">
+                <i data-lucide="file-text" style="width: 14px;"></i> Open Source License
+            </button>
+        </div>
+
+        <!-- Modal Content Container -->
+        <div class="impressum-modal-body">
+
+            <!-- TAB 1: Impressum / Legal Disclosure -->
+            <div id="impressumTabPaneLegal" class="impressum-tab-pane active">
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="building" style="width: 16px; color: var(--accent-blue);"></i>
+                        1. Angaben gemäß § 5 TMG / Information Pursuant to Statutory Requirements
+                    </h3>
+                    <p class="legal-text">
+                        <strong>Project Name:</strong> FinDashIQ &bull; Quantitative AI Financial Intelligence Terminal<br>
+                        <strong>Nature of Project:</strong> Open-Source Quantitative Analytics and Computational Finance Software<br>
+                        <strong>Lead Maintainer / Developer:</strong> Handyman Jack &amp; Open Source Contributors<br>
+                        <strong>Repository:</strong> <span class="mono" style="color: var(--accent-cyan);">pmaurer/somedayv3</span><br>
+                        <strong>Contact / Inquiries:</strong> <span class="mono" style="color: var(--accent-cyan);">contact@findashiq.local</span> or submit an issue via repository
+                    </p>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="server" style="width: 16px; color: var(--accent-green);"></i>
+                        2. Hosting &amp; Technical Execution
+                    </h3>
+                    <p class="legal-text">
+                        This application is operated as a self-hosted client/server application. All analytical calculations, quantitative indicator formulas (SuperTrend, VWAP, CMF, RSI, Stochastic, MACD), delta caching, and user authentication are executed within the local operating environment of the deploying user.
+                    </p>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="alert-circle" style="width: 16px; color: var(--accent-orange);"></i>
+                        3. Responsible for Content (gemäß § 55 Abs. 2 RStV)
+                    </h3>
+                    <p class="legal-text">
+                        The individual administrator of this deployed instance is responsible for the configuration, tickers tracked, alert channels, and data feeds utilized within their deployment.
+                    </p>
+                </div>
+            </div>
+
+            <!-- TAB 2: Risk Disclaimer & Limitation of Liability -->
+            <div id="impressumTabPaneDisclaimer" class="impressum-tab-pane" style="display: none;">
+                <div class="legal-section-card alert-warning-bordered">
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <i data-lucide="shield-alert" style="width: 28px; height: 28px; color: var(--accent-red); flex-shrink: 0; margin-top: 2px;"></i>
+                        <div>
+                            <h3 style="font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px;">
+                                Total Exclusion of Financial Liability
+                            </h3>
+                            <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-secondary);">
+                                <strong>THE CREATOR, AUTHORS, MAINTAINERS, AND CONTRIBUTORS OF FINDASHIQ EXPRESSLY DISCLAIM ALL LIABILITY FOR ANY FINANCIAL LOSSES, TRADING LOSSES, LOST PROFITS, INDIRECT, DIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES INCURRED BY ANY USER AS A RESULT OF RELYING ON THIS SOFTWARE.</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="ban" style="width: 16px; color: var(--accent-red);"></i>
+                        1. No Investment, Financial, Tax, or Legal Advice
+                    </h3>
+                    <p class="legal-text">
+                        None of the information, quantitative metrics, AI-generated theses, probabilistic price targets, execution matrices, or technical consensus ratings provided on FinDashIQ constitute financial advice, investment advice, investment brokerage, or an offer or recommendation to buy or sell any security, stock, ETF, cryptocurrency, option, or derivative.
+                    </p>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="activity" style="width: 16px; color: var(--accent-orange);"></i>
+                        2. High-Risk Investment Warning &amp; Backtesting Limitations
+                    </h3>
+                    <p class="legal-text">
+                        Financial trading involves substantial risk of loss and is not suitable for every investor. You may lose some or all of your invested capital. 
+                        <strong>Past backtest performance, historical simulation scorecards, and strategy equity curves are hypothetical and do not predict or guarantee future market returns.</strong>
+                    </p>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="cpu" style="width: 16px; color: var(--accent-purple);"></i>
+                        3. AI Synthesis &amp; LLM Output Disclaimer
+                    </h3>
+                    <p class="legal-text">
+                        Narratives produced by the AI Financial Copilot, AI Market Scanner, Catalyst Synthesizers, and 30-Day Scenario Generators are generated by Large Language Models (such as Google Gemini or OpenAI GPT). LLMs are probabilistic models capable of hallucinations, factual inaccuracies, and unexpected mathematical variations. Always independently verify all figures before making any real-world financial decisions.
+                    </p>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="database" style="width: 16px; color: var(--accent-cyan);"></i>
+                        4. Data Feeds Accuracy &amp; Delays
+                    </h3>
+                    <p class="legal-text">
+                        Market quotes, historical OHLCV data, fundamentals, and news feeds are sourced via third-party providers (such as Yahoo Finance / yfinance). Data may be delayed, incomplete, inaccurate, or temporarily unavailable. No warranty is made regarding the continuity or correctness of external market feeds.
+                    </p>
+                </div>
+            </div>
+
+            <!-- TAB 3: Data Privacy & Local Storage -->
+            <div id="impressumTabPanePrivacy" class="impressum-tab-pane" style="display: none;">
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="shield-check" style="width: 16px; color: var(--accent-green);"></i>
+                        1. Local-First Privacy Architecture
+                    </h3>
+                    <p class="legal-text">
+                        FinDashIQ is designed with a privacy-by-design philosophy. The application does <strong>not</strong> track users, run analytics trackers, or phone home to third-party telemetry servers.
+                    </p>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="key" style="width: 16px; color: var(--accent-amber);"></i>
+                        2. API Key Security &amp; Client-Side Storage
+                    </h3>
+                    <p class="legal-text">
+                        Your Google Gemini API Key and OpenAI API Key are stored exclusively in your browser's local storage (<span class="mono">localStorage</span>). Keys are never committed to disk in shared configuration files or sent to unauthorized servers. They are transmitted solely to the respective provider API endpoint when requesting AI synthesis.
+                    </p>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="hard-drive" style="width: 16px; color: var(--accent-blue);"></i>
+                        3. Server-Side Data Storage
+                    </h3>
+                    <p class="legal-text">
+                        User profiles, password hashes (salted SHA-256), watchlists, and alert rules are stored locally on the hosting machine in the <span class="mono">data/</span> folder. Only authorized administrators of the deployment have access to these files.
+                    </p>
+                </div>
+            </div>
+
+            <!-- TAB 4: Attributions & Third-Party Credits -->
+            <div id="impressumTabPaneAttributions" class="impressum-tab-pane" style="display: none;">
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="layers" style="width: 16px; color: var(--accent-cyan);"></i>
+                        1. Python Core &amp; Data Science Packages
+                    </h3>
+                    <p class="legal-text" style="margin-bottom: 10px;">
+                        FinDashIQ is built on established open-source Python computational packages and web servers:
+                    </p>
+                    <div class="attribution-grid">
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Flask</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">BSD-3-Clause</span>
+                            </div>
+                            <div class="attribution-desc">Lightweight WSGI web application framework &amp; REST routing engine.</div>
+                            <div class="attribution-author">The Pallets Projects</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Pandas</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">BSD-3-Clause</span>
+                            </div>
+                            <div class="attribution-desc">High-performance time-series dataframe manipulation &amp; rolling quantitative indicator formulas.</div>
+                            <div class="attribution-author">PyData / Pandas Development Team</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">NumPy</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">BSD-3-Clause</span>
+                            </div>
+                            <div class="attribution-desc">Array processing, matrix vectorization, and mathematical statistical computations.</div>
+                            <div class="attribution-author">NumPy Developers</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">yfinance</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">Apache-2.0</span>
+                            </div>
+                            <div class="attribution-desc">Market data downloader, real-time quote feeds, earnings schedules &amp; news streams.</div>
+                            <div class="attribution-author">Ran Aroussi &amp; Contributors</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">google-genai</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">Apache-2.0</span>
+                            </div>
+                            <div class="attribution-desc">Official Google GenAI SDK for Gemini multimodal reasoning &amp; financial synthesis.</div>
+                            <div class="attribution-author">Google LLC</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Requests</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">Apache-2.0</span>
+                            </div>
+                            <div class="attribution-desc">Synchronous HTTP library for live forex exchange rates and external REST feeds.</div>
+                            <div class="attribution-author">Kenneth Reitz &amp; PSF</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Gunicorn</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">MIT License</span>
+                            </div>
+                            <div class="attribution-desc">Production WSGI HTTP server for scalable Python deployments.</div>
+                            <div class="attribution-author">Benoit Chesneau &amp; Contributors</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Werkzeug</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">BSD-3-Clause</span>
+                            </div>
+                            <div class="attribution-desc">Comprehensive WSGI web server utility library and security password hashing.</div>
+                            <div class="attribution-author">The Pallets Projects</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="layout" style="width: 16px; color: var(--accent-purple);"></i>
+                        2. Frontend Libraries, Visualizations &amp; Typography
+                    </h3>
+                    <div class="attribution-grid">
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">ApexCharts.js</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">MIT License</span>
+                            </div>
+                            <div class="attribution-desc">Interactive financial charts (candlesticks, SuperTrend overlays, multi-oscillator panels).</div>
+                            <div class="attribution-author">Juned Chhipa &amp; ApexCharts Contributors</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Lucide Icons</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">ISC License</span>
+                            </div>
+                            <div class="attribution-desc">Clean, modern, and lightweight vector icon set for interface elements and indicators.</div>
+                            <div class="attribution-author">Lucide Project Contributors</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Inter Font</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">OFL 1.1</span>
+                            </div>
+                            <div class="attribution-desc">Geometric variable typeface crafted for high legibility on computer displays.</div>
+                            <div class="attribution-author">Rasmus Andersson</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">JetBrains Mono</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">OFL 1.1</span>
+                            </div>
+                            <div class="attribution-desc">Monospace font engineered for financial data tables, quotes, and quantitative metrics.</div>
+                            <div class="attribution-author">JetBrains s.r.o.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="globe" style="width: 16px; color: var(--accent-green);"></i>
+                        3. External APIs, Data Feeds &amp; AI Providers
+                    </h3>
+                    <div class="attribution-grid">
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Yahoo! Finance</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">Data Feed</span>
+                            </div>
+                            <div class="attribution-desc">Global stock market quotes, OHLCV time-series feeds, fundamentals, and breaking news.</div>
+                            <div class="attribution-author">Yahoo! Inc.</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Google Gemini API</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">AI Inference</span>
+                            </div>
+                            <div class="attribution-desc">Generative AI models powering the Copilot, Market Scanner, and Analyst agents.</div>
+                            <div class="attribution-author">Google LLC / DeepMind</div>
+                        </div>
+                        <div class="attribution-item">
+                            <div class="attribution-item-header">
+                                <span class="attribution-name mono">Frankfurter / ExchangeRate</span>
+                                <span class="badge-pill" style="font-size: 0.65rem;">Forex Feed</span>
+                            </div>
+                            <div class="attribution-desc">Real-time reference foreign exchange rates for cross-currency portfolio conversion.</div>
+                            <div class="attribution-author">European Central Bank Data Feeds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: Open Source License & Terms -->
+            <div id="impressumTabPaneTerms" class="impressum-tab-pane" style="display: none;">
+                <div class="legal-section-card">
+                    <h3 class="legal-section-heading">
+                        <i data-lucide="award" style="width: 16px; color: var(--accent-cyan);"></i>
+                        MIT License
+                    </h3>
+                    <div style="background: var(--bg-input); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; margin-top: 10px;">
+                        Copyright (c) 2026 FinDashIQ Open Source Project<br><br>
+                        Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:<br><br>
+                        The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<br><br>
+                        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Modal Footer -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="shield" style="width: 13px; height: 13px;"></i>
+                <span>Strictly for Research &amp; Educational Purposes</span>
+            </div>
+            <button type="button" class="btn-toggle" style="padding: 7px 18px; font-size: 0.82rem;" onclick="closeImpressumModal()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
