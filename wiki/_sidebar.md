@@ -12,11 +12,13 @@
 - **[Global News Wire](Global-News-and-Market-Catalysts.md)**
 - **[Multi-Currency Forex](Multi-Currency-and-Forex-Engine.md)**
 
-### 🔔 Signal Notifications Hub
+### 🔔 Signal Notifications & Dispatch Hub
 - **[Configuring Notifications](Configuring-Notifications.md)**
-- **[Telegram Bot Setup](Telegram-Bot-Setup.md)**
-- **[Discord Webhook Setup](Discord-Webhook-Setup.md)**
-- **[Custom APIs & Email](Custom-API-and-Email-Webhooks.md)**
+- **[📱 Telegram Bot Setup](Telegram-Bot-Setup.md)**
+- **[💬 Discord Webhook Setup](Discord-Webhook-Setup.md)**
+- **[📧 Email & SMTP Setup](Email-and-SMTP-Setup.md)**
+- **[🔔 Browser Push & Audio Chimes](Browser-Push-and-Audio-Alerts.md)**
+- **[🌐 Custom REST API Webhooks](Custom-API-Webhooks.md)**
 
 ### ⚙️ System & Governance
 - **[Authentication & Roles](Authentication-and-User-Management.md)**

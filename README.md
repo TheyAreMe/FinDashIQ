@@ -257,11 +257,13 @@ WantedBy=multi-user.target
 
 Comprehensive documentation, architectural guides, and integration tutorials are available in the official **[FinDashIQ GitHub Wiki](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki)**:
 
-- 📖 **[Project Wiki Home](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki)** — Full knowledge base, setup walk-throughs, and architecture overviews.
-- 🔔 **[Configuring the Notification Section](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Configuring-Notifications)** — Step-by-step alert configuration, multi-factor indicator types, thresholds, rule lifecycle, and test simulation.
-- 📱 **[Telegram Bot Setup Guide](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Telegram-Bot-Setup)** — Setting up bots via `@BotFather`, obtaining Chat IDs, and dispatching alerts.
-- 💬 **[Discord Webhook Integration](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Discord-Webhook-Setup)** — Setting up webhooks and formatting Discord trading channel embeds.
-- 🌐 **[Custom API & Email Webhooks](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Custom-API-and-Email-Webhooks)** — JSON payload schemas and connecting to external trading bots, Zapier, and n8n.
+- 📖 **[Project Wiki Home](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Home.md)** — Full knowledge base, setup walk-throughs, and architecture overviews.
+- 🔔 **[Configuring Notifications & Global Watchlist](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Configuring-Notifications.md)** — Multi-factor indicator alerts, portfolio-wide watchlist monitoring (`*WATCHLIST*`), and rule lifecycles.
+- 📱 **[Telegram Bot Setup Guide](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Telegram-Bot-Setup.md)** — Setting up bots via `@BotFather`, obtaining Chat IDs, and direct server messaging.
+- 💬 **[Discord Webhook Integration](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Discord-Webhook-Setup.md)** — Setting up webhooks and formatting Discord trading channel embeds.
+- 📧 **[Email & SMTP Setup Guide](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Email-and-SMTP-Setup.md)** — Direct SMTP outbound configuration (`.env`) and HTML executive memos.
+- 🔔 **[Browser Push & Audio Alerts](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Browser-Push-and-Audio-Alerts.md)** — HTML5 desktop notifications and Web Audio synthesizer chimes.
+- 🌐 **[Custom REST API Webhooks](https://github.com/TheyAreMe/FinDashIQ/tree/main/wiki/Custom-API-Webhooks.md)** — JSON payload schemas and connecting to external trading bots, Zapier, and n8n.
 
 ---
 

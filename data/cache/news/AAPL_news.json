@@ -1,5 +1,5 @@
 {
-  "timestamp": 1788022633.7983866,
+  "timestamp": 1788077595.478343,
   "ticker": "AAPL",
   "country": "United States",
   "flag": "🇺🇸",
@@ -11,8 +11,8 @@
       "publisher": "MarketWatch",
       "country": "United States",
       "flag": "🇺🇸",
-      "publishedAt": "Today 08:30AM",
-      "timestamp": 1788022634,
+      "publishedAt": "Aug-29-26 08:30AM",
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -24,7 +24,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "Aug-28-26 10:09PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -36,7 +36,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "06:24PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -48,7 +48,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "05:53PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -60,7 +60,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "02:04PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -72,7 +72,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "01:48PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -84,7 +84,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "01:48PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -96,7 +96,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "01:45PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -108,7 +108,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "01:18PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -120,8 +120,20 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "01:15PM",
-      "timestamp": 1788022634,
+      "timestamp": 1788077596,
       "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Apple | AAPL Stock Price, Company Overview & News - Forbes",
+      "summary": "Apple | AAPL Stock Price, Company Overview & News&nbsp;&nbsp;Forbes",
+      "url": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5rWDNjOGl0aWxxdkhOMjkwZHdyR0ptVVhFaVJOUDVtZW9XYlk2b3RtTkdoWmY0ajMyUE16Wm5WN0VlUkVsa24zYmhJcHdMNmZF?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788077596,
+      "sourceType": "rss",
       "timeAgo": "Just now"
     },
     {
@@ -132,7 +144,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022633,
+      "timestamp": 1788077596,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -144,31 +156,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022633,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Values Added Financial LLC's Apple Inc(AAPL) Holding History - GuruFocus",
-      "summary": "Values Added Financial LLC's Apple Inc(AAPL) Holding History&nbsp;&nbsp;GuruFocus",
-      "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxPVUo5c19BUWZhZk9PWnZLblJBQ1FzTElnWUNFSW01LWlGS3hKZkd0UldOa2FMQnJRbDhaTlhnenE1dEI3WTVVSHpsSS01dE9qOURLelA0ZGdwRHNLSDhvRENfUVc3c2Ftem44blpxenNxMEhrOWtWblV5U1NucnQ0djRvMFA?oc=5",
-      "publisher": "Google News Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788022633,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Jim Cramer’s Latest Thought on Apple Inc. (AAPL) - Yahoo Finance",
-      "summary": "Jim Cramer’s Latest Thought on Apple Inc. (AAPL)&nbsp;&nbsp;Yahoo Finance",
-      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNZ1RMM2loTkNsaVYtdllGcWdNWkI5VkhJbzFtSmxWM0F0bndxX2JIaEwwd1RPcy1OUzdkd1ZpalhXOHZVWFh5Tlh2ek5qSFduZjFJT2E0a3VSN05IZ2UyeHZ5cVM4UzZmVDE0cGRMbzg1a1lNakhqMGxXY1QxUlgycldGd2Y1MXFzejdkZldZY0c3TWpnYUVTTg?oc=5",
-      "publisher": "Google News Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788022633,
+      "timestamp": 1788077596,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -180,19 +168,19 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022633,
+      "timestamp": 1788077596,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
     {
-      "title": "Apple stock slides nearly 10% as Cook warns of memory shortage impact - Yahoo Finance",
-      "summary": "Apple stock slides nearly 10% as Cook warns of memory shortage impact&nbsp;&nbsp;Yahoo Finance",
-      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNSTVDTlRuakJsWTFGbTVEdHZ6X3FXTVZLN2FwT2lSRHpObDRqeTJqajBYa3dpSU1IbVpLZG52MzFGQ2VlY01LdWhrbWpjbmRxNlhzUkdvM09pYUNTQ2c2NjYzX1pUX3VBUGYzLUJSRFNtTk11TGw2dG1BVzZnOEthS3V4TGVLWW5rVVQ0WGVnR0xXLVBPMGNITHdDZkhKMzl2LTI1cDU1NjBYQmVxdV95dlhWUEtFeUZtU1kwRTZiZnJSQXE3SHRn?oc=5",
+      "title": "Jim Cramer’s Latest Thought on Apple Inc. (AAPL) - Yahoo Finance",
+      "summary": "Jim Cramer’s Latest Thought on Apple Inc. (AAPL)&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNZ1RMM2loTkNsaVYtdllGcWdNWkI5VkhJbzFtSmxWM0F0bndxX2JIaEwwd1RPcy1OUzdkd1ZpalhXOHZVWFh5Tlh2ek5qSFduZjFJT2E0a3VSN05IZ2UyeHZ5cVM4UzZmVDE0cGRMbzg1a1lNakhqMGxXY1QxUlgycldGd2Y1MXFzejdkZldZY0c3TWpnYUVTTg?oc=5",
       "publisher": "Google News Wire",
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022633,
+      "timestamp": 1788077596,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -204,7 +192,19 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022633,
+      "timestamp": 1788077596,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Apple stock slides nearly 10% as Cook warns of memory shortage impact - Yahoo Finance",
+      "summary": "Apple stock slides nearly 10% as Cook warns of memory shortage impact&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxNSTVDTlRuakJsWTFGbTVEdHZ6X3FXTVZLN2FwT2lSRHpObDRqeTJqajBYa3dpSU1IbVpLZG52MzFGQ2VlY01LdWhrbWpjbmRxNlhzUkdvM09pYUNTQ2c2NjYzX1pUX3VBUGYzLUJSRFNtTk11TGw2dG1BVzZnOEthS3V4TGVLWW5rVVQ0WGVnR0xXLVBPMGNITHdDZkhKMzl2LTI1cDU1NjBYQmVxdV95dlhWUEtFeUZtU1kwRTZiZnJSQXE3SHRn?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788077596,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -216,7 +216,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022633,
+      "timestamp": 1788077596,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -228,19 +228,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022633,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Jim Cramer Can’t Help But Gloat At Apple Inc (NASDAQ:AAPL)’s AI Developments - Yahoo Finance",
-      "summary": "Jim Cramer Can’t Help But Gloat At Apple Inc (NASDAQ:AAPL)’s AI Developments&nbsp;&nbsp;Yahoo Finance",
-      "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOYndJY2ZFT0h0cDZiVjQ2alFNVEIxQkR5YmtBUXEzMzI2UXFscG51QWtvcnlCWTdtckFKdEhyWTVQM1d3QmN1X2FTOU1ROGZKWmlvR21CV29jOXlNVWkxVWRyMmtGX3J5dnEzX2RsY0VMR0djZUc2U2tIOXN6d2FfT25GS01vNlRjLTlvM3c3ZC0?oc=5",
-      "publisher": "Google News Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788022633,
+      "timestamp": 1788077596,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -252,7 +240,31 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022633,
+      "timestamp": 1788077596,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Jim Cramer Can’t Help But Gloat At Apple Inc (NASDAQ:AAPL)’s AI Developments - Yahoo Finance",
+      "summary": "Jim Cramer Can’t Help But Gloat At Apple Inc (NASDAQ:AAPL)’s AI Developments&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxOYndJY2ZFT0h0cDZiVjQ2alFNVEIxQkR5YmtBUXEzMzI2UXFscG51QWtvcnlCWTdtckFKdEhyWTVQM1d3QmN1X2FTOU1ROGZKWmlvR21CV29jOXlNVWkxVWRyMmtGX3J5dnEzX2RsY0VMR0djZUc2U2tIOXN6d2FfT25GS01vNlRjLTlvM3c3ZC0?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788077596,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Here is What to Know Beyond Why Apple Inc. (AAPL) is a Trending Stock - Yahoo Finance",
+      "summary": "Here is What to Know Beyond Why Apple Inc. (AAPL) is a Trending Stock&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPZy1lblBIejMtQ0o4VVFtQkdlMFlIZXlqR2RRUEw1dkhWR3JlSGtSaDR5S0pZNEo1bnFwUEZpRkZ1SFNuV0pkX1B2NHdjd3diaWN4b2J5cW9aanhNOEl3WVpXb2pQby1SamFSUEI2Q3lUWm5tWUk3YXpxVkpMTjlVd3JXYWs5Q0t1Z2dsVEs2QnV1U09R?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788077596,
       "sourceType": "rss",
       "timeAgo": "Just now"
     }
