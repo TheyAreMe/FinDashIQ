@@ -11,7 +11,7 @@ This guide details how to configure Telegram Bots in FinDashIQ for real-time qua
    - **Display Name**: e.g. `FinDashIQ Quant Bot`
    - **Bot Username** (must end in `bot`): e.g. `FinDashIQ_bot`
 3. `@BotFather` will provide your **Bot API Token** (e.g. `<TOKEN>`).
-4. Paste the token into your [.env](file:///c:/Users/Handyman%20Jack/Repositories/somedayv3/.env) file:
+4. Paste the token into your [.env] file:
    ```env
    TELEGRAM_BOT_TOKEN=<TOKEN>
    ```
@@ -25,12 +25,12 @@ Select the method below matching where you want alerts delivered:
 ### 👤 Method A: Direct Private Messages (DMs to You)
 *Best for personal trading alerts delivered directly to your Telegram inbox.*
 
-1. **Grant Permission**: In Telegram, open a chat with your bot (e.g. `@FinDashIQ_bot`) and tap **"Start"** (or send `hello`).
+1. **Grant Permission**: In Telegram, open a chat with your bot (e.g. `@FinDashIQ_bot`) and tap **"Start"** (or send `/start`).
 2. **Find Your Chat ID** (choose one):
    - **Option 1 (Auto-Detect — Recommended)**: In FinDashIQ Destination, type `auto` (or leave blank). FinDashIQ will automatically discover your Chat ID from Telegram.
-   - **Option 2 (Direct Browser Check)**: Open `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` and look for `"id": 987654321`.
-   - **Option 3 (ID Bot)**: Message `@raw_data_bot` or `@myidbot` to see your numeric User ID (e.g. `987654321`).
-3. **In FinDashIQ**: Enter `auto` or your numeric Chat ID (e.g. `987654321`), then click **"Trigger Test Message"**.
+   - **Option 2 (Direct Browser Check)**: Open `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` and look for `"id": <ID>`.
+   - **Option 3 (ID Bot)**: Message `@raw_data_bot` or `@myidbot` to see your numeric User ID (e.g. `<ID>`).
+3. **In FinDashIQ**: Enter `auto` or your numeric Chat ID (e.g. `<ID>`), then click **"Trigger Test Message"**.
 
 ---
 
@@ -73,7 +73,7 @@ Select the method below matching where you want alerts delivered:
 
 | Target Location | Prerequisites in Telegram | FinDashIQ Destination Input |
 | :--- | :--- | :--- |
-| **Personal DM** | Tap **Start** on `@FinDashIQ_bot` | `auto` or numeric ID `987654321` |
+| **Personal DM** | Tap **Start** on `@FinDashIQ_bot` | `auto` or numeric ID `<ID>` |
 | **Public Channel / Group** | Set group to **Public** + Bot is **Admin** | `@FinDashIQ` (public handle) |
 | **Private Group** | Bot is **Admin** + Send `/test @FinDashIQ_bot` | `auto` or numeric ID `-100...` |
 | **Inline (No .env)** | Tap **Start** on bot | `BOT_TOKEN:CHAT_ID` |
