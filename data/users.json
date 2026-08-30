@@ -20,7 +20,21 @@
       "NEL.OL",
       "PYPL"
     ],
-    "alerts": [],
+    "alerts": [
+      {
+        "id": "alert-1788081983287",
+        "ticker": "*WATCHLIST*",
+        "signalType": "news_sentiment_bearish",
+        "signalName": "\ud83d\udcc9 Adverse Event Wire (Downgrades / Headwinds)",
+        "category": "News & Catalyst",
+        "condition": "sentiment_negative",
+        "threshold": "Sentiment: Bearish / Adverse",
+        "channel": "Telegram Bot",
+        "channelTarget": "auto",
+        "active": true,
+        "createdAt": "2026-08-30T11:26:23.287455"
+      }
+    ],
     "aiSettings": {
       "apiKey": "",
       "model": "gemini-3.7-flash"

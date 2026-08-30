@@ -1,45 +1,9 @@
 {
-  "timestamp": 1788022392.0362363,
+  "timestamp": 1788081352.632978,
   "ticker": "QCOM",
   "country": "United States",
   "flag": "🇺🇸",
   "news": [
-    {
-      "title": "Qualcomm's HBC play pulls Samsung and SK hynix into a new race beyond HBM",
-      "summary": "",
-      "url": "https://www.digitimes.com/news/a20260828VL218/qualcomm-hbm-samsung-infrastructure-bandwidth.html",
-      "publisher": "Financial Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-28-26 06:39PM",
-      "timestamp": 1788022393,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Vietnam urges Qualcomm, Samsung to deepen AI, chip investment as it seeks tech upgrade",
-      "summary": "",
-      "url": "https://finance.yahoo.com/technology/ai/articles/vietnam-urges-qualcomm-samsung-deepen-035324366.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-27-26 11:53PM",
-      "timestamp": 1788022393,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Qualcomm's Costs Are Inside The Guidance And Its Replacement Growth Is Not",
-      "summary": "",
-      "url": "https://finance.yahoo.com/m/df252dae-845c-3851-bf01-16d99b1a3cde/qualcomm%27s-costs-are-inside.html",
-      "publisher": "Yahoo Finance",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "Aug-26-26 01:53PM",
-      "timestamp": 1788022393,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
     {
       "title": "Qualcomm (NASDAQ:QCOM): Growth at a Reasonable Price - ChartMill",
       "summary": "Qualcomm (NASDAQ:QCOM): Growth at a Reasonable Price&nbsp;&nbsp;ChartMill",
@@ -48,7 +12,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -60,7 +24,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -72,7 +36,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -84,31 +48,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Why Qualcomm (QCOM) Shares Are Trading Lower Today - Yahoo Finance",
-      "summary": "Why Qualcomm (QCOM) Shares Are Trading Lower Today&nbsp;&nbsp;Yahoo Finance",
-      "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNYmZ5SjVsLVVHelhpd3dIdFhCZ1YxZUN0UW5iMEFiemFtbF8yNXlIVGxoOXJWVVhkd3JhVmdTTUdGaklkRjVJbTROMUpqekhad0RFNWtabEE3SnktWXRoYjJ0Y0swTUNDOURXX0dULWVPSGQ5SkR6VkZlR29uOXFHTWVFTV9ubVB5WDdpTlBEaDZyU2U0cXFRTGI0dnVfdw?oc=5",
-      "publisher": "Google News Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788022392,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "QUALCOMM INC (NASDAQ:QCOM) Earns Top Spot on Best Dividend Stocks Screener - ChartMill",
-      "summary": "QUALCOMM INC (NASDAQ:QCOM) Earns Top Spot on Best Dividend Stocks Screener&nbsp;&nbsp;ChartMill",
-      "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPb20zOWJVN3VxM1Q2ek5QUWltZVpTeVgwNklEazI4RlJxWU0zODgybktXVGs2ejYyREhvLWRuUXNObGNGNERXcnd2cHZzYXJ0RlRBb2piUzBpYURmRm5LNUpPZzRwdTdFRGowaE9TbXc2dUhwc2dvb0NPQWtKTFhLUjlMeld1UXJybWM0YnBrb0JuMThXZlVxSXZMV2NERUhrVjVTdWd6VDdHYTJWQ0ZYSHBmYks2XzI1ZXBxMW9DOGk?oc=5",
-      "publisher": "Google News Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -120,7 +60,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -132,19 +72,19 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
     {
-      "title": "Is Qualcomm Inc. (QCOM) a Top tech Stock in Ken Fisher Portfolio on Data Center Opportunities? - Yahoo Finance",
-      "summary": "Is Qualcomm Inc. (QCOM) a Top tech Stock in Ken Fisher Portfolio on Data Center Opportunities?&nbsp;&nbsp;Yahoo Finance",
-      "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOc0ZGczU0Tjdab1JTdXNsdU1VNW9WXzh1a3hlUUluZXowNlJTcWZfV0szNmdTZEp2OG8wYkIzUUhNY2NoZFBPZkxJSGFXblIxaHFQTG5nRm9xSHJHa0NDT2dHS2g3SDhHZzVYX00xZVNDTDcwa0RUNmo1OEtGel9ZUURrb2k0UnQ3Zkx3Z1RMbFJnNVJBQmc?oc=5",
+      "title": "Qualcomm reports better-than-anticipated Q2 earnings, stock rises over 10% - Yahoo Finance",
+      "summary": "Qualcomm reports better-than-anticipated Q2 earnings, stock rises over 10%&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxON21SMUNTRkM5SWJ1clVaODRKMkpOM1diaHdEemp6SEV4VEptZzZBZVJNT25PUHJSOVZJdmJmUVBtRThub2hxajRWZU40OHBVS2lsZzVwX0praUN5TFJHMmpDaDF1eU9hQTJHdUJqelNiZHd2TDFHek5Od3BKQ18yNHhWQTFhdS1ldW1TS0wtX1QyaG56ZTh5SjlpT1V0Z2xkQVd6Q2ZDRnNCSUVmSVVtYnhpN2k3bTRqeEY0NnFBcE5MbFdRQTNOSmtzMDZCcG9uT0E?oc=5",
       "publisher": "Google News Wire",
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -156,7 +96,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -168,7 +108,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -180,7 +120,19 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is Qualcomm Inc. (QCOM) a Top tech Stock in Ken Fisher Portfolio on Data Center Opportunities? - Yahoo Finance",
+      "summary": "Is Qualcomm Inc. (QCOM) a Top tech Stock in Ken Fisher Portfolio on Data Center Opportunities?&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOc0ZGczU0Tjdab1JTdXNsdU1VNW9WXzh1a3hlUUluZXowNlJTcWZfV0szNmdTZEp2OG8wYkIzUUhNY2NoZFBPZkxJSGFXblIxaHFQTG5nRm9xSHJHa0NDT2dHS2g3SDhHZzVYX00xZVNDTDcwa0RUNmo1OEtGel9ZUURrb2k0UnQ3Zkx3Z1RMbFJnNVJBQmc?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -192,8 +144,56 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022392,
+      "timestamp": 1788081353,
       "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Qualcomm (QCOM) Soars 11% Ahead of Next Week’s Earnings - Yahoo Finance",
+      "summary": "Qualcomm (QCOM) Soars 11% Ahead of Next Week’s Earnings&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPR0FYeHV4eTc2TmdkdTJ5VnZqXzhOR3VCUXowZTBTWEJyUWNER0xfUjI3Rlg4LXJTYWwzTV9FandfZjBObjZjTldqVWZSYklYMU84MFRYYmNLdUtTLVhfSHhYbDBnRVRjWldhUncxVmxReWlEUjNtSktQNlh0cEpiLWJkam1xOExtQWF2ZWNZamdlalJkWExKTQ?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788081353,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Qualcomm's HBC play pulls Samsung and SK hynix into a new race beyond HBM",
+      "summary": "",
+      "url": "https://www.digitimes.com/news/a20260828VL218/qualcomm-hbm-samsung-infrastructure-bandwidth.html",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 06:39PM",
+      "timestamp": 1788081353,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Vietnam urges Qualcomm, Samsung to deepen AI, chip investment as it seeks tech upgrade",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/vietnam-urges-qualcomm-samsung-deepen-035324366.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 11:53PM",
+      "timestamp": 1788081353,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Qualcomm's Costs Are Inside The Guidance And Its Replacement Growth Is Not",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/df252dae-845c-3851-bf01-16d99b1a3cde/qualcomm%27s-costs-are-inside.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 01:53PM",
+      "timestamp": 1788081353,
+      "sourceType": "finviz",
       "timeAgo": "Just now"
     }
   ]

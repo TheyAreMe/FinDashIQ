@@ -3,6 +3,14 @@ import os
 import json
 import concurrent.futures
 from datetime import datetime, timedelta
+
+# Explicitly load .env file into environment
+try:
+    from dotenv import load_dotenv
+    load_dotenv(override=True)
+except ImportError:
+    pass
+
 from flask import Flask, render_template, jsonify, request, session, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -11,6 +19,26 @@ from services.ai_service import AIService
 from services.scanner_service import ScannerService
 from services.currency_service import CurrencyService
 from services.news_service import news_service
+
+
+def _load_dotenv_if_present():
+    """Optional zero-dependency .env file loader fallback. If .env is not present, does nothing and system operates normally."""
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        k, v = k.strip(), v.strip().strip('"').strip("'")
+                        if k:
+                            os.environ[k] = v
+        except Exception:
+            pass
+
+
+_load_dotenv_if_present()
 
 app = Flask(__name__, template_folder='templates')
 app.secret_key = os.environ.get('SECRET_KEY', 'findashiq_enterprise_quant_key_2026_x89')
@@ -28,7 +56,14 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_
 @app.context_processor
 def inject_asset_version():
     """Injects static asset version string for automatic client cache busting."""
-    return {'asset_version': '4.16.0'}
+    return {'asset_version': '4.34.0'}
+
+
+
+
+
+
+
 
 
 @app.after_request
@@ -1124,9 +1159,14 @@ def api_alert_item(alert_id):
 
 @app.route('/api/alerts/test-trigger', methods=['POST'])
 def api_test_trigger_alert():
-    """Generates a triggered notification simulation for a signal rule, including full news text and links for news catalysts."""
+    """Executes live or simulated notification dispatch across configured channels."""
+    from services.notification_service import notification_service
+
     data = request.get_json(silent=True) or {}
-    ticker = data.get('ticker', 'NVDA')
+    raw_ticker = str(data.get('ticker', 'NVDA')).strip().upper()
+    is_global_watchlist = raw_ticker in ('*WATCHLIST*', 'WATCHLIST', 'ALL_WATCHLIST', 'PORTFOLIO')
+    ticker = 'NVDA' if is_global_watchlist else raw_ticker
+    
     signal_name = data.get('signalName') or data.get('signalType', 'SuperTrend Bullish Flip')
     threshold = data.get('threshold', 'Trigger Level Reached')
     channel = data.get('channel', 'Telegram Bot')
@@ -1152,28 +1192,36 @@ def api_test_trigger_alert():
         except Exception:
             pass
 
+    if is_global_watchlist:
+        title = f"🚨 [Portfolio Alert] {ticker} Triggered: {signal_name}"
+    else:
+        title = f"🚨 {ticker} Signal Triggered: {signal_name}"
+
     if is_news and news_headline:
-        message = f"📰 BREAKING CATALYST WIRE ({news_publisher}): \"{news_headline}\"\n\n{news_summary or 'Real-time breaking market catalyst and corporate filing.'}\n\n🔗 Direct Link: {news_url}"
+        message = f"📰 BREAKING CATALYST WIRE ({news_publisher or 'Wire'}): \"{news_headline}\"\n\n{news_summary or 'Real-time breaking market catalyst and corporate filing.'}\n\n🔗 Direct Link: {news_url or '#'}"
     else:
         message = f"Quantitative Multi-Factor Engine triggered condition [{threshold}] for {ticker}. Algorithmic momentum, volume-weighted metrics, and volatility bands indicate actionable execution bias."
 
-    mock_notification = {
-        "id": f"msg-{int(datetime.now().timestamp() * 1000)}",
-        "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    dispatch_report = notification_service.dispatch_alert({
         "ticker": ticker,
-        "signalType": signal_name,
+        "isGlobalWatchlist": is_global_watchlist,
+        "signalName": signal_name,
+        "signalType": data.get('signalType', ''),
         "category": category,
+        "condition": data.get('condition', ''),
+        "threshold": threshold,
         "channel": channel,
         "channelTarget": channel_target,
-        "title": f"🚨 {ticker} Signal Triggered: {signal_name}",
+        "title": title,
         "message": message,
         "newsHeadline": news_headline,
         "newsSummary": news_summary,
         "newsPublisher": news_publisher,
         "newsUrl": news_url,
-        "status": "Delivered"
-    }
-    return jsonify({"success": True, "notification": mock_notification}), 200
+        "metrics": data.get('metrics', {})
+    })
+
+    return jsonify({"success": True, "notification": dispatch_report}), 200
 
 
 if __name__ == '__main__':

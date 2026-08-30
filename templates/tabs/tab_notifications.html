@@ -2,6 +2,55 @@
 <!-- TOP TAB 3: SIGNAL ALERTS & NOTIFICATIONS HUB -->
 <!-- ========================================================= -->
 <div id="topView-notifications" class="top-view-pane">
+    <!-- 🔄 Autonomous Background Signal & News Monitoring Engine Banner -->
+    <div class="bg-engine-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <!-- Left: Status Indicator & Pulse -->
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div id="bgEnginePulseDot" class="pulse-dot-active"></div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary);">Autonomous Signal Monitoring Engine</span>
+                        <span id="bgEngineStatusBadge" class="badge-pill badge-positive" style="font-size: 0.65rem;">Active • Auto-Polling</span>
+                    </div>
+                    <div id="bgEngineCountdownText" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+                        Next automated calculation &amp; news wire scan in: <strong id="bgCountdownTimer" style="color: var(--accent-cyan); font-family: monospace; font-size: 0.82rem;">15:00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center: Slider Control (1 min to 24h) -->
+            <div style="flex: 1; min-width: 260px; max-width: 440px; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted);">
+                    <span>Polling Interval: <strong id="bgIntervalDisplay" style="color: var(--accent-purple); font-weight: 700;">15 Minutes</strong></span>
+                    <span style="color: var(--text-secondary);">Range: 1m &ndash; 24h</span>
+                </div>
+                <input type="range" id="bgPollingIntervalSlider" min="0" max="14" value="4" step="1" class="custom-range-slider" oninput="handlePollingIntervalChange(this.value)">
+                <div style="display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); padding: 0 2px;">
+                    <span>1m</span>
+                    <span>5m</span>
+                    <span style="color: var(--accent-purple); font-weight: 700;">15m (Def)</span>
+                    <span>1h</span>
+                    <span>4h</span>
+                    <span>12h</span>
+                    <span>24h</span>
+                </div>
+            </div>
+
+            <!-- Right: Action Controls -->
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button type="button" id="btnBgCheckNow" class="btn-bg-engine-primary" onclick="triggerManualSignalCheck()" title="Execute instant calculation and news wire scan right now">
+                    <i data-lucide="refresh-cw" id="bgRefreshIcon" style="width: 14px; height: 14px;"></i>
+                    <span id="bgCheckNowText">Check Signals Now</span>
+                </button>
+                <button type="button" id="btnBgPauseToggle" class="btn-bg-engine-secondary" onclick="toggleBackgroundEngine()" title="Pause or resume autonomous background monitoring">
+                    <i data-lucide="pause" id="bgPauseIcon" style="width: 14px; height: 14px;"></i>
+                    <span id="bgPauseText">Pause</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="notifications-layout">
         <!-- Left: Advanced Alert Rule Configurator -->
         <div class="notifications-left-col">
@@ -18,33 +67,23 @@
                     <div style="display: flex; flex-direction: column; gap: 16px;">
                         <!-- 1. Target Asset -->
                         <div>
-                            <label class="form-label" style="display: flex; justify-content: space-between;">
+                            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                                 <span>Target Asset / Stock</span>
-                                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">Select tracked asset or enter symbol</span>
+                                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: normal;">Select entire watchlist, individual asset, or search company</span>
                             </label>
-                            <div style="display: flex; gap: 8px;">
-                                <select id="alertTickerSelect" class="form-select" style="flex: 1;" onchange="updateAlertPreview()">
-                                    <optgroup label="Tracked Portfolio Assets">
-                                        <option value="NVDA" selected>NVDA — NVIDIA Corporation</option>
-                                        <option value="MSFT">MSFT — Microsoft Corporation</option>
-                                        <option value="IFX.DE">IFX.DE — Infineon Technologies AG</option>
-                                        <option value="TSM">TSM — Taiwan Semiconductor</option>
-                                        <option value="SPCX">SPCX — SPCX Acquisition Corp</option>
-                                        <option value="EXXT.DE">EXXT.DE — iShares NASDAQ 100 ETF</option>
-                                        <option value="XDWT.DE">XDWT.DE — Xtrackers MSCI World Tech</option>
+                            <div class="alert-target-stock-row" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <select id="alertTickerSelect" class="form-select" style="flex: 1; min-width: 200px;" onchange="updateAlertPreview()">
+                                    <optgroup label="🌐 Global Portfolio-Wide Monitor">
+                                        <option value="*WATCHLIST*" selected style="font-weight: 700; color: var(--accent-cyan);">🌐 ALL WATCHLIST ASSETS (Portfolio-Wide Global Alert)</option>
                                     </optgroup>
-                                    <optgroup label="Global Technology &amp; Growth Leaders">
-                                        <option value="AAPL">AAPL — Apple Inc.</option>
-                                        <option value="AMZN">AMZN — Amazon.com Inc.</option>
-                                        <option value="GOOGL">GOOGL — Alphabet Inc.</option>
-                                        <option value="META">META — Meta Platforms Inc.</option>
-                                        <option value="TSLA">TSLA — Tesla Inc.</option>
-                                        <option value="AMD">AMD — Advanced Micro Devices</option>
-                                        <option value="PLTR">PLTR — Palantir Technologies</option>
-                                        <option value="SAP.DE">SAP.DE — SAP SE</option>
+                                    <optgroup label="Tracked Portfolio Assets (Watchlist)" id="alertWatchlistOptgroup">
+                                        <!-- Dynamically synced with active Watchlist -->
                                     </optgroup>
                                 </select>
-                                <input type="text" id="alertCustomTicker" class="form-input" style="width: 120px; text-transform: uppercase;" placeholder="Custom..." oninput="updateAlertPreview()">
+                                <button type="button" class="btn-watchlist-add btn-alert-search-stock" onclick="openAddStockModal('alert')" title="Search all stocks, ETFs & companies across international exchanges to create alert">
+                                    <i data-lucide="search" style="width: 14px; height: 14px;"></i>
+                                    <span>Search Stock</span>
+                                </button>
                             </div>
                         </div>
 
@@ -99,37 +138,22 @@
                             </div>
                         </div>
 
-                        <!-- 3. Condition & Threshold Configurator -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                            <div>
-                                <label class="form-label">Evaluation Logic</label>
-                                <select id="alertCondition" class="form-select" onchange="updateAlertPreview()">
-                                    <option value="direction_flip">Direction / State Flip</option>
-                                    <option value="crosses_above">Crosses Above (&gt;=)</option>
-                                    <option value="crosses_below">Crosses Below (&lt;=)</option>
-                                    <option value="reaches_level">Reaches Exact Price ($)</option>
-                                    <option value="news_event">🚨 Breaking News Event</option>
-                                    <option value="sentiment_positive">📈 Bullish Sentiment Catalyst</option>
-                                    <option value="sentiment_negative">📉 Bearish / Adverse Catalyst</option>
-                                    <option value="tier1_publish">🏛️ Tier-1 Publisher Wire</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label">Trigger Threshold Parameter</label>
-                                <input type="text" id="alertThreshold" class="form-input" value="Bullish Uptrend Confirmation" placeholder="e.g. 75%, Bullish Flip, $185.00" oninput="updateAlertPreview()">
-                            </div>
-                        </div>
-
-                        <!-- 4. Communication Channel & Dispatch Target Configuration -->
+                        <!-- 3. Communication Channel & Dispatch Target Configuration -->
                         <div style="background: var(--bg-card-hover); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
                             <div>
-                                <label class="form-label" style="display: flex; align-items: center; gap: 6px;">
-                                    <i data-lucide="send" style="width: 14px; color: var(--accent-cyan);"></i>
-                                    <span>Dispatch Channel &amp; Delivery Destination</span>
-                                </label>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <label class="form-label" style="display: flex; align-items: center; gap: 6px; margin-bottom: 0;">
+                                        <i data-lucide="send" style="width: 14px; color: var(--accent-cyan);"></i>
+                                        <span>Dispatch Channel &amp; Delivery Destination</span>
+                                    </label>
+                                    <a id="alertSetupGuideLink" href="javascript:void(0)" onclick="openHelpTopic('telegram')" style="font-size: 0.72rem; color: var(--accent-blue); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;" title="Open Telegram Bot Setup Guide">
+                                        <span>Setup Guide</span>
+                                        <i data-lucide="external-link" style="width: 11px; height: 11px;"></i>
+                                    </a>
+                                </div>
                                 <select id="alertChannel" class="form-select" onchange="handleChannelChange()">
                                     <option value="Telegram Bot">📱 Telegram Bot &amp; Push Notification</option>
-                                    <option value="Email Webhook">📧 Email Notification Webhook</option>
+                                    <option value="Email Webhook">📧 Email Notification (SMTP / Webhook)</option>
                                     <option value="Discord Webhook">💬 Discord Trading Channel Webhook</option>
                                     <option value="Browser Push">🔔 In-App &amp; Desktop Sound Alert</option>
                                     <option value="Custom API Webhook">🌐 Custom Webhook (JSON POST Endpoint)</option>
@@ -138,15 +162,24 @@
 
                             <!-- Channel-Specific Target Field -->
                             <div>
-                                <label id="channelTargetLabel" class="form-label" style="font-size: 0.75rem;">Telegram Chat ID / Channel</label>
-                                <input type="text" id="alertChannelTarget" class="form-input" placeholder="e.g. @quant_trader or 123456789" value="@quant_desk" oninput="updateAlertPreview()">
-                                <div id="channelTargetHelp" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">
-                                    Sends instant markdown-formatted signal messages to your configured Telegram Chat ID.
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <label id="channelTargetLabel" class="form-label" style="font-size: 0.75rem; margin-bottom: 0;">Telegram Destination (Private DMs, Public Channels, or Groups)</label>
+                                    <button type="button" id="btnBrowserPermission" class="btn-toggle" onclick="requestBrowserNotificationPermission()" style="display: none; padding: 2px 8px; font-size: 0.70rem; color: var(--accent-cyan);">
+                                        <i data-lucide="bell" style="width: 11px; height: 11px;"></i>
+                                        <span>Enable Desktop Notifications</span>
+                                    </button>
+                                </div>
+                                <input type="text" id="alertChannelTarget" class="form-input" placeholder='e.g. "auto" (Personal DMs / Private Groups), @PublicChannel, or Chat ID' value="auto" oninput="updateAlertPreview()">
+                                <div id="channelTargetHelp" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 5px; line-height: 1.45;">
+                                    <div><strong>Supported Destination Options:</strong></div>
+                                    <div>&bull; <strong>Option A (Personal DMs):</strong> Type <code>auto</code> or numeric Chat ID <em>(send /start to bot first)</em></div>
+                                    <div>&bull; <strong>Option B (Public Channel/Group):</strong> Type <code>@PublicChannel</code> <em>(group must be set to Public + bot is Admin)</em></div>
+                                    <div>&bull; <strong>Option C (Private Group):</strong> Type <code>auto</code> or <code>-100...</code> <em>(bot is Admin + send /test in group)</em></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 5. Live Alert Trigger Preview Card -->
+                        <!-- 4. Live Alert Trigger Preview Card -->
                         <div style="background: rgba(124, 58, 237, 0.04); border: 1px dashed rgba(124, 58, 237, 0.35); border-radius: var(--radius-sm); padding: 14px 16px;">
                             <div style="font-size: 0.72rem; font-weight: 700; color: var(--accent-purple); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
                                 <i data-lucide="eye" style="width: 13px;"></i>
@@ -177,7 +210,7 @@
                         <i data-lucide="shield-check" style="color: var(--accent-green);"></i>
                         <span>Active Signal Trigger Rules</span>
                     </div>
-                    <span id="activeAlertsBadge" class="badge-pill badge-neutral">3 Rules Active</span>
+                    <span id="activeAlertsBadge" class="badge-pill badge-neutral">0 Rules Active</span>
                 </div>
 
                 <div id="activeAlertsList" class="active-alerts-container">
@@ -205,34 +238,10 @@
                 </div>
 
                 <div id="alertHistoryLog" class="alert-history-container" style="flex: 1;">
-                    <div class="alert-log-item">
-                        <div class="alert-log-header">
-                            <span class="badge-pill badge-bullish" style="font-size: 0.7rem;">NVDA • SUPERTREND</span>
-                            <span class="alert-log-time">Just now</span>
-                        </div>
-                        <div class="alert-log-title">🚨 NVDA Signal Triggered: SuperTrend Uptrend Flip</div>
-                        <div class="alert-log-body">
-                            Quantitative multi-factor engine detected a major technical trigger for NVDA. SuperTrend flipped to Bullish support at $175.40 with surging Chaikin Money Flow (+0.185).
-                        </div>
-                        <div class="alert-log-footer">
-                            <span>Channel: 📱 Telegram Bot (<code>@quant_desk</code>)</span>
-                            <span style="color: var(--accent-green);">✔ Delivered</span>
-                        </div>
-                    </div>
-
-                    <div class="alert-log-item">
-                        <div class="alert-log-header">
-                            <span class="badge-pill badge-bullish" style="font-size: 0.7rem;">MSFT • AI CONVICTION</span>
-                            <span class="alert-log-time">15 mins ago</span>
-                        </div>
-                        <div class="alert-log-title">🧠 MSFT Signal Triggered: AI Conviction Exceeded 80%</div>
-                        <div class="alert-log-body">
-                            Multi-factor AI Conviction Score for MSFT climbed to 85.0% (Strong Bullish), confirming upside expansion target toward $518.50.
-                        </div>
-                        <div class="alert-log-footer">
-                            <span>Channel: 📧 Email Webhook (<code>usermail@googlemail.com</code>)</span>
-                            <span style="color: var(--accent-green);">✔ Delivered</span>
-                        </div>
+                    <div id="alertHistoryEmptyState" style="font-size: 0.78rem; color: var(--text-muted); text-align: center; padding: 36px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <i data-lucide="bell-off" style="width: 24px; height: 24px; color: var(--text-muted); margin-bottom: 8px; opacity: 0.5;"></i>
+                        <div>No signal alerts in activity log.</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; opacity: 0.75;">Triggered alerts and dispatch receipts will appear here in real-time.</div>
                     </div>
                 </div>
             </div>

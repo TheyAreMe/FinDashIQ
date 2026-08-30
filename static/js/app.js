@@ -497,6 +497,7 @@ function updateAIBadges(overrideStatus = null) {
         headerBadge.style.borderColor = 'rgba(239, 68, 68, 0.45)';
         headerBadge.style.color = '#ef4444';
         headerBadge.style.background = 'rgba(239, 68, 68, 0.08)';
+        headerBadge.title = 'No AI model active — Click to enter Google Gemini API Key';
         if (dot) {
             dot.style.backgroundColor = '#ef4444';
             dot.style.boxShadow = '0 0 8px #ef4444';
@@ -507,6 +508,7 @@ function updateAIBadges(overrideStatus = null) {
         headerBadge.style.borderColor = 'rgba(245, 158, 11, 0.45)';
         headerBadge.style.color = '#f59e0b';
         headerBadge.style.background = 'rgba(245, 158, 11, 0.08)';
+        headerBadge.title = `${modelName} Quota Exceeded — Click to manage API Key or Model`;
         if (dot) {
             dot.style.backgroundColor = '#f59e0b';
             dot.style.boxShadow = '0 0 8px #f59e0b';
@@ -517,6 +519,7 @@ function updateAIBadges(overrideStatus = null) {
         headerBadge.style.borderColor = 'rgba(16, 185, 129, 0.45)';
         headerBadge.style.color = '#10b981';
         headerBadge.style.background = 'rgba(16, 185, 129, 0.08)';
+        headerBadge.title = `${modelName} Active — Click to manage AI Intelligence Settings`;
         if (dot) {
             dot.style.backgroundColor = '#10b981';
             dot.style.boxShadow = '0 0 8px #10b981';
@@ -1122,6 +1125,10 @@ function switchProfileModalTab(tabKey) {
     lucide.createIcons();
 }
 
+function openHelpTopic(topic = 'overview') {
+    openHelpModal(topic);
+}
+
 function openHelpModal(topic = 'overview') {
     const modal = document.getElementById('helpModal');
     if (!modal) return;
@@ -1167,7 +1174,11 @@ function switchHelpTab(tabKey) {
         'news': 'helpTabNews',
         'currency': 'helpTabCurrency',
         'notifications': 'helpTabNotifications',
-        'webhooks': 'helpTabWebhooks',
+        'telegram': 'helpTabTelegram',
+        'discord': 'helpTabDiscord',
+        'email': 'helpTabEmail',
+        'browser': 'helpTabBrowser',
+        'webhooks': 'helpTabTelegram',
         'api': 'helpTabApi',
         'auth': 'helpTabAuth',
         'architecture': 'helpTabArchitecture',
@@ -3714,6 +3725,7 @@ function switchTopTab(tabKey) {
             handleRunScanner(false);
         }
     } else if (tabKey === 'notifications') {
+        populateAlertTickerOptions();
         renderAlerts();
     }
 
@@ -3955,6 +3967,7 @@ function renderWatchlist() {
     const tableWrapper = document.getElementById('watchlistTableWrapper');
     const countBadge = document.getElementById('topWatchlistCount');
     if (countBadge) countBadge.textContent = `${state.watchlistTickers.length} Stocks`;
+    populateAlertTickerOptions();
 
     // Ensure toggle buttons state matches active mode
     const btnCards = document.getElementById('btnWatchlistViewCards');
@@ -3979,6 +3992,7 @@ function renderWatchlistTags() {
     // Lightweight count synchronization helper for backwards-compatibility
     const countBadge = document.getElementById('topWatchlistCount');
     if (countBadge) countBadge.textContent = `${state.watchlistTickers.length} Stocks`;
+    populateAlertTickerOptions();
 }
 
 function formatShortDate(dateStr) {
@@ -4678,7 +4692,7 @@ function escapeHtml(str) {
 let stockSearchDebounceTimer = null;
 let activeSearchAbortController = null;
 
-let stockSearchModalMode = 'watchlist'; // 'watchlist' | 'deep-dive'
+let stockSearchModalMode = 'watchlist'; // 'watchlist' | 'deep-dive' | 'alert'
 
 function openAddStockModal(mode = 'watchlist', initialQuery = '') {
     stockSearchModalMode = mode;
@@ -4694,7 +4708,12 @@ function openAddStockModal(mode = 'watchlist', initialQuery = '') {
 
     if (!modal) return;
 
-    if (mode === 'deep-dive') {
+    if (mode === 'alert') {
+        if (titleEl) titleEl.textContent = 'Search Stock for Signal Alert';
+        if (subtitleEl) subtitleEl.textContent = 'Search by company name or ticker symbol to configure signal alert trigger';
+        if (iconEl) iconEl.innerHTML = `<i data-lucide="bell-plus" style="color: var(--accent-purple); width: 22px; height: 22px;"></i>`;
+        if (footerNoteEl) footerNoteEl.textContent = 'Select any stock or ETF to populate into the Signal Alert Trigger configurator.';
+    } else if (mode === 'deep-dive') {
         if (titleEl) titleEl.textContent = 'Search Stock for Deep Dive';
         if (subtitleEl) subtitleEl.textContent = 'Search by company name or ticker symbol to analyze in Deep-Dive terminal';
         if (iconEl) iconEl.innerHTML = `<i data-lucide="sparkles" style="color: var(--accent-cyan); width: 22px; height: 22px;"></i>`;
@@ -4842,6 +4861,29 @@ async function performStockSearch(query) {
                         const type = escapeHtml(item.type || 'EQUITY');
                         const isTracked = state.watchlistTickers.includes(item.ticker);
 
+                        if (stockSearchModalMode === 'alert') {
+                            return `
+                                <div class="stock-search-item" onclick="handleSelectStockForAlert('${ticker}', '${name.replace(/'/g, "\\'")}')" style="cursor: pointer;">
+                                    <div class="stock-search-item-left">
+                                        <div class="stock-search-ticker-badge" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.4);">${ticker}</div>
+                                        <div class="stock-search-details">
+                                            <div class="stock-search-company-name" title="${name}">${name}</div>
+                                            <div class="stock-search-meta-row">
+                                                <span class="stock-search-tag exchange" title="Listing Exchange">${exchange}</span>
+                                                <span class="stock-search-tag type">${type}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn-stock-search-add" onclick="event.stopPropagation(); handleSelectStockForAlert('${ticker}', '${name.replace(/'/g, "\\'")}')" style="background: linear-gradient(135deg, #8b5cf6, #2563eb); border-color: transparent; color: #fff;">
+                                            <i data-lucide="bell-plus" style="width: 13px; height: 13px;"></i>
+                                            <span>Select for Alert</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
                         if (stockSearchModalMode === 'deep-dive') {
                             return `
                                 <div class="stock-search-item" onclick="handleOpenDeepDiveFromModal('${ticker}')" style="cursor: pointer;">
@@ -4933,6 +4975,30 @@ async function performStockSearch(query) {
                 const type = escapeHtml(item.type || 'EQUITY');
                 const sector = item.sector ? escapeHtml(item.sector) : '';
                 const isTracked = state.watchlistTickers.includes(item.ticker);
+
+                if (stockSearchModalMode === 'alert') {
+                    return `
+                        <div class="stock-search-item" onclick="handleSelectStockForAlert('${ticker}', '${name.replace(/'/g, "\\'")}')" style="cursor: pointer;">
+                            <div class="stock-search-item-left">
+                                <div class="stock-search-ticker-badge" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.4);">${ticker}</div>
+                                <div class="stock-search-details">
+                                    <div class="stock-search-company-name" title="${name}">${name}</div>
+                                    <div class="stock-search-meta-row">
+                                        <span class="stock-search-tag exchange" title="Listing Exchange">${exchange}</span>
+                                        <span class="stock-search-tag type">${type}</span>
+                                        ${sector ? `<span class="stock-search-tag sector">${sector}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="button" class="btn-stock-search-add" onclick="event.stopPropagation(); handleSelectStockForAlert('${ticker}', '${name.replace(/'/g, "\\'")}')" style="background: linear-gradient(135deg, #8b5cf6, #2563eb); border-color: transparent; color: #fff;">
+                                    <i data-lucide="bell-plus" style="width: 13px; height: 13px;"></i>
+                                    <span>Select for Alert</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
 
                 if (stockSearchModalMode === 'deep-dive') {
                     return `
@@ -5040,6 +5106,71 @@ async function handleOpenDeepDiveFromModal(ticker) {
     }
     
     await handleAnalyze();
+}
+
+function handleSelectStockForAlert(ticker, name = '') {
+    if (!ticker) return;
+    const cleanTicker = ticker.trim().toUpperCase();
+    closeAddStockModal();
+
+    if (state.activeTopTab !== 'notifications') {
+        switchTopTab('notifications');
+    }
+
+    const tickerSelect = document.getElementById('alertTickerSelect');
+    const customInput = document.getElementById('alertCustomTicker');
+
+    if (tickerSelect) {
+        let optExists = Array.from(tickerSelect.options).some(opt => opt.value.toUpperCase() === cleanTicker);
+        if (!optExists) {
+            const newOpt = document.createElement('option');
+            newOpt.value = cleanTicker;
+            newOpt.textContent = name ? `${cleanTicker} — ${name}` : cleanTicker;
+            newOpt.selected = true;
+            tickerSelect.insertBefore(newOpt, tickerSelect.firstChild);
+        }
+        tickerSelect.value = cleanTicker;
+    }
+
+    if (customInput) {
+        customInput.value = cleanTicker;
+    }
+
+    updateAlertPreview();
+
+    const formEl = document.getElementById('createAlertForm');
+    if (formEl) {
+        formEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+function populateAlertTickerOptions() {
+    const tickerSelect = document.getElementById('alertTickerSelect');
+    if (!tickerSelect) return;
+    const currentVal = tickerSelect.value;
+
+    const trackedOptgroup = document.getElementById('alertWatchlistOptgroup') || tickerSelect.querySelector('optgroup[label*="Tracked"]') || tickerSelect.querySelector('optgroup');
+    if (trackedOptgroup) {
+        if (state.watchlistTickers && state.watchlistTickers.length > 0) {
+            trackedOptgroup.innerHTML = state.watchlistTickers.map(ticker => {
+                const stock = state.watchlistData?.[ticker] || state.stocksData?.[ticker];
+                const name = stock?.profile?.name || stock?.name || ticker;
+                return `<option value="${ticker}">${ticker} — ${name}</option>`;
+            }).join('');
+        } else {
+            trackedOptgroup.innerHTML = `<option value="" disabled>(No stocks currently in watchlist)</option>`;
+        }
+    }
+
+    if (currentVal && Array.from(tickerSelect.options).some(o => o.value === currentVal)) {
+        tickerSelect.value = currentVal;
+    } else {
+        const firstValid = Array.from(tickerSelect.options).find(o => !o.disabled && o.value);
+        if (firstValid) {
+            tickerSelect.value = firstValid.value;
+        }
+    }
+    updateAlertPreview();
 }
 
 // =============================================================
@@ -6067,8 +6198,11 @@ async function initAlerts() {
     } catch (e) {
         state.alerts = [];
     }
+    populateAlertTickerOptions();
     renderAlerts();
+    loadAlertHistory();
     updateAlertPreview();
+    startBackgroundAlertEngine();
 }
 
 function handleSignalTypeChange() {
@@ -6076,16 +6210,8 @@ function handleSignalTypeChange() {
     const option = select?.selectedOptions[0];
     if (!option) return;
 
-    const condition = option.getAttribute('data-cond') || 'direction_flip';
-    const threshold = option.getAttribute('data-thresh') || 'Uptrend Confirmation';
     const desc = option.getAttribute('data-desc') || '';
-
-    const condEl = document.getElementById('alertCondition');
-    const threshEl = document.getElementById('alertThreshold');
     const descBox = document.getElementById('signalDescBox');
-
-    if (condEl) condEl.value = condition;
-    if (threshEl) threshEl.value = threshold;
     if (descBox && desc) descBox.textContent = desc;
 
     updateAlertPreview();
@@ -6096,25 +6222,60 @@ function handleChannelChange() {
     const targetLabel = document.getElementById('channelTargetLabel');
     const targetInput = document.getElementById('alertChannelTarget');
     const targetHelp = document.getElementById('channelTargetHelp');
+    const permBtn = document.getElementById('btnBrowserPermission');
 
     const userEmail = state.user?.email || 'analyst@findashiq.com';
 
+    if (permBtn) {
+        permBtn.style.display = (channel === 'Browser Push') ? 'inline-flex' : 'none';
+        if (channel === 'Browser Push' && 'Notification' in window) {
+            if (Notification.permission === 'granted') {
+                permBtn.innerHTML = '<i data-lucide="check" style="width: 11px;"></i><span>Notifications Active</span>';
+                permBtn.style.color = 'var(--accent-green)';
+            } else if (Notification.permission === 'denied') {
+                permBtn.innerHTML = '<i data-lucide="bell-off" style="width: 11px;"></i><span>Permission Blocked</span>';
+                permBtn.style.color = 'var(--accent-red)';
+            } else {
+                permBtn.innerHTML = '<i data-lucide="bell" style="width: 11px;"></i><span>Enable Desktop Alerts</span>';
+                permBtn.style.color = 'var(--accent-cyan)';
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+
+    const guideLink = document.getElementById('alertSetupGuideLink');
+
     if (channel === 'Telegram Bot') {
-        if (targetLabel) targetLabel.textContent = 'Telegram Chat ID / Username';
+        if (targetLabel) targetLabel.textContent = 'Telegram Destination (Private DMs, Public Channels, or Groups)';
         if (targetInput) {
-            targetInput.placeholder = 'e.g. @quant_trader or 123456789';
-            targetInput.value = '@quant_desk';
+            targetInput.placeholder = 'e.g. "auto" (Personal DMs / Private Groups), @PublicChannel, or Chat ID';
+            targetInput.value = 'auto';
             targetInput.disabled = false;
         }
-        if (targetHelp) targetHelp.textContent = 'Sends instant markdown-formatted signal messages to your configured Telegram Chat ID.';
+        if (targetHelp) {
+            targetHelp.innerHTML = `
+                <div><strong>Supported Destination Options:</strong></div>
+                <div>&bull; <strong>Option A (Personal DMs):</strong> Type <code>auto</code> or numeric Chat ID <em>(send /start to bot first)</em></div>
+                <div>&bull; <strong>Option B (Public Channel/Group):</strong> Type <code>@PublicChannel</code> <em>(group must be set to Public + bot is Admin)</em></div>
+                <div>&bull; <strong>Option C (Private Group):</strong> Type <code>auto</code> or <code>-100...</code> <em>(bot is Admin + send /test in group)</em></div>
+            `;
+        }
+        if (guideLink) {
+            guideLink.setAttribute('onclick', "openHelpTopic('telegram')");
+            guideLink.setAttribute('title', "Open Telegram Bot Setup Guide");
+        }
     } else if (channel === 'Email Webhook') {
-        if (targetLabel) targetLabel.textContent = 'Destination Recipient Email Address';
+        if (targetLabel) targetLabel.textContent = 'Destination Recipient Email Address / Webhook';
         if (targetInput) {
-            targetInput.placeholder = 'e.g. yourname@domain.com';
+            targetInput.placeholder = 'e.g. trader@yourdomain.com or https://hooks.zapier.com/...';
             targetInput.value = userEmail;
             targetInput.disabled = false;
         }
-        if (targetHelp) targetHelp.textContent = 'Dispatches structured HTML executive notification memo to the recipient email address.';
+        if (targetHelp) targetHelp.textContent = 'Dispatches structured HTML executive notification memos via SMTP (or email webhook).';
+        if (guideLink) {
+            guideLink.setAttribute('onclick', "openHelpTopic('email')");
+            guideLink.setAttribute('title', "Open Email & SMTP Setup Guide");
+        }
     } else if (channel === 'Discord Webhook') {
         if (targetLabel) targetLabel.textContent = 'Discord Channel Webhook URL';
         if (targetInput) {
@@ -6123,14 +6284,22 @@ function handleChannelChange() {
             targetInput.disabled = false;
         }
         if (targetHelp) targetHelp.textContent = 'Pushes formatted quantitative embed cards into your Discord trading channels.';
+        if (guideLink) {
+            guideLink.setAttribute('onclick', "openHelpTopic('discord')");
+            guideLink.setAttribute('title', "Open Discord Webhook Setup Guide");
+        }
     } else if (channel === 'Browser Push') {
-        if (targetLabel) targetLabel.textContent = 'Desktop Notification Priority & Sound';
+        if (targetLabel) targetLabel.textContent = 'Desktop Notification Priority & Sound Engine';
         if (targetInput) {
             targetInput.placeholder = 'In-App Desktop Toast';
-            targetInput.value = 'High Priority • Real-time Audio Chime';
+            targetInput.value = 'High Priority • Real-time Audio Synthesizer Chime';
             targetInput.disabled = true;
         }
         if (targetHelp) targetHelp.textContent = 'Triggers instant browser desktop push notifications with high-priority audio alerts.';
+        if (guideLink) {
+            guideLink.setAttribute('onclick', "openHelpTopic('browser')");
+            guideLink.setAttribute('title', "Open Browser Push & Audio Chimes Guide");
+        }
     } else if (channel === 'Custom API Webhook') {
         if (targetLabel) targetLabel.textContent = 'HTTP Endpoint URL (JSON POST Webhook)';
         if (targetInput) {
@@ -6138,26 +6307,79 @@ function handleChannelChange() {
             targetInput.value = 'https://api.findashiq.internal/hooks/trader';
             targetInput.disabled = false;
         }
-        if (targetHelp) targetHelp.textContent = 'Sends raw JSON quantitative signal payload to your custom trading bot or API listener.';
+        if (targetHelp) targetHelp.textContent = 'Sends standard REST JSON quantitative payload (event, ticker, signal, news, metrics) to your custom trading bot or API listener.';
+        if (guideLink) {
+            guideLink.setAttribute('onclick', "openHelpTopic('api')");
+            guideLink.setAttribute('title', "Open Custom REST API Webhooks Guide");
+        }
     }
 
     updateAlertPreview();
 }
 
+async function requestBrowserNotificationPermission() {
+    if (!('Notification' in window)) {
+        alert('This browser does not support desktop notifications.');
+        return;
+    }
+    const perm = await Notification.requestPermission();
+    const btn = document.getElementById('btnBrowserPermission');
+    if (btn) {
+        if (perm === 'granted') {
+            btn.innerHTML = '<i data-lucide="check" style="width: 11px;"></i><span>Notifications Enabled</span>';
+            btn.style.color = 'var(--accent-green)';
+            playAlertChime();
+        } else {
+            btn.innerHTML = '<i data-lucide="bell-off" style="width: 11px;"></i><span>Permission Denied</span>';
+            btn.style.color = 'var(--accent-red)';
+        }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+}
+
+function playAlertChime() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        if (ctx.state === 'suspended') {
+            ctx.resume();
+        }
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+        osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.12); // A5
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.4);
+    } catch (e) {
+        console.warn('Audio chime omitted:', e);
+    }
+}
+
 function updateAlertPreview() {
     const tickerSelect = document.getElementById('alertTickerSelect');
-    const customTicker = document.getElementById('alertCustomTicker')?.value.trim();
-    const ticker = customTicker ? customTicker.toUpperCase() : (tickerSelect?.value || 'NVDA');
+    const rawTicker = tickerSelect?.value || '*WATCHLIST*';
+    const isGlobal = rawTicker === '*WATCHLIST*' || rawTicker === 'ALL_WATCHLIST';
 
     const sigSelect = document.getElementById('alertSignalType');
-    const sigName = sigSelect?.selectedOptions[0]?.textContent || 'SuperTrend Bullish Flip';
-    const thresh = document.getElementById('alertThreshold')?.value || 'Trigger Level Reached';
+    const selectedOption = sigSelect?.selectedOptions[0];
+    const sigName = selectedOption?.textContent || 'SuperTrend Bullish Flip';
+    const thresh = selectedOption?.getAttribute('data-thresh') || 'Trigger Level Reached';
     const channel = document.getElementById('alertChannel')?.value || 'Telegram Bot';
     const target = document.getElementById('alertChannelTarget')?.value || '@quant_desk';
 
     const previewEl = document.getElementById('alertLivePreviewText');
     if (previewEl) {
-        previewEl.innerHTML = `⚡ When <strong>${ticker}</strong> triggers <strong>${sigName}</strong> (<em>${thresh}</em>), dispatch alert via <strong>${channel}</strong> to <code>${target}</code>.`;
+        if (isGlobal) {
+            previewEl.innerHTML = `🌐 When <strong>ANY asset in your active Watchlist</strong> triggers <strong>${sigName}</strong> (<em>${thresh}</em>), dispatch alert via <strong>${channel}</strong> to <code>${target}</code>.`;
+        } else {
+            previewEl.innerHTML = `⚡ When <strong>${rawTicker}</strong> triggers <strong>${sigName}</strong> (<em>${thresh}</em>), dispatch alert via <strong>${channel}</strong> to <code>${target}</code>.`;
+        }
     }
 }
 
@@ -6186,10 +6408,16 @@ function renderAlerts() {
     state.alerts.forEach(rule => {
         const card = document.createElement('div');
         card.className = 'alert-rule-card';
-        const channelTargetText = rule.channelTarget ? ` (<code>${rule.channelTarget}</code>)` : '';
+        const channelTargetText = rule.channelTarget ? ` (<code>${escapeHtml(rule.channelTarget)}</code>)` : '';
         const sigName = rule.signalName || rule.signalType;
-        const categoryBadge = rule.category ? `<span class="badge-pill badge-neutral" style="font-size: 0.65rem; padding: 1px 6px;">${rule.category}</span>` : '';
-        const compName = state.stocksData?.[rule.ticker]?.profile?.name || state.watchlistData?.[rule.ticker]?.profile?.name || '';
+        const categoryBadge = rule.category ? `<span class="badge-pill badge-neutral" style="font-size: 0.65rem; padding: 1px 6px;">${escapeHtml(rule.category)}</span>` : '';
+        
+        const isGlobal = rule.ticker === '*WATCHLIST*' || rule.ticker === 'ALL_WATCHLIST' || rule.ticker === 'WATCHLIST';
+        const compName = isGlobal ? 'Entire Tracked Watchlist Portfolio' : (state.stocksData?.[rule.ticker]?.profile?.name || state.watchlistData?.[rule.ticker]?.profile?.name || '');
+
+        const tickerBadge = isGlobal ? 
+            `<span class="badge-pill" style="font-size: 0.72rem; background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.4); font-weight: 700;">🌐 ALL WATCHLIST ASSETS</span>` :
+            `<strong style="font-size: 0.95rem; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; line-height: 1.1;">${escapeHtml(rule.ticker)}</strong>`;
 
         card.innerHTML = `
             <div style="flex: 1;">
@@ -6199,13 +6427,13 @@ function renderAlerts() {
                     </span>
                     ${categoryBadge}
                     <div style="display: inline-flex; flex-direction: column; min-width: 0;">
-                        <strong style="font-size: 0.95rem; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; line-height: 1.1;">${rule.ticker}</strong>
-                        ${compName ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500; line-height: 1.2;">${compName}</span>` : ''}
+                        ${tickerBadge}
+                        ${compName ? `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 500; line-height: 1.2;">${escapeHtml(compName)}</span>` : ''}
                     </div>
-                    <span style="font-size: 0.78rem; color: var(--accent-cyan); font-weight: 700; margin-left: 4px;">${sigName}</span>
+                    <span style="font-size: 0.78rem; color: var(--accent-cyan); font-weight: 700; margin-left: 4px;">${escapeHtml(sigName)}</span>
                 </div>
                 <div style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4;">
-                    Condition: <strong style="color: var(--text-primary);">${rule.threshold}</strong> • Channel: <strong style="color: var(--accent-purple);">${rule.channel}</strong>${channelTargetText}
+                    Condition: <strong style="color: var(--text-primary);">${escapeHtml(rule.threshold)}</strong> • Channel: <strong style="color: var(--accent-purple);">${escapeHtml(rule.channel)}</strong>${channelTargetText}
                 </div>
             </div>
 
@@ -6229,14 +6457,13 @@ function renderAlerts() {
 
 async function handleTestTriggerFromForm() {
     const tickerSelect = document.getElementById('alertTickerSelect');
-    const customTicker = document.getElementById('alertCustomTicker')?.value.trim();
-    const ticker = customTicker ? customTicker.toUpperCase() : (tickerSelect?.value || 'NVDA');
+    const ticker = tickerSelect?.value || '*WATCHLIST*';
 
     const sigSelect = document.getElementById('alertSignalType');
     const selectedOption = sigSelect?.selectedOptions[0];
     const signalName = selectedOption?.textContent || 'SuperTrend Bullish Flip';
+    const threshold = selectedOption?.getAttribute('data-thresh') || 'Trigger Level Reached';
 
-    const threshold = document.getElementById('alertThreshold')?.value || 'Trigger Level Reached';
     const channel = document.getElementById('alertChannel')?.value || 'Telegram Bot';
     const channelTarget = document.getElementById('alertChannelTarget')?.value || '@quant_desk';
 
@@ -6245,17 +6472,16 @@ async function handleTestTriggerFromForm() {
 
 async function handleCreateAlert() {
     const tickerSelect = document.getElementById('alertTickerSelect');
-    const customTicker = document.getElementById('alertCustomTicker')?.value.trim();
-    const ticker = customTicker ? customTicker.toUpperCase() : (tickerSelect?.value || 'NVDA');
+    const ticker = tickerSelect?.value || '*WATCHLIST*';
 
     const sigSelect = document.getElementById('alertSignalType');
     const selectedOption = sigSelect?.selectedOptions[0];
     const signalType = selectedOption?.value || 'supertrend_bull';
     const signalName = selectedOption?.textContent || 'SuperTrend Bullish Flip';
     const category = selectedOption?.getAttribute('data-cat') || 'Trend & Volatility';
+    const condition = selectedOption?.getAttribute('data-cond') || 'direction_flip';
+    const threshold = selectedOption?.getAttribute('data-thresh') || 'Uptrend Confirmation';
 
-    const condition = document.getElementById('alertCondition')?.value || 'direction_flip';
-    const threshold = document.getElementById('alertThreshold')?.value || 'Uptrend Confirmation';
     const channel = document.getElementById('alertChannel')?.value || 'Telegram Bot';
     const channelTarget = document.getElementById('alertChannelTarget')?.value || '@quant_desk';
 
@@ -6269,9 +6495,6 @@ async function handleCreateAlert() {
         if (data.alerts) {
             state.alerts = data.alerts;
             renderAlerts();
-        }
-        if (document.getElementById('alertCustomTicker')) {
-            document.getElementById('alertCustomTicker').value = '';
         }
         updateAlertPreview();
     } catch (e) {
@@ -6311,12 +6534,71 @@ async function deleteAlertRule(id) {
     }
 }
 
-function renderAlertNotificationItem(notif) {
+function getAlertHistoryStorageKey() {
+    const username = state.user?.username || 'guest';
+    return `findashiq_alert_history_${username}`;
+}
+
+function loadAlertHistory() {
     const logContainer = document.getElementById('alertHistoryLog');
     if (!logContainer) return;
 
-    if (logContainer.children.length === 1 && logContainer.firstElementChild.textContent.includes('cleared')) {
-        logContainer.innerHTML = '';
+    try {
+        const raw = localStorage.getItem(getAlertHistoryStorageKey());
+        state.alertHistory = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(state.alertHistory)) state.alertHistory = [];
+    } catch (e) {
+        state.alertHistory = [];
+    }
+
+    logContainer.innerHTML = '';
+    if (state.alertHistory.length === 0) {
+        renderAlertHistoryEmptyState();
+        return;
+    }
+
+    // Render stored items
+    state.alertHistory.forEach(item => {
+        renderAlertNotificationItem(item, false);
+    });
+}
+
+function renderAlertHistoryEmptyState(customMessage) {
+    const logContainer = document.getElementById('alertHistoryLog');
+    if (!logContainer) return;
+    logContainer.innerHTML = `
+        <div id="alertHistoryEmptyState" style="font-size: 0.78rem; color: var(--text-muted); text-align: center; padding: 36px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <i data-lucide="bell-off" style="width: 24px; height: 24px; color: var(--text-muted); margin-bottom: 8px; opacity: 0.5;"></i>
+            <div>${escapeHtml(customMessage || 'No signal alerts in activity log.')}</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; opacity: 0.75;">Triggered alerts and dispatch receipts will appear here in real-time.</div>
+        </div>
+    `;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function renderAlertNotificationItem(notif, shouldSave = true) {
+    const logContainer = document.getElementById('alertHistoryLog');
+    if (!logContainer) return;
+
+    const emptyEl = document.getElementById('alertHistoryEmptyState');
+    if (emptyEl) {
+        emptyEl.remove();
+    }
+
+    if (shouldSave) {
+        if (!Array.isArray(state.alertHistory)) state.alertHistory = [];
+        const itemToSave = {
+            ...notif,
+            id: notif.id || `notif_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
+            timestamp: notif.timestamp || new Date().toLocaleTimeString()
+        };
+        state.alertHistory.unshift(itemToSave);
+        if (state.alertHistory.length > 50) {
+            state.alertHistory = state.alertHistory.slice(0, 50);
+        }
+        try {
+            localStorage.setItem(getAlertHistoryStorageKey(), JSON.stringify(state.alertHistory));
+        } catch (e) {}
     }
 
     const item = document.createElement('div');
@@ -6348,91 +6630,525 @@ function renderAlertNotificationItem(notif) {
         `;
     }
 
+    const deliveryStatusHtml = notif.delivered ?
+        `<span style="color: var(--accent-green); font-weight: 700; font-size: 0.72rem;">✔ ${escapeHtml(notif.status || 'Delivered Successfully')}</span>` :
+        `<span style="color: var(--accent-red); font-weight: 700; font-size: 0.72rem;">⚠ ${escapeHtml(notif.status || 'Delivery Failed')}</span>`;
+
+    const isGlobal = notif.isGlobalWatchlist || notif.ticker === '*WATCHLIST*';
+    const tickerTag = isGlobal ? `🌐 WATCHLIST • ${escapeHtml(notif.ticker)}` : escapeHtml(notif.ticker);
+
     item.innerHTML = `
         <div class="alert-log-header">
             <span class="badge-pill ${notif.sentiment?.toLowerCase().includes('bear') ? 'badge-neutral' : 'badge-bullish'}" style="font-size: 0.7rem;">
-                ${escapeHtml(notif.ticker)} • ${isSim ? 'SIMULATED TRIGGER' : 'LIVE TRIGGER'}
+                ${tickerTag} • ${isSim ? 'SIMULATED TRIGGER' : 'LIVE TRIGGER'}
             </span>
             <span class="alert-log-time">${notif.timestamp ? (notif.timestamp.includes(' ') ? notif.timestamp.split(' ')[1] : notif.timestamp) : 'Just now'}</span>
         </div>
         <div class="alert-log-title">${escapeHtml(notif.title || '')}</div>
         <div class="alert-log-body">${escapeHtml(notif.message || '')}</div>
         ${newsMetaHtml}
-        <div class="alert-log-footer">
+        <div class="alert-log-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
             <span>Channel: ${escapeHtml(notif.channel || 'Telegram')}${targetDisplay}</span>
-            <span style="color: var(--accent-green); font-weight: 700;">✔ Delivered Successfully</span>
+            ${deliveryStatusHtml}
         </div>
     `;
 
-    logContainer.insertBefore(item, logContainer.firstChild);
+    if (shouldSave) {
+        logContainer.insertBefore(item, logContainer.firstChild);
+    } else {
+        logContainer.appendChild(item);
+    }
     if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// ==============================================================================
+// 🔄 AUTONOMOUS BACKGROUND SIGNAL MONITORING & INTERVAL ENGINE
+// ==============================================================================
+
+const POLL_INTERVAL_STEPS = [1, 2, 5, 10, 15, 30, 45, 60, 120, 180, 240, 360, 480, 720, 1440]; // minutes
+let bgPollingIntervalMinutes = 15;
+let bgCountdownSeconds = 900;
+let bgCountdownIntervalId = null;
+let isBgMonitoringPaused = false;
+let isBgCheckInProgress = false;
+
+function getBgPollingStorageKey() {
+    return 'findashiq_bg_poll_interval_' + (state.user?.username || 'guest');
+}
+
+function getBgPausedStorageKey() {
+    return 'findashiq_bg_poll_paused_' + (state.user?.username || 'guest');
+}
+
+function formatIntervalMinutes(minutes) {
+    if (minutes < 60) return `${minutes} Minute${minutes === 1 ? '' : 's'}`;
+    const hours = minutes / 60;
+    if (Number.isInteger(hours)) return `${hours} Hour${hours === 1 ? '' : 's'}`;
+    return `${hours.toFixed(1)} Hours`;
+}
+
+function formatCountdownSeconds(seconds) {
+    if (seconds <= 0) return '00:00';
+    if (seconds < 60) return `00:${seconds < 10 ? '0' : ''}${seconds}`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    if (m < 60) return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    const h = Math.floor(m / 60);
+    const remM = m % 60;
+    return `${h}h ${remM}m ${s < 10 ? '0' : ''}${s}s`;
+}
+
+function updateCountdownUI() {
+    const timerEl = document.getElementById('bgCountdownTimer');
+    const badgeEl = document.getElementById('bgEngineStatusBadge');
+    const pulseDot = document.getElementById('bgEnginePulseDot');
+    const countdownText = document.getElementById('bgEngineCountdownText');
+
+    if (isBgMonitoringPaused) {
+        if (timerEl) timerEl.textContent = 'PAUSED';
+        if (badgeEl) {
+            badgeEl.className = 'badge-pill badge-neutral';
+            badgeEl.textContent = 'Paused';
+        }
+        if (pulseDot) {
+            pulseDot.className = 'pulse-dot-paused';
+        }
+        if (countdownText) {
+            countdownText.innerHTML = 'Autonomous background monitoring is currently <strong style="color: var(--accent-amber);">paused</strong>.';
+        }
+        return;
+    }
+
+    if (badgeEl) {
+        badgeEl.className = 'badge-pill badge-positive';
+        badgeEl.textContent = 'Active • Auto-Polling';
+    }
+    if (pulseDot) {
+        pulseDot.className = 'pulse-dot-active';
+    }
+    if (countdownText && !countdownText.querySelector('#bgCountdownTimer')) {
+        countdownText.innerHTML = `Next automated calculation &amp; news wire scan in: <strong id="bgCountdownTimer" style="color: var(--accent-cyan); font-family: monospace; font-size: 0.82rem;">${formatCountdownSeconds(bgCountdownSeconds)}</strong>`;
+    } else {
+        const liveTimerEl = document.getElementById('bgCountdownTimer');
+        if (liveTimerEl) liveTimerEl.textContent = formatCountdownSeconds(bgCountdownSeconds);
+    }
+}
+
+function updatePauseButtonUI() {
+    const btn = document.getElementById('btnBgPauseToggle');
+    if (!btn) return;
+
+    if (isBgMonitoringPaused) {
+        btn.innerHTML = '<i data-lucide="play" id="bgPauseIcon" style="width: 13px; height: 13px;"></i><span id="bgPauseText">Resume</span>';
+        btn.style.color = 'var(--accent-green)';
+    } else {
+        btn.innerHTML = '<i data-lucide="pause" id="bgPauseIcon" style="width: 13px; height: 13px;"></i><span id="bgPauseText">Pause</span>';
+        btn.style.color = 'var(--text-secondary)';
+    }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function getBgNextPollStorageKey() {
+    return 'findashiq_bg_next_poll_' + (state.user?.username || 'guest');
+}
+
+function scheduleNextBackgroundPoll(minutes) {
+    const mins = minutes || bgPollingIntervalMinutes || 15;
+    const intervalMs = mins * 60 * 1000;
+    const nextTimestamp = Date.now() + intervalMs;
+    try {
+        localStorage.setItem(getBgNextPollStorageKey(), nextTimestamp.toString());
+    } catch (e) {}
+    bgCountdownSeconds = Math.round(intervalMs / 1000);
+}
+
+function handlePollingIntervalChange(stepIndex) {
+    const idx = parseInt(stepIndex, 10);
+    const minutes = POLL_INTERVAL_STEPS[Math.max(0, Math.min(idx, POLL_INTERVAL_STEPS.length - 1))] || 15;
+    bgPollingIntervalMinutes = minutes;
+
+    try {
+        localStorage.setItem(getBgPollingStorageKey(), minutes.toString());
+    } catch (e) {}
+
+    const displayEl = document.getElementById('bgIntervalDisplay');
+    if (displayEl) {
+        displayEl.textContent = formatIntervalMinutes(minutes) + (minutes === 15 ? ' (Recommended)' : '');
+    }
+
+    scheduleNextBackgroundPoll(minutes);
+    updateCountdownUI();
+}
+
+function toggleBackgroundEngine() {
+    isBgMonitoringPaused = !isBgMonitoringPaused;
+    try {
+        localStorage.setItem(getBgPausedStorageKey(), isBgMonitoringPaused ? 'true' : 'false');
+    } catch (e) {}
+    updatePauseButtonUI();
+    updateCountdownUI();
+    if (typeof showNotification === 'function') {
+        showNotification(isBgMonitoringPaused ? 'Background signal monitoring paused' : 'Background signal monitoring resumed', 'info');
+    }
+}
+
+function startBackgroundAlertEngine() {
+    try {
+        const savedMinutes = parseInt(localStorage.getItem(getBgPollingStorageKey()), 10);
+        if (savedMinutes && POLL_INTERVAL_STEPS.includes(savedMinutes)) {
+            bgPollingIntervalMinutes = savedMinutes;
+        }
+        const savedPaused = localStorage.getItem(getBgPausedStorageKey()) === 'true';
+        isBgMonitoringPaused = savedPaused;
+
+        // Restore remaining seconds from next scheduled poll timestamp
+        const savedNextTimestamp = parseInt(localStorage.getItem(getBgNextPollStorageKey()), 10);
+        if (savedNextTimestamp && !isNaN(savedNextTimestamp)) {
+            const remainingMs = savedNextTimestamp - Date.now();
+            if (remainingMs > 1000) {
+                bgCountdownSeconds = Math.round(remainingMs / 1000);
+            } else {
+                // Time already elapsed while page was closed/reloaded; trigger poll after 2 seconds
+                bgCountdownSeconds = 2;
+            }
+        } else {
+            scheduleNextBackgroundPoll(bgPollingIntervalMinutes);
+        }
+    } catch (e) {
+        scheduleNextBackgroundPoll(bgPollingIntervalMinutes);
+    }
+
+    const slider = document.getElementById('bgPollingIntervalSlider');
+    const displayEl = document.getElementById('bgIntervalDisplay');
+    const stepIdx = POLL_INTERVAL_STEPS.indexOf(bgPollingIntervalMinutes);
+    if (slider && stepIdx !== -1) slider.value = stepIdx;
+    if (displayEl) {
+        displayEl.textContent = formatIntervalMinutes(bgPollingIntervalMinutes) + (bgPollingIntervalMinutes === 15 ? ' (Recommended)' : '');
+    }
+
+    updatePauseButtonUI();
+    updateCountdownUI();
+
+    if (bgCountdownIntervalId) clearInterval(bgCountdownIntervalId);
+    bgCountdownIntervalId = setInterval(() => {
+        if (isBgMonitoringPaused) return;
+
+        // Recalculate remaining seconds from next scheduled timestamp for 100% clock drift and reload resilience
+        try {
+            const nextTimestamp = parseInt(localStorage.getItem(getBgNextPollStorageKey()), 10);
+            if (nextTimestamp && !isNaN(nextTimestamp)) {
+                const diffMs = nextTimestamp - Date.now();
+                bgCountdownSeconds = Math.max(0, Math.round(diffMs / 1000));
+            } else {
+                bgCountdownSeconds--;
+            }
+        } catch (e) {
+            bgCountdownSeconds--;
+        }
+
+        if (bgCountdownSeconds <= 0) {
+            scheduleNextBackgroundPoll(bgPollingIntervalMinutes);
+            runBackgroundSignalCheck();
+        }
+        updateCountdownUI();
+    }, 1000);
+}
+
+async function triggerManualSignalCheck() {
+    if (isBgCheckInProgress) return;
+    const btn = document.getElementById('btnBgCheckNow');
+    const icon = document.getElementById('bgRefreshIcon');
+    const btnText = document.getElementById('bgCheckNowText');
+
+    // Immediately reset the schedule and countdown on click
+    scheduleNextBackgroundPoll(bgPollingIntervalMinutes);
+    updateCountdownUI();
+
+    if (icon) icon.classList.add('spin-animation');
+    if (btn) btn.disabled = true;
+    if (btnText) btnText.textContent = 'Scanning...';
+
+    try {
+        const result = await runBackgroundSignalCheck(true);
+        // Resync schedule after scan completes
+        scheduleNextBackgroundPoll(bgPollingIntervalMinutes);
+        updateCountdownUI();
+
+        if (typeof showNotification === 'function') {
+            if (result.scannedCount > 0) {
+                if (result.activeRuleCount > 0) {
+                    showNotification(`Signal scan complete • Evaluated ${result.scannedCount} assets across ${result.activeRuleCount} active rules`, 'success');
+                } else {
+                    showNotification(`Scanned ${result.scannedCount} watchlist assets • Note: 0 active trigger rules configured`, 'info');
+                }
+            } else {
+                showNotification('No assets found to scan. Add stocks to your watchlist or create a trigger rule.', 'warning');
+            }
+        }
+    } catch (err) {
+        console.error('Manual signal check error:', err);
+        if (typeof showNotification === 'function') {
+            showNotification('Failed to complete signal scan: ' + (err.message || 'Network error'), 'error');
+        }
+    } finally {
+        if (icon) icon.classList.remove('spin-animation');
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = 'Check Signals Now';
+        updateCountdownUI();
+    }
+}
+
+async function runBackgroundSignalCheck(isManual = false) {
+    if (isBgCheckInProgress) return { scannedCount: 0, activeRuleCount: 0 };
+
+    isBgCheckInProgress = true;
+    let scannedCount = 0;
+    let activeRuleCount = 0;
+
+    try {
+        const activeRules = (state.alerts || []).filter(a => a.active);
+        activeRuleCount = activeRules.length;
+
+        // Collect all tickers to scan
+        const tickerSet = new Set();
+
+        if (activeRules.length > 0) {
+            const hasGlobal = activeRules.some(r => r.ticker === '*WATCHLIST*' || r.ticker === 'ALL_WATCHLIST' || r.ticker === 'WATCHLIST');
+            if (hasGlobal) {
+                (state.watchlistTickers || ['AAPL', 'NVDA', 'MSFT']).forEach(t => tickerSet.add(t));
+            }
+            activeRules.forEach(r => {
+                if (r.ticker && !r.ticker.startsWith('*')) tickerSet.add(r.ticker);
+            });
+        } else {
+            // Fallback for manual check or default watchlist monitoring
+            (state.watchlistTickers || ['AAPL', 'NVDA', 'MSFT']).forEach(t => tickerSet.add(t));
+        }
+
+        const tickers = Array.from(tickerSet).filter(Boolean);
+        scannedCount = tickers.length;
+
+        if (tickers.length === 0) return { scannedCount: 0, activeRuleCount };
+
+        const resp = await fetch('/api/stocks/resolve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tickers: tickers })
+        });
+
+        if (!resp.ok) {
+            throw new Error(`Server returned HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        if (data && data.stocks) {
+            Object.assign(state.stocksData, data.stocks);
+            if (activeRules.length > 0) {
+                evaluateAlertRules(data.stocks);
+            }
+        }
+
+        return { scannedCount, activeRuleCount };
+    } catch (err) {
+        console.warn('Background signal check error:', err);
+        throw err;
+    } finally {
+        isBgCheckInProgress = false;
+    }
 }
 
 function evaluateAlertRules(stocksData) {
     if (!state.alerts || state.alerts.length === 0 || !stocksData) return;
-    
+
     const activeRules = state.alerts.filter(a => a.active);
     if (activeRules.length === 0) return;
 
     activeRules.forEach(rule => {
-        const stock = stocksData[rule.ticker];
-        if (!stock || stock.error) return;
+        const isGlobal = rule.ticker === '*WATCHLIST*' || rule.ticker === 'ALL_WATCHLIST' || rule.ticker === 'WATCHLIST';
+        const tickersToEvaluate = isGlobal ? (state.watchlistTickers || Object.keys(stocksData)) : [rule.ticker];
 
-        const signals = stock.signals?.indicators || {};
-        const newsSignal = signals.News_Catalyst || (stock.news && stock.news.length > 0 ? {
-            headline: stock.news[0].title,
-            summary: stock.news[0].summary || stock.news[0].title,
-            publisher: stock.news[0].publisher || 'Breaking Wire',
-            url: stock.news[0].url || '#',
-            sentiment: 'Neutral',
-            status: 'neutral'
-        } : null);
+        tickersToEvaluate.forEach(ticker => {
+            const stock = stocksData[ticker];
+            if (!stock || stock.error) return;
 
-        const sigType = rule.signalType;
+            const signals = stock.signals?.indicators || {};
+            const newsSignal = signals.News_Catalyst || (stock.news && stock.news.length > 0 ? {
+                headline: stock.news[0].title,
+                summary: stock.news[0].summary || stock.news[0].title,
+                publisher: stock.news[0].publisher || 'Breaking Wire',
+                url: stock.news[0].url || '#',
+                sentiment: 'Neutral',
+                status: 'neutral'
+            } : null);
 
-        let triggered = false;
-        let triggerTitle = '';
-        let triggerMsg = '';
-        let newsMeta = null;
+            const sigType = rule.signalType;
+            let triggered = false;
+            let triggerTitle = '';
+            let triggerMsg = '';
+            let newsMeta = null;
 
-        if (sigType === 'news_breaking_catalyst' && newsSignal) {
-            triggered = true;
-            triggerTitle = `🚨 Breaking News Catalyst: ${rule.ticker}`;
-            triggerMsg = `High-impact breaking news catalyst detected for ${rule.ticker}: "${newsSignal.headline}"`;
-            newsMeta = newsSignal;
-        } else if (sigType === 'news_sentiment_bullish' && newsSignal && newsSignal.status === 'bullish') {
-            triggered = true;
-            triggerTitle = `📈 Bullish Catalyst Detected: ${rule.ticker}`;
-            triggerMsg = `Positive catalyst headline and upgraded momentum detected for ${rule.ticker}.`;
-            newsMeta = newsSignal;
-        } else if (sigType === 'news_sentiment_bearish' && newsSignal && newsSignal.status === 'bearish') {
-            triggered = true;
-            triggerTitle = `📉 Adverse Catalyst Alert: ${rule.ticker}`;
-            triggerMsg = `Adverse news event or negative headline pressure detected for ${rule.ticker}.`;
-            newsMeta = newsSignal;
-        } else if (sigType === 'news_tier1_source' && newsSignal) {
-            triggered = true;
-            triggerTitle = `🏛️ Tier-1 Wire Breaking: ${rule.ticker}`;
-            triggerMsg = `Premier publisher (${newsSignal.publisher}) wire headline detected for ${rule.ticker}.`;
-            newsMeta = newsSignal;
-        }
+            // 1. Trend & Volatility Indicators
+            if (sigType === 'supertrend_bull_flip' && (signals.SuperTrend?.status === 'bullish' || signals.SuperTrend?.direction === 1)) {
+                triggered = true;
+                triggerTitle = `🟢 ${isGlobal ? '[Watchlist] ' : ''}SuperTrend Bullish Flip: ${ticker}`;
+                triggerMsg = `SuperTrend turned Bullish (Uptrend confirmation) for ${ticker} at $${(stock.currentPrice || 0).toFixed(2)}.`;
+            } else if (sigType === 'supertrend_bear_flip' && (signals.SuperTrend?.status === 'bearish' || signals.SuperTrend?.direction === -1)) {
+                triggered = true;
+                triggerTitle = `🔴 ${isGlobal ? '[Watchlist] ' : ''}SuperTrend Bearish Flip: ${ticker}`;
+                triggerMsg = `SuperTrend turned Bearish (Downtrend signal) for ${ticker} at $${(stock.currentPrice || 0).toFixed(2)}.`;
+            } else if (sigType === 'ema_golden_cross' && (signals.SMA_Cross?.status === 'golden_cross' || signals.SMA_Cross?.status === 'bullish')) {
+                triggered = true;
+                triggerTitle = `✨ ${isGlobal ? '[Watchlist] ' : ''}EMA Golden Cross: ${ticker}`;
+                triggerMsg = `Fast Moving Average crossed above 200-period baseline for ${ticker}.`;
+            } else if (sigType === 'ema_death_cross' && (signals.SMA_Cross?.status === 'death_cross' || signals.SMA_Cross?.status === 'bearish')) {
+                triggered = true;
+                triggerTitle = `⚠️ ${isGlobal ? '[Watchlist] ' : ''}EMA Death Cross: ${ticker}`;
+                triggerMsg = `Fast Moving Average crossed below 200-period baseline for ${ticker}.`;
+            } else if (sigType === 'bollinger_upper' && (signals.Bollinger_Bands?.status === 'overbought' || (stock.currentPrice && signals.Bollinger_Bands?.upper && stock.currentPrice >= signals.Bollinger_Bands.upper))) {
+                triggered = true;
+                triggerTitle = `🚀 ${isGlobal ? '[Watchlist] ' : ''}Bollinger Upper Breakout: ${ticker}`;
+                triggerMsg = `Price breached Upper 2.0-StdDev Bollinger Band at $${(stock.currentPrice || 0).toFixed(2)}.`;
+            } else if (sigType === 'bollinger_lower' && (signals.Bollinger_Bands?.status === 'oversold' || (stock.currentPrice && signals.Bollinger_Bands?.lower && stock.currentPrice <= signals.Bollinger_Bands.lower))) {
+                triggered = true;
+                triggerTitle = `🛡️ ${isGlobal ? '[Watchlist] ' : ''}Bollinger Lower Dip: ${ticker}`;
+                triggerMsg = `Price touched Lower 2.0-StdDev Bollinger Band at $${(stock.currentPrice || 0).toFixed(2)}.`;
+            }
+            // 2. Momentum & Oscillators
+            else if (sigType === 'rsi_oversold' && (signals.RSI?.value < 30.0 || signals.RSI?.status === 'oversold')) {
+                triggered = true;
+                triggerTitle = `⚡ ${isGlobal ? '[Watchlist] ' : ''}RSI Deep Oversold: ${ticker}`;
+                triggerMsg = `14-period RSI dropped to ${(signals.RSI?.value || 28).toFixed(1)} (< 30.0 Oversold) for ${ticker}.`;
+            } else if (sigType === 'rsi_overbought' && (signals.RSI?.value > 70.0 || signals.RSI?.status === 'overbought')) {
+                triggered = true;
+                triggerTitle = `🔥 ${isGlobal ? '[Watchlist] ' : ''}RSI Overbought: ${ticker}`;
+                triggerMsg = `14-period RSI climbed to ${(signals.RSI?.value || 72).toFixed(1)} (> 70.0 Overbought) for ${ticker}.`;
+            } else if (sigType === 'macd_bull_cross' && (signals.MACD?.status === 'bullish' || signals.MACD?.histogram > 0)) {
+                triggered = true;
+                triggerTitle = `📊 ${isGlobal ? '[Watchlist] ' : ''}MACD Bullish Cross: ${ticker}`;
+                triggerMsg = `Fast MACD Line crossed above Signal Line for ${ticker}.`;
+            } else if (sigType === 'macd_bear_cross' && (signals.MACD?.status === 'bearish' || signals.MACD?.histogram < 0)) {
+                triggered = true;
+                triggerTitle = `📉 ${isGlobal ? '[Watchlist] ' : ''}MACD Bearish Cross: ${ticker}`;
+                triggerMsg = `Fast MACD Line crossed below Signal Line for ${ticker}.`;
+            } else if (sigType === 'stoch_oversold_cross' && (signals.Stochastic?.status === 'oversold' || signals.Stochastic?.status === 'bullish')) {
+                triggered = true;
+                triggerTitle = `💫 ${isGlobal ? '[Watchlist] ' : ''}Stochastic Oversold Reversal: ${ticker}`;
+                triggerMsg = `Stochastic %K crossed %D in oversold zone (< 20) for ${ticker}.`;
+            }
+            // 3. Institutional Flow
+            else if (sigType === 'cmf_inflow' && (signals.CMF?.value > 0.15 || signals.CMF?.status === 'inflow')) {
+                triggered = true;
+                triggerTitle = `🌊 ${isGlobal ? '[Watchlist] ' : ''}CMF Heavy Inflow: ${ticker}`;
+                triggerMsg = `Chaikin Money Flow surged to +${(signals.CMF?.value || 0.18).toFixed(2)} (Institutional Accumulation).`;
+            } else if (sigType === 'cmf_outflow' && (signals.CMF?.value < -0.15 || signals.CMF?.status === 'outflow')) {
+                triggered = true;
+                triggerTitle = `🔻 ${isGlobal ? '[Watchlist] ' : ''}CMF Heavy Outflow: ${ticker}`;
+                triggerMsg = `Chaikin Money Flow dropped to ${(signals.CMF?.value || -0.18).toFixed(2)} (Distribution).`;
+            } else if (sigType === 'vwap_cross_above' && (signals.VWAP?.status === 'bullish' || (stock.currentPrice && signals.VWAP?.value && stock.currentPrice > signals.VWAP.value))) {
+                triggered = true;
+                triggerTitle = `🏛️ ${isGlobal ? '[Watchlist] ' : ''}Price Above Daily VWAP: ${ticker}`;
+                triggerMsg = `Price holds above Daily Volume-Weighted Average Price at $${(stock.currentPrice || 0).toFixed(2)}.`;
+            } else if (sigType === 'vwap_cross_below' && (signals.VWAP?.status === 'bearish' || (stock.currentPrice && signals.VWAP?.value && stock.currentPrice < signals.VWAP.value))) {
+                triggered = true;
+                triggerTitle = `🔻 ${isGlobal ? '[Watchlist] ' : ''}Price Below Daily VWAP: ${ticker}`;
+                triggerMsg = `Price dropped below Daily Volume-Weighted Average Price at $${(stock.currentPrice || 0).toFixed(2)}.`;
+            }
+            // 4. Quantitative AI & Risk Execution
+            else if (sigType === 'ai_conviction_high' && (stock.conviction_score >= 80 || stock.ai_rating === 'Strong Buy')) {
+                triggered = true;
+                triggerTitle = `🧠 ${isGlobal ? '[Watchlist] ' : ''}AI Conviction Upgrade (≥ 80%): ${ticker}`;
+                triggerMsg = `Algorithmic conviction reached ${(stock.conviction_score || 85).toFixed(1)}% (Strong Bullish).`;
+            } else if (sigType === 'ai_conviction_drop' && (stock.conviction_score < 45 || stock.ai_rating === 'Sell')) {
+                triggered = true;
+                triggerTitle = `⚠️ ${isGlobal ? '[Watchlist] ' : ''}AI Conviction Deterioration (< 45%): ${ticker}`;
+                triggerMsg = `Algorithmic conviction score dropped to ${(stock.conviction_score || 40).toFixed(1)}%.`;
+            } else if (sigType === 'daily_spike_pct' && (stock.changePercent || 0) >= 3.5) {
+                triggered = true;
+                triggerTitle = `🚀 ${isGlobal ? '[Watchlist] ' : ''}Intraday Volatility Spike: ${ticker}`;
+                triggerMsg = `Price surged +${(stock.changePercent || 0).toFixed(2)}% in daily session at $${(stock.currentPrice || 0).toFixed(2)}.`;
+            } else if (sigType === 'daily_drop_pct' && (stock.changePercent || 0) <= -3.5) {
+                triggered = true;
+                triggerTitle = `📉 ${isGlobal ? '[Watchlist] ' : ''}Intraday Volatility Drop: ${ticker}`;
+                triggerMsg = `Price declined ${(stock.changePercent || 0).toFixed(2)}% in daily session at $${(stock.currentPrice || 0).toFixed(2)}.`;
+            }
+            // 5. Breaking News Catalysts
+            else if (sigType === 'news_breaking_catalyst' && newsSignal) {
+                triggered = true;
+                triggerTitle = `🚨 ${isGlobal ? '[Watchlist] ' : ''}Breaking News Catalyst: ${ticker}`;
+                triggerMsg = `High-impact breaking catalyst headline: "${newsSignal.headline}"`;
+                newsMeta = newsSignal;
+            } else if (sigType === 'news_sentiment_bullish' && newsSignal && (newsSignal.status === 'bullish' || (newsSignal.sentiment && newsSignal.sentiment.toLowerCase().includes('bull')))) {
+                triggered = true;
+                triggerTitle = `📈 ${isGlobal ? '[Watchlist] ' : ''}Bullish Catalyst Wire: ${ticker}`;
+                triggerMsg = `Positive upgrade / earnings wire: "${newsSignal.headline}"`;
+                newsMeta = newsSignal;
+            } else if (sigType === 'news_sentiment_bearish' && newsSignal && (newsSignal.status === 'bearish' || (newsSignal.sentiment && newsSignal.sentiment.toLowerCase().includes('bear')))) {
+                triggered = true;
+                triggerTitle = `📉 ${isGlobal ? '[Watchlist] ' : ''}Adverse Event Wire: ${ticker}`;
+                triggerMsg = `Adverse news event headline: "${newsSignal.headline}"`;
+                newsMeta = newsSignal;
+            } else if (sigType === 'news_tier1_source' && newsSignal) {
+                triggered = true;
+                triggerTitle = `🏛️ ${isGlobal ? '[Watchlist] ' : ''}Tier-1 Wire Breaking: ${ticker}`;
+                triggerMsg = `${newsSignal.publisher} wire headline: "${newsSignal.headline}"`;
+                newsMeta = newsSignal;
+            }
 
-        if (triggered && newsMeta) {
-            renderAlertNotificationItem({
-                ticker: rule.ticker,
-                title: triggerTitle,
-                message: triggerMsg,
-                channel: rule.channel,
-                channelTarget: rule.channelTarget,
-                timestamp: new Date().toLocaleTimeString(),
-                newsHeadline: newsMeta.headline,
-                newsSummary: newsMeta.summary,
-                newsPublisher: newsMeta.publisher,
-                newsUrl: newsMeta.url,
-                sentiment: newsMeta.sentiment,
-                isSimulated: false
-            });
-        }
+            if (triggered) {
+                const dedupeKey = `alert_${rule.id}_${ticker}_${sigType}_${(newsMeta?.headline || '').slice(0, 25)}`;
+                if (window[dedupeKey]) return;
+                window[dedupeKey] = true;
+                // 30-minute cooldown per specific trigger event
+                setTimeout(() => { delete window[dedupeKey]; }, 1800000);
+
+                if (rule.channel === 'Browser Push') {
+                    playAlertChime();
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        try {
+                            new Notification(triggerTitle, {
+                                body: triggerMsg,
+                                icon: '/static/img/logo.png'
+                            });
+                        } catch (e) {}
+                    }
+                    renderAlertNotificationItem({
+                        ticker: ticker,
+                        isGlobalWatchlist: isGlobal,
+                        title: triggerTitle,
+                        message: triggerMsg,
+                        channel: rule.channel,
+                        channelTarget: rule.channelTarget,
+                        timestamp: new Date().toLocaleTimeString(),
+                        newsHeadline: newsMeta?.headline,
+                        newsSummary: newsMeta?.summary,
+                        newsPublisher: newsMeta?.publisher,
+                        newsUrl: newsMeta?.url,
+                        sentiment: newsMeta?.sentiment || 'Bullish',
+                        isSimulated: false,
+                        status: 'Delivered',
+                        delivered: true
+                    });
+                } else {
+                    // Remote Dispatch to Telegram, Discord, Email, or Custom Webhooks
+                    fetch('/api/alerts/test-trigger', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ticker: ticker,
+                            signalName: rule.signalName || triggerTitle,
+                            channel: rule.channel,
+                            threshold: rule.threshold || triggerMsg,
+                            channelTarget: rule.channelTarget,
+                            newsUrl: newsMeta?.url || '#'
+                        })
+                    }).then(r => r.json()).then(data => {
+                        if (data && data.notification) {
+                            renderAlertNotificationItem(data.notification);
+                        }
+                    }).catch(e => console.warn('Background alert dispatch error:', e));
+                }
+            }
+        });
     });
 }
 
@@ -6445,6 +7161,17 @@ async function testTriggerAlert(id, ticker, signalName, channel, threshold = 'Tr
         });
         const data = await res.json();
         if (data.notification) {
+            if (channel === 'Browser Push') {
+                playAlertChime();
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    try {
+                        new Notification(data.notification.title || 'Signal Triggered', {
+                            body: data.notification.message || 'Trigger event fired.',
+                            icon: '/static/img/logo.png'
+                        });
+                    } catch (e) {}
+                }
+            }
             renderAlertNotificationItem(data.notification);
         }
     } catch (e) {
@@ -6453,6 +7180,14 @@ async function testTriggerAlert(id, ticker, signalName, channel, threshold = 'Tr
 }
 
 function clearAlertHistory() {
-    const log = document.getElementById('alertHistoryLog');
-    if (log) log.innerHTML = '<div style="font-size: 0.78rem; color: var(--text-muted); text-align: center; padding: 20px;">Alert activity log cleared.</div>';
+    state.alertHistory = [];
+    try {
+        localStorage.removeItem(getAlertHistoryStorageKey());
+        localStorage.removeItem('findashiq_alert_logs_' + (state.user?.username || 'guest'));
+    } catch (e) {}
+    renderAlertHistoryEmptyState('Alert activity log cleared.');
+    if (typeof showNotification === 'function') {
+        showNotification('Signal activity log cleared', 'info');
+    }
 }
+

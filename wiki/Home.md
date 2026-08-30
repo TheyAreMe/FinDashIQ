@@ -21,10 +21,12 @@ Welcome to the **FinDashIQ Knowledge Base & Operational Documentation**. FinDash
 ---
 
 ### 🔔 3. Signal Change Alerts & Notifications Hub
-- **[Configuring Notifications & Triggers](Configuring-Notifications.md)** — Multi-factor trigger rules across 4 quantitative indicator categories, condition evaluation logic, channel dispatch, testing simulation, and alert lifecycle management.
-- **[Telegram Bot Setup Guide](Telegram-Bot-Setup.md)** — Connecting Telegram Bots via `@BotFather` and configuring Chat IDs / public channels.
-- **[Discord Webhook Setup Guide](Discord-Webhook-Setup.md)** — Pushing rich embed alert cards to Discord trading channels.
-- **[Custom API & Email Webhooks](Custom-API-and-Email-Webhooks.md)** — HTTP POST JSON payload schemas, sample receivers, Zapier, and n8n integrations.
+- **[Configuring Notifications & Global Watchlist](Configuring-Notifications.md)** — Multi-factor trigger rules across 5 quantitative indicator categories, global watchlist multi-asset monitoring (`*WATCHLIST*`), live test simulation, and rule lifecycle management.
+- **[📱 Telegram Bot Setup Guide](Telegram-Bot-Setup.md)** — Connecting Telegram Bots via `@BotFather`, configuring Chat IDs, public channels, and server tokens.
+- **[💬 Discord Webhook Setup Guide](Discord-Webhook-Setup.md)** — Pushing rich embed alert cards with sentiment color coding to Discord trading channels.
+- **[📧 Email & SMTP Notification Guide](Email-and-SMTP-Setup.md)** — Outbound SMTP configuration (`.env`), executive HTML memos, and email webhooks.
+- **[🔔 Browser Push & Audio Chimes Guide](Browser-Push-and-Audio-Alerts.md)** — Native HTML5 desktop notifications, background tab execution, and Web Audio synthesizer chimes.
+- **[🌐 Custom REST API Webhooks](Custom-API-Webhooks.md)** — Standard HTTP POST JSON payloads, Python/Node.js receivers, Zapier, and n8n integrations.
 
 ---
 
@@ -32,15 +34,3 @@ Welcome to the **FinDashIQ Knowledge Base & Operational Documentation**. FinDash
 - **[Authentication & User Management](Authentication-and-User-Management.md)** — Role-based access control (Admin vs User), data isolation, user preferences (base currency, default view mode), and Dark/Bright visual theme modes.
 - **[Performance, Caching & Architecture](Performance-Caching-and-Architecture.md)** — Server-side CSV disk caching, incremental delta updates, multi-threaded analytics, reverse proxy configuration, and hardened security headers (HSTS, CSP, X-Frame-Options).
 - **[Legal Disclaimer & Compliance](Legal-Disclaimer-and-Compliance.md)** — Regulatory guidelines, educational & research purpose disclaimer, limitation of liability, and GDPR privacy handling.
-
----
-
-## 🚀 Architectural Highlights
-
-| Pillar | Implementation | Benefit |
-| :--- | :--- | :--- |
-| **Speed** | Server-side CSV caching & incremental delta downloads | Sub-10ms UI view transitions & >98% network bandwidth reduction |
-| **Intelligence** | Multi-factor quantitative heuristics & Google Gemini AI | Deterministic 100% offline uptime with optional deep natural language synthesis |
-| **Forex** | Dynamic currency conversion (10 fiat currencies) | Seamless global multi-currency analysis with automatic forex rate sync |
-| **Security** | Role-based isolation, ProxyFix, HSTS & strict CSP | Enterprise-grade deployment readiness and secure session handling |
-| **Reliability** | Local JSON data persistence (`data/`) | Permanent retention across browser restarts and device transitions |

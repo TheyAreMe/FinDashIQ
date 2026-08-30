@@ -45,8 +45,11 @@
                         <option value="currency">💱 Multi-Currency &amp; Dynamic Forex</option>
                     </optgroup>
                     <optgroup label="🔔 Alerts &amp; Notification Rules">
-                        <option value="notifications">🔔 Signal Alerts &amp; Trigger Engine</option>
-                        <option value="webhooks">📱 Telegram &amp; Discord Dispatch</option>
+                        <option value="notifications">🔔 Signal Alerts &amp; Watchlist Hub</option>
+                        <option value="telegram">📱 Telegram Bot Setup</option>
+                        <option value="discord">💬 Discord Webhook Setup</option>
+                        <option value="email">📧 Email &amp; SMTP Setup</option>
+                        <option value="browser">🔔 Browser Push &amp; Audio Chimes</option>
                         <option value="api">🌐 Custom Webhooks &amp; REST API</option>
                     </optgroup>
                     <optgroup label="⚙️ Administration &amp; Legal">
@@ -100,15 +103,27 @@
                 <div class="help-nav-category" style="margin-top: 12px;">Alerts &amp; Dispatch</div>
                 <button type="button" class="help-nav-btn" onclick="switchHelpTab('notifications')">
                     <i data-lucide="bell" style="width: 14px; color: var(--accent-green);"></i>
-                    <span>Notifications &amp; Triggers</span>
+                    <span>Notifications Hub</span>
                 </button>
-                <button type="button" class="help-nav-btn" onclick="switchHelpTab('webhooks')">
-                    <i data-lucide="send" style="width: 14px; color: var(--accent-orange);"></i>
-                    <span>Telegram &amp; Discord</span>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('telegram')">
+                    <i data-lucide="send" style="width: 14px; color: #0284c7;"></i>
+                    <span>Telegram Bot</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('discord')">
+                    <i data-lucide="message-square" style="width: 14px; color: #8b5cf6;"></i>
+                    <span>Discord Webhook</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('email')">
+                    <i data-lucide="mail" style="width: 14px; color: #f59e0b;"></i>
+                    <span>Email &amp; SMTP</span>
+                </button>
+                <button type="button" class="help-nav-btn" onclick="switchHelpTab('browser')">
+                    <i data-lucide="volume-2" style="width: 14px; color: #ec4899;"></i>
+                    <span>Browser &amp; Sound</span>
                 </button>
                 <button type="button" class="help-nav-btn" onclick="switchHelpTab('api')">
                     <i data-lucide="code" style="width: 14px; color: var(--accent-cyan);"></i>
-                    <span>Custom APIs &amp; REST</span>
+                    <span>Custom REST APIs</span>
                 </button>
 
                 <div class="help-nav-category" style="margin-top: 12px;">Administration &amp; Legal</div>
@@ -372,56 +387,157 @@
 
                 <!-- TAB: Notifications & Triggers -->
                 <div id="helpTabNotifications" class="help-doc-section">
-                    <div class="help-doc-title">🔔 Signal Alerts &amp; Notifications Hub</div>
+                    <div class="help-doc-title">🔔 Signal Alerts &amp; Watchlist Hub</div>
                     <p class="help-doc-lead">
                         Configure multi-factor trigger rules that continuously evaluate quantitative indicators and
-                        dispatch instant alerts to your trading desk.
+                        dispatch instant alerts to your trading desk, automated bots, and messaging channels.
                     </p>
 
-                    <div class="help-section-sub">Supported Trigger Indicators</div>
+                    <div class="help-section-sub">🌐 Global Watchlist Alerts vs. Individual Stocks</div>
                     <ul class="help-list">
-                        <li><strong>Trend &amp; Volatility:</strong> SuperTrend Bullish/Bearish Direction Flips, SMA
-                            50/200 Golden &amp; Death Crosses, Bollinger Band Upper Breakouts &amp; Lower Reversals.
-                        </li>
-                        <li><strong>Momentum Oscillators:</strong> RSI Deep Oversold (&lt;30) &amp; Overbought (&gt;70),
-                            MACD Signal Crosses, Stochastic Oscillator Crosses (&lt;20).</li>
-                        <li><strong>Institutional Flow:</strong> Chaikin Money Flow Inflow (&gt;+0.15) &amp; Outflow
-                            (&lt;-0.15), VWAP Intraday Crosses.</li>
-                        <li><strong>AI &amp; Risk Levels:</strong> AI Conviction Upgrades (&ge;80%) &amp; Drops
-                            (&lt;45%), Dynamic TP1 Reached, Volatility Stop-Loss Breaches, Intraday Volatility
-                            Spikes/Drops (&plusmn;3.5%).</li>
+                        <li><strong>🌐 ALL WATCHLIST ASSETS (Global Monitor):</strong> Selecting this target monitors your entire active watchlist simultaneously. When any holding triggers the signal (e.g. adverse news, oversold RSI dip), an alert is dispatched specifically for that asset.</li>
+                        <li><strong>Individual Stocks / ETFs:</strong> Monitor a specific stock or search international companies via the <strong>Search Stock</strong> modal.</li>
+                    </ul>
+
+                    <div class="help-section-sub">Supported Trigger Indicator Categories</div>
+                    <ul class="help-list">
+                        <li><strong>Trend &amp; Volatility:</strong> SuperTrend Direction Flips (Bullish/Bearish), SMA 50/200 Golden &amp; Death Crosses, Bollinger Band Upper Breakouts &amp; Lower Reversal Zones.</li>
+                        <li><strong>Momentum Oscillators:</strong> RSI Deep Oversold (&lt;30) &amp; Overbought Exhaustion (&gt;70), MACD Signal Line Crosses, Stochastic Oscillator Crosses (&lt;20).</li>
+                        <li><strong>Institutional Flow:</strong> Chaikin Money Flow Heavy Inflows (&gt;+0.15) &amp; Outflows (&lt;-0.15), Daily VWAP Breakouts and Breakdowns.</li>
+                        <li><strong>📰 Breaking News Catalysts:</strong> 🚨 High-Impact Breaking News, 📈 Bullish Catalysts (Earnings/Upgrades), 📉 Adverse Events (Downgrades/Headwinds), 🏛️ Tier-1 Publisher Breaking Headlines.</li>
+                        <li><strong>AI &amp; Risk Levels:</strong> AI Conviction Upgrades (&ge;80%) &amp; Drops (&lt;45%), Dynamic ATR TP1 Reached, Volatility Stop-Loss Breaches, Intraday Volatility Spikes/Drops (&plusmn;3.5%).</li>
+                    </ul>
+
+                    <div class="help-section-sub">🔄 Autonomous Background Monitoring Engine</div>
+                    <ul class="help-list">
+                        <li><strong>Configurable Slider (1m to 24h):</strong> Set your desired automated polling interval directly with the slider bar (defaults to 15 minutes). Persisted automatically.</li>
+                        <li><strong>Live Heartbeat &amp; Countdown:</strong> Real-time timer counts down to the next scan with live active status indicator.</li>
+                        <li><strong>Check Signals Now:</strong> Execute an instant background calculation and news scan across your rules without waiting for the timer.</li>
+                        <li><strong>Pause / Resume:</strong> Temporarily suspend background polling at any time with a single click.</li>
                     </ul>
 
                     <div class="help-callout">
-                        <strong>⚡ Testing Triggers:</strong> Use the <strong>"Trigger Test Message"</strong> button in
-                        the form or click <strong>"Test"</strong> on any active rule card to simulate immediate message
-                        delivery.
+                        <strong>⚡ Live Testing &amp; Status Feedback:</strong> Click <strong>"Trigger Test Message"</strong> on the form or <strong>"Test"</strong> on any active rule card to execute live dispatch across your configured channel and receive instant delivery confirmation.
                     </div>
                 </div>
 
-                <!-- TAB: Webhooks -->
-                <div id="helpTabWebhooks" class="help-doc-section">
-                    <div class="help-doc-title">📱 Telegram &amp; Discord Webhook Setup</div>
+                <!-- TAB: Telegram Bot -->
+                <div id="helpTabTelegram" class="help-doc-section">
+                    <div class="help-doc-title">📱 Telegram Bot Setup &amp; Delivery Methods</div>
+                    <p class="help-doc-lead">
+                        Receive instant markdown-formatted market catalyst signals, price breakout alerts, and direct news links right in your Telegram chats, public channels, or private trading groups.
+                    </p>
 
-                    <div class="help-section-sub">📱 Telegram Bot Setup</div>
+                    <div class="help-callout" style="border-left-color: var(--accent-cyan);">
+                        <strong>🔑 Step 1: Create Bot &amp; Set Token in <code>.env</code></strong>
+                        <ol class="help-list" style="margin-top: 6px;">
+                            <li>Open Telegram, search for <strong>@BotFather</strong>, send <code>/newbot</code>, and follow prompts.</li>
+                            <li>Copy the <strong>Bot API Token</strong> and add to your <code>.env</code> file: <code>TELEGRAM_BOT_TOKEN=...</code></li>
+                        </ol>
+                    </div>
+
+                    <div class="help-section-sub">👤 Method A: Direct Private Messages (DMs to You)</div>
+                    <ul class="help-list">
+                        <li><strong>Step 1:</strong> In Telegram, search for your bot (e.g. <code>@FinDashIQ_bot</code>) and tap <strong>"Start"</strong> (or send <code>hello</code>).</li>
+                        <li><strong>Step 2:</strong> In FinDashIQ Destination, type <code>auto</code> (or your numeric Chat ID from <code>@raw_data_bot</code>).</li>
+                        <li><strong>Step 3:</strong> Click <strong>Trigger Test Message</strong> — the alert will arrive directly in your private chat.</li>
+                    </ul>
+
+                    <div class="help-section-sub">📢 Method B: Public Channels &amp; Public Groups (e.g. <code>@FinDashIQ</code>)</div>
+                    <ul class="help-list">
+                        <li><strong>Step 1 (Make Public):</strong> In Telegram group settings ➔ Edit ➔ <strong>Group Type</strong> ➔ Set to <strong>Public</strong> ➔ Assign handle (e.g. <code>FinDashIQ</code>).</li>
+                        <li><strong>Step 2 (Admin Rights):</strong> In Group Administrators, add your bot (e.g. <code>@FinDashIQ_bot</code>) as an <strong>Admin</strong> with <em>Post Messages</em> rights.</li>
+                        <li><strong>Step 3:</strong> In FinDashIQ Destination, enter <code>@FinDashIQ</code> and click <strong>Trigger Test Message</strong>.</li>
+                    </ul>
+
+                    <div class="help-section-sub">🔒 Method C: Private Groups (No public handle)</div>
+                    <ul class="help-list">
+                        <li><strong>Step 1:</strong> Add your bot to the private group as an <strong>Administrator</strong>.</li>
+                        <li><strong>Step 2:</strong> In the group chat, send <code>/test @FinDashIQ_bot</code>.</li>
+                        <li><strong>Step 3:</strong> In FinDashIQ Destination, enter <code>auto</code> (or the numeric group ID starting with <code>-100...</code>) and click <strong>Trigger Test Message</strong>.</li>
+                    </ul>
+
+                    <div class="help-callout" style="border-left-color: var(--accent-amber); margin-top: 14px;">
+                        <strong>⚠️ Note on <code>chat not found</code> (HTTP 400):</strong> Telegram only allows <code>@handle</code> addressing for <strong>Public</strong> groups/channels. If your group is Private, either set it to Public (Method B) or use <code>auto</code> with Admin rights (Method C).
+                    </div>
+                </div>
+
+                <!-- TAB: Discord Webhook -->
+                <div id="helpTabDiscord" class="help-doc-section">
+                    <div class="help-doc-title">💬 Discord Webhook Integration</div>
+                    <p class="help-doc-lead">
+                        Push real-time quantitative indicator breakouts and corporate catalyst wires directly into your Discord trading channels with rich formatted embeds.
+                    </p>
+
+                    <div class="help-section-sub">1. Generate Discord Webhook URL</div>
                     <ol class="help-list">
-                        <li>Message <strong>@BotFather</strong> on Telegram and create a new bot via
-                            <code>/newbot</code>.
-                        </li>
-                        <li>Start a chat with your bot and obtain your Chat ID (using <code>@userinfobot</code>) or
-                            public channel username (e.g. <code>@quant_desk</code>).</li>
-                        <li>In FinDashIQ, select <strong>Telegram Bot</strong> and enter your Chat ID/Username.</li>
-                        <li>Click <strong>Trigger Test Message</strong> to verify delivery.</li>
+                        <li>Open your Discord server and navigate to your trading channel (e.g. <code>#quant-signals</code>).</li>
+                        <li>Click the gear icon next to the channel name to open <strong>Channel Settings</strong>.</li>
+                        <li>Go to <strong>Integrations ➔ Webhooks ➔ New Webhook</strong>.</li>
+                        <li>Name the webhook (e.g. <code>FinDashIQ AI Desk</code>) and click <strong>Copy Webhook URL</strong>.</li>
                     </ol>
 
-                    <div class="help-section-sub">💬 Discord Webhook Setup</div>
+                    <div class="help-section-sub">2. Embed Color Coding</div>
+                    <div class="help-grid-cards">
+                        <div class="help-feature-card">
+                            <div class="help-card-head" style="color: var(--accent-green);">🟢 Bullish Triggers</div>
+                            <div>SuperTrend Bullish Flips, Golden Crosses, Oversold RSI Rebounds, and CMF Inflows.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head" style="color: var(--accent-red);">🔴 Bearish Triggers</div>
+                            <div>SuperTrend Bearish Breakdowns, Death Crosses, Overbought Exhaustion, and SL Breaches.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head" style="color: var(--accent-purple);">🟣 Breaking Catalysts</div>
+                            <div>Tier-1 news headlines, earnings beat catalysts, and AI conviction upgrades.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: Email & SMTP -->
+                <div id="helpTabEmail" class="help-doc-section">
+                    <div class="help-doc-title">📧 Email &amp; SMTP Server Configuration</div>
+                    <p class="help-doc-lead">
+                        Dispatches structured HTML executive notification memos directly to your inbox or email automation webhook endpoints.
+                    </p>
+
+                    <div class="help-section-sub">1. SMTP Server Environment Setup (.env)</div>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
+                        Configure your outbound SMTP credentials in your <code>.env</code> file:
+                    </p>
+                    <pre class="help-code-block"><code>SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_app_specific_password
+SMTP_FROM=alerts@findashiq.com</code></pre>
+
+                    <div class="help-section-sub">2. Executive Memo Contents</div>
+                    <ul class="help-list">
+                        <li><strong>Asset Symbol &amp; Company:</strong> Ticker and profile summary.</li>
+                        <li><strong>Algorithmic Context:</strong> Multi-factor momentum, volume, and volatility status.</li>
+                        <li><strong>Breaking News Links:</strong> Direct hyperlinks to full catalyst articles.</li>
+                    </ul>
+                </div>
+
+                <!-- TAB: Browser Push & Audio -->
+                <div id="helpTabBrowser" class="help-doc-section">
+                    <div class="help-doc-title">🔔 Browser Push &amp; Audio Synthesizer Chimes</div>
+                    <p class="help-doc-lead">
+                        Instant in-browser and operating system desktop push alerts with zero latency, powered by the HTML5 Notification API and Web Audio synthesizer.
+                    </p>
+
+                    <div class="help-section-sub">1. How Desktop Push Works</div>
+                    <ul class="help-list">
+                        <li><strong>HTML5 Desktop Notifications:</strong> Fires operating system notification popups even when your browser is minimized or running in a background tab.</li>
+                        <li><strong>Web Audio Synthesizer Chime:</strong> Produces a high-priority dual-tone acoustic chime (587Hz ➔ 880Hz) with zero external media files.</li>
+                        <li><strong>100% Offline Capable:</strong> Runs entirely client-side without external notification servers.</li>
+                    </ul>
+
+                    <div class="help-section-sub">2. Enabling Desktop Alerts</div>
                     <ol class="help-list">
-                        <li>Open your Discord channel settings ➔ <strong>Integrations</strong> ➔
-                            <strong>Webhooks</strong> ➔ <strong>New Webhook</strong>.
-                        </li>
-                        <li>Copy the Webhook URL (e.g. <code>https://discord.com/api/webhooks/...</code>).</li>
-                        <li>In FinDashIQ, select <strong>Discord Webhook</strong> and paste the URL.</li>
-                        <li>Click <strong>Trigger Test Message</strong> to push an embed card into your channel.</li>
+                        <li>Select <strong>🔔 In-App &amp; Desktop Sound Alert</strong> in the Dispatch Channel dropdown.</li>
+                        <li>Click the <strong>Enable Desktop Alerts</strong> button next to the destination label.</li>
+                        <li>Click <strong>Allow / Grant</strong> on your browser's permission prompt.</li>
                     </ol>
                 </div>
 
@@ -429,28 +545,32 @@
                 <div id="helpTabApi" class="help-doc-section">
                     <div class="help-doc-title">🌐 Custom Webhooks &amp; REST API</div>
                     <p class="help-doc-lead">
-                        Connect FinDashIQ signal alerts to custom trading execution bots, Python/Node.js endpoints, or
-                        automation hubs (Zapier, n8n, Make).
+                        Connect FinDashIQ signal alerts to custom trading execution bots (Python, Node.js, Go), FastAPI listeners, or automation hubs (Zapier, n8n, Make).
                     </p>
 
-                    <div class="help-section-sub">JSON Webhook POST Payload</div>
+                    <div class="help-section-sub">Standard JSON Webhook POST Payload</div>
                     <pre class="help-code-block"><code>{
   "event": "QUANT_SIGNAL_TRIGGER",
+  "timestamp": "2026-08-30T10:35:00Z",
   "ticker": "NVDA",
-  "signal": {
-    "key": "supertrend_bull",
-    "name": "SuperTrend Direction Flip ➔ Bullish Uptrend",
-    "threshold": "Bullish Uptrend Confirmation"
+  "signalName": "SuperTrend Direction Flip ➔ Bullish Uptrend",
+  "signalType": "supertrend_bull",
+  "category": "Trend & Volatility",
+  "threshold": "Bullish Uptrend Confirmation",
+  "title": "🚨 NVDA Signal Triggered: SuperTrend Bullish Flip",
+  "message": "Quantitative Multi-Factor Engine triggered condition [Bullish Uptrend Confirmation] for NVDA...",
+  "news": {
+    "headline": "NVIDIA Unveils Next-Gen AI Architecture",
+    "summary": "Major cloud providers order high-volume deployments...",
+    "publisher": "Reuters Financial Wire",
+    "url": "https://www.reuters.com/..."
   },
   "metrics": {
-    "price": 175.40,
-    "currency": "USD",
     "rsi14": 58.4,
     "cmf": 0.185,
     "vwap": 173.20,
     "aiConviction": 84.0
-  },
-  "channel": "Custom API Webhook"
+  }
 }</code></pre>
                 </div>
 

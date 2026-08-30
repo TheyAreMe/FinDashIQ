@@ -1,5 +1,5 @@
 {
-  "timestamp": 1788022390.2719302,
+  "timestamp": 1788081352.3349416,
   "ticker": "SMCI",
   "country": "United States",
   "flag": "🇺🇸",
@@ -12,7 +12,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "02:03PM",
-      "timestamp": 1788022391,
+      "timestamp": 1788081353,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -24,7 +24,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "09:35AM",
-      "timestamp": 1788022391,
+      "timestamp": 1788081353,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -36,7 +36,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "03:34PM",
-      "timestamp": 1788022391,
+      "timestamp": 1788081353,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -48,7 +48,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "Aug-24-26 04:30PM",
-      "timestamp": 1788022391,
+      "timestamp": 1788081353,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -60,7 +60,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "01:26PM",
-      "timestamp": 1788022391,
+      "timestamp": 1788081353,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -72,7 +72,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "01:24PM",
-      "timestamp": 1788022391,
+      "timestamp": 1788081353,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -84,7 +84,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "Aug-21-26 09:08PM",
-      "timestamp": 1788022391,
+      "timestamp": 1788081353,
       "sourceType": "finviz",
       "timeAgo": "Just now"
     },
@@ -96,7 +96,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -108,7 +108,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -120,19 +120,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Supermicro Receives Over $60B in Q4 Orders as Backlog Hits Record Levels - Stock Titan",
-      "summary": "Supermicro Receives Over $60B in Q4 Orders as Backlog Hits Record Levels&nbsp;&nbsp;Stock Titan",
-      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxNQWt0cTVGX2xzQ2FQLVRyVFA0VVdjZGlod0R2YWwxSW5JMHJnVWtwbmxNMlNOTXJoVzRVUlhxUEZvajVNbFlTcENKdlNIbDY0NWYxNWRrOG1vT3plSFpUajhyN2IzUlpObXZTV2pxSzZQVXRjYUlmUTBvRHVPRm8yaldqeUtUcElSSHl0TWZLaEpNRFZtSVoycFI5bFhtS25zMGdfTGFPbjhvVlhLdHJWV2NzTzZFcnVWNVVNd0pR?oc=5",
-      "publisher": "Google News Wire",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -144,7 +132,19 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Super Micro Computer (SMCI) Stock Gets Fair Value Boost After Analysts Lift Targets - Yahoo Finance",
+      "summary": "Super Micro Computer (SMCI) Stock Gets Fair Value Boost After Analysts Lift Targets&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQSHZFbldlcHFOalAxRmpJcFJtMUg5eXpfNGhIcVdZM3pZSmVQR3NxTFdSQjhNTW1BV2otVnlBdUg3Tm1sbE9KbWxERWlIMHM0ZU14MkdFV2IwajhONlJ2d1R6aHRtUzBQcjBLZzQ1VmFCUVd4cXN4REJSb09lVm1wUFc2MWZLS2JSTXQ3NlFEOURaWkhxZGtvUFd5VnM?oc=5",
+      "publisher": "Google News Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -156,7 +156,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -168,7 +168,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -180,7 +180,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -192,7 +192,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -204,7 +204,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -216,7 +216,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -228,19 +228,19 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
     {
-      "title": "Super Micro Computer (SMCI) A Data Center Stock Cheaper Than the S&P - Yahoo Finance",
-      "summary": "Super Micro Computer (SMCI) A Data Center Stock Cheaper Than the S&P&nbsp;&nbsp;Yahoo Finance",
-      "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPYjl2cFZMUWw0N29wckxmQTNvMGZkSnhvMzlHOG9Sc2owSG8tVk5EeFBxVFI5emhQOXlzM3VpdEdIaVlvLUxFY0JCSVctZWlnNFdMQ0lmQXBQejZCTW9HakdiSWtyYjcweDh3enZ6c3lrWldhSFhGUUZiQlVYRG1XM2J0ZlNWSVVtb1RXVzBkV2FHZE5QOE9wU1BFbw?oc=5",
+      "title": "Super Micro Computer (SMCI) Earnings Expected to Grow: What to Know Ahead of Next Week's Release - Yahoo Finance",
+      "summary": "Super Micro Computer (SMCI) Earnings Expected to Grow: What to Know Ahead of Next Week's Release&nbsp;&nbsp;Yahoo Finance",
+      "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNdVctMzVfTGhpLUhuU2tkOFQtaE0wbFBQbzl4eFl6Q1FweXN0VzFscXlVRXRTVFZwd2ZucDl6T3FmMkVsQnBuMlB6T1FMX3dYdWJTWmtuVDkwSGJURFE3Q0I5dHF6TFpDUzVoTUR1emZESHJITUhQWGkyZnhpQWhxZlgwajJGMTduVTJCQWtzSVlFdzBIR0FFeEY2ckxPZU1X?oc=5",
       "publisher": "Google News Wire",
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788022390,
+      "timestamp": 1788081353,
       "sourceType": "rss",
       "timeAgo": "Just now"
     }
