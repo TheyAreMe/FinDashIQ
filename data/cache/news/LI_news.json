@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109724.74677,
+  "ticker": "LI",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Li Auto posts Q2 net loss amid soft demand in China",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/9fe01bee-001b-346b-993a-7924c51c2546/li-auto-posts-q2-net-loss.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 08:28AM",
+      "timestamp": 1788109725,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Li Auto Inc (LI) (Q2 2026) Earnings Call Highlights: Navigating Cost Pressures and Driving ...",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/li-auto-inc-li-q2-190128760.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 03:01PM",
+      "timestamp": 1788109725,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "What's Happening With Li Auto Stock Wednesday",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/whats-happening-li-auto-stock-173545254.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:35PM",
+      "timestamp": 1788109725,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Li Earnings Show 'Intense' Chinese EV Competition Isn't Going Away",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/li-auto-earnings-stock-price-6df4cfca?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:54AM",
+      "timestamp": 1788109725,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Li Auto beats second-quarter revenue forecasts but weak Q3 outlook weighs on shares",
+      "summary": "",
+      "url": "/news/385565/li-auto-beats-second-quarter-revenue-forecasts-but-weak-q3-outlook-weighs-on-shares",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:34AM",
+      "timestamp": 1788109725,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

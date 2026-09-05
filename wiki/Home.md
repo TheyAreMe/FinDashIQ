@@ -1,4 +1,4 @@
-# ⚡ FinDashIQ Wiki & Operational Documentation Hub
+# ⚡ FinDashIQ Wiki & Operational Documentation Hub (v2.6)
 
 Welcome to the **FinDashIQ Knowledge Base & Operational Documentation**. FinDashIQ is an institutional-grade quantitative financial analytics terminal combining multi-factor technical indicators, persistent watchlist intelligence, dynamic strategy backtesting, automated AI investment synthesis, real-time multi-currency conversion, and multi-channel signal notification rules.
 
@@ -9,7 +9,7 @@ Welcome to the **FinDashIQ Knowledge Base & Operational Documentation**. FinDash
 ### 📊 1. Core Terminal Views
 - **[Watchlist & Market Intelligence Hub](Watchlist-and-Market-Hub.md)** — Real-time price tracking, dual Card/Table view modes, drag-and-drop reordering, SVG trend sparklines, multi-factor conviction gauges, CMF/VWAP/RSI/SuperTrend metric bars, company search modal, and asset basket management.
 - **[Stock Deep-Dive Terminal Guide](Stock-Deep-Dive-Terminal.md)** — Search terminal, multi-stock tabs, AI investment thesis, 30-day probabilistic scenarios, execution matrix, interactive AI Copilot, dynamic candlestick charts, technical oscillators, and multi-factor consensus.
-- **[AI Stock Scanner & Opportunity Discovery](AI-Stock-Scanner-Guide.md)** — Multi-factor thematic screener, ecological & ESG asset filtering (85–98/100), buy recommendations outside active watchlist, asymmetric execution matrices, and 1-click tracking.
+- **[AI Stock Scanner & Opportunity Discovery](AI-Stock-Scanner-Guide.md)** — Autonomous background market scanner, elite institutional conviction setups (≥85%), dynamic universe expansion (300+ stocks), live countdown timing, real-time search filter, and 1-click tracking outside active watchlist.
 - **[Strategy Backtesting & Order Execution](Strategy-Backtesting-Guide.md)** — Algorithmic strategies (Multi-Factor Quant, SuperTrend, MACD+RSI), multi-timeframe analysis (1M to MAX), alpha calculations, win rates, profit factor, drawdown scorecards, dynamic equity curves, and order execution ledgers.
 
 ---

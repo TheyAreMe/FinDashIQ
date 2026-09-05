@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109576.0304568,
+  "ticker": "RGTI",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Can High Gate Fidelity Justify Buying Rigetti Stock Today?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/4f8c9116-c5c0-3506-b8c7-399ace22a258/can-high-gate-fidelity.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 11:22AM",
+      "timestamp": 1788109576,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rigetti Shares Plunge After Major Leadership Shake-Up",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/rigetti-shares-plunge-major-leadership-183506016.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-20-26 02:35PM",
+      "timestamp": 1788109576,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rigetti Computing Establishes Dedicated Systems Delivery Organization to Scale Customer Deployments and Advance Quantum Processor Roadmap",
+      "summary": "",
+      "url": "/news/383910/rigetti-computing-establishes-dedicated-systems-delivery-organization-to-scale-customer-deployments-and-advance-quantum-processor-roadmap",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-19-26 07:00PM",
+      "timestamp": 1788109576,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Quantinuum Is Working With This Apple Partner to Scale Quantum Computing",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/quantinuum-quanta-computer-quantum-computing-apple-941c462d?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-14-26 08:18AM",
+      "timestamp": 1788109576,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Rigetti Stock's Bullish Signal Could Mean More Upside",
+      "summary": "",
+      "url": "/news/381978/rigetti-stocks-bullish-signal-could-mean-more-upside",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-13-26 03:09PM",
+      "timestamp": 1788109576,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

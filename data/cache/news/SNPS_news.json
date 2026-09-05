@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109570.7107286,
+  "ticker": "SNPS",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Synopsys Inc. stock outperforms competitors on strong trading day",
+      "summary": "",
+      "url": "https://www.marketwatch.com/data-news/synopsys-inc-stock-outperforms-competitors-on-strong-trading-day-cd47aa1c-dd73db476124?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 04:30PM",
+      "timestamp": 1788109571,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Synopsys CEO on demand for 'more efficient AI silicon'",
+      "summary": "",
+      "url": "https://www.youtube.com/shorts/GtDrQ9Z80UU",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:00PM",
+      "timestamp": 1788109571,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Synopsys Q3 2026 earnings beat estimates, raises full-year guidance",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/9895f73c-b443-38c5-9bcb-9d18069d6028/synopsys-q3-2026-earnings.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:25PM",
+      "timestamp": 1788109571,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Synopsys upgrade bets on FY27 growth rebound and stronger chip-design demand",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/articles/synopsys-upgrade-bets-fy27-growth-143339418.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:33AM",
+      "timestamp": 1788109571,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Synopsys beats Q3 forecasts and lifts 2026 guidance as AI demand strengthens",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/00c1cac5-036c-3b31-be0a-51267e31272f/synopsys-beats-q3-forecasts.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:10AM",
+      "timestamp": 1788109571,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

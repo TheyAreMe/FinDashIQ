@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108582.125384,
+  "ticker": "AZN",
+  "country": "United Kingdom",
+  "flag": "🇬🇧",
+  "news": [
+    {
+      "title": "IONS, AZN Stocks Fall On Full Data From Failed Cardiomyopathy Trial Jefferies Sees Neutral To Negative Readthrough To ALNY",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/d5301e6f-b01e-3aaa-9ab9-4587080d83ae/ions%2C-azn-stocks-fall-on-full.html",
+      "publisher": "Yahoo Finance",
+      "country": "United Kingdom",
+      "flag": "🇬🇧",
+      "publishedAt": "Aug-28-26 05:18PM",
+      "timestamp": 1788108582,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "AstraZeneca, Ionis data spark debate about RNA drugs impact on deadly heart disease",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/16dfdb18-3419-355b-aaf9-a6d80dc10ec6/astrazeneca%2C-ionis-data-spark.html",
+      "publisher": "Yahoo Finance",
+      "country": "United Kingdom",
+      "flag": "🇬🇧",
+      "publishedAt": "06:58AM",
+      "timestamp": 1788108582,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "AstraZeneca Stock Remains 14% Lower Despite Tezspire Phase 3 Success",
+      "summary": "",
+      "url": "https://finance.yahoo.com/healthcare/articles/astrazeneca-stock-remains-14-lower-191038631.html",
+      "publisher": "Yahoo Finance",
+      "country": "United Kingdom",
+      "flag": "🇬🇧",
+      "publishedAt": "Aug-27-26 03:10PM",
+      "timestamp": 1788108582,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "New data could widen use of AstraZeneca, Amgen immune disease drug",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/6e203914-d59f-3f9e-95d4-2226faa57c0c/new-data-could-widen-use-of.html",
+      "publisher": "Yahoo Finance",
+      "country": "United Kingdom",
+      "flag": "🇬🇧",
+      "publishedAt": "07:58AM",
+      "timestamp": 1788108582,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Amgen-AstraZenecas Tezspire nets another Phase III inflammatory disease win",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/c233daec-805a-36d5-8b04-e1ae73d57c2c/amgen-astrazeneca%E2%80%99s-tezspire.html",
+      "publisher": "Yahoo Finance",
+      "country": "United Kingdom",
+      "flag": "🇬🇧",
+      "publishedAt": "07:30AM",
+      "timestamp": 1788108582,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

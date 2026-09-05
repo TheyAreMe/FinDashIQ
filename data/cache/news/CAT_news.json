@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108554.6055005,
+  "ticker": "CAT",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Caterpillar is bringing to AI deployment what it learned from automating mining",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/caterpillar-bringing-ai-deployment-learned-150000020.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Today 11:00AM",
+      "timestamp": 1788108555,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is Caterpillar Stock Relying on an Artificial Demand Story?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/765cf682-366d-3986-a681-29be414f349a/is-caterpillar-stock-relying.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 01:18PM",
+      "timestamp": 1788108555,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Caterpillar CEO Joe Creed to Participate in Virtual Headquarters Visit with Wells Fargo",
+      "summary": "",
+      "url": "/news/386265/caterpillar-ceo-joe-creed-to-participate-in-virtual-headquarters-visit-with-wells-fargo",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 09:15AM",
+      "timestamp": 1788108555,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Can CAT Stock Yield 12% Annualized Income While You Wait Out The Slowdown?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/f4020eb5-32ad-3a6e-a5aa-d605dcf6ece6/can-cat-stock-yield-12%25.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:03PM",
+      "timestamp": 1788108555,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Before The Surge, Caterpillar Stocks Order Book Told A Different Story",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/833ffbd5-de6e-36d0-9fa2-2375d2ad6dc4/before-the-surge%2C-caterpillar.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-25-26 11:16AM",
+      "timestamp": 1788108555,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

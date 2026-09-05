@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109729.4690714,
+  "ticker": "EVGO",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "EVgo and GM Enhance the Charging Experience with New Flagship Sites",
+      "summary": "",
+      "url": "/news/380465/evgo-and-gm-enhance-the-charging-experience-with-new-flagship-sites",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-11-26 07:30AM",
+      "timestamp": 1788109730,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "EVgo, Inc. Q2 2026 Earnings Call Summary",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/39d76425-016e-3445-a0c6-650fd742825a/evgo%2C-inc.-q2-2026-earnings.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-05-26 05:55PM",
+      "timestamp": 1788109730,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "EVgo Inc. Reports Second Quarter 2026 Results",
+      "summary": "",
+      "url": "/news/377473/evgo-inc-reports-second-quarter-2026-results",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "07:30AM",
+      "timestamp": 1788109730,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "EVgo Expands Fast Charging in the U.S. with Supercharger Deployment",
+      "summary": "",
+      "url": "/news/377332/evgo-expands-fast-charging-in-the-us-with-supercharger-deployment",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:30AM",
+      "timestamp": 1788109730,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Pilot, General Motors and EVgo Power EV Road Trips with More Than 300 Fast-Charging Locations Nationwide",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260804995481/en/Pilot,",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-04-26 08:40AM",
+      "timestamp": 1788109730,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

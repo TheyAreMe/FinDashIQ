@@ -1,156 +1,212 @@
 # 🛰️ AI Quantitative Stock Scanner & Opportunity Discovery
 
-FinDashIQ features an institutional **AI Stock Scanner (Top Tab 3)** designed to discover high-conviction buy recommendations across thematic sectors and ecological investments for stocks **not currently on your watchlist**.
+FinDashIQ features an institutional **AI Stock Scanner (Top Tab 3)** designed to discover high-conviction buy setups, viral news catalysts, and benchmark basket leaders across global equity markets for stocks **not currently on your watchlist**.
+
+The scanner operates an **autonomous background engine** that continuously evaluates hundreds of assets, precalculating opportunities, technical signals, and catalysts into a warm in-memory cache for instant sub-5ms rendering.
 
 ---
 
 ## 📋 Table of Contents
 1. [Core Scanner Capabilities](#1-core-scanner-capabilities)
-2. [Thematic Sectors & ESG Universe](#2-thematic-sectors--esg-universe)
-3. [Filter & Parameter Controls](#3-filter--parameter-controls)
-4. [Quick Presets](#4-quick-presets)
-5. [Opportunity Card Anatomy](#5-opportunity-card-anatomy)
-6. [REST API Reference](#6-rest-api-reference)
+2. [Interface Architecture & Layout](#2-interface-architecture--layout)
+3. [Global Universe & Regional Markets](#3-global-universe--regional-markets)
+4. [Algorithmic Screener Strategies](#4-algorithmic-screener-strategies)
+5. [Benchmark ETF & Index Baskets](#5-benchmark-etf--index-baskets)
+6. [Opportunity Card Anatomy & Catalyst Box](#6-opportunity-card-anatomy--catalyst-box)
+7. [Admin Scheduling & Engine Controls](#7-admin-scheduling--engine-controls)
+8. [REST API Reference](#8-rest-api-reference)
 
 ---
 
 ## 1. Core Scanner Capabilities
 
-- **Uncovered Market Alpha**: Automatically filters out all stocks currently tracked in your personal watchlist (`[x] Exclude stocks already on my Watchlist`) to focus exclusively on fresh opportunities.
-- **Thematic & Ecological Universe**: Screens dedicated investment categories including **Clean & Green / Decarbonization**, **Pure AI & Quantum Compute**, **Cybersecurity**, **Biotech & Genomics**, **Fintech**, and **Industrial Automation**.
-- **Multi-Factor Indicator Screening**: Concurrently tests each asset for:
-  - **SuperTrend (10, 3)** trendline confirmation.
-  - **RSI (14)** momentum expansion and oversold mean-reversion bounces (<55).
-  - **Chaikin Money Flow (CMF 20)** institutional capital accumulation (>+0.05).
-  - **Volume-Weighted Average Price (VWAP)** benchmark support.
-  - **MACD (12, 26, 9)** bullish histogram expansion.
-- **Dynamic Trade Execution Matrix**: Calculates asymmetric entry zones, volatility-based stop-losses (ATR-calibrated), target take-profit (TP1), and risk/reward ratios converted to your selected base currency.
-- **AI Investment Thesis & Catalyst**: Synthesizes the core business catalysts and technical tailwinds explaining why the asset qualifies for purchase.
-- **Instant Actions**: Single-click **"+ Add to Watchlist"** (server-persisted) and **"Deep-Dive in Terminal →"** for immediate multi-timeframe exploration.
+- **Elite Institutional Conviction (≥ 85% by Default)**: Defaults to screening high-probability quantitative setups (≥ 85% conviction), with optional criteria thresholds for 75%, 62%, or 50%.
+- **Autonomous Background Engine**: Runs periodic screening cycles in the background (default: every 30 minutes, configurable from 15 min to 2 hours) so users experience zero loading latency.
+- **Live Timing & Dynamic Countdown**: The summary bar displays exact `Last Scan / Next Due` timestamps along with a ticking live countdown timer (`(in Xm Ys)` / `(Due now)`).
+- **Dynamic Top Tab Badge**: The Top Tab 3 badge in the navigation bar automatically reflects the exact count of stocks currently matching your active filters and search query.
+- **Real-Time Recommendations Search Bar**: Search filtered candidates by ticker, company name, or sector with instant in-memory filtering.
+- **Search Query Persistence**: Switching between **Grid Cards View** and **Table View** preserves the active search filter seamlessly without reset.
+- **Uncovered Market Alpha**: Automatically filters out all stocks currently tracked in your personal watchlist (`✨ Exclude Watchlist Stocks`) to focus exclusively on fresh candidates.
+- **Dynamic Universe Expansion**: Search and add custom international equities and ETFs to the background screening pool via the **Add Stock to Universe** modal.
+- **Breaking News Catalyst Engine**: NLP wire parser flags viral positive news announcements, earnings surprises, and volume surges ($RVOL \ge 1.2\text{x}$ to $3.0\text{x}$ 20-Day SMA).
+- **Multi-Factor Indicator Confirmation**: Evaluates SuperTrend trendline support, RSI mean-reversion, Chaikin Money Flow accumulation, and Volume-Weighted Average Price (VWAP).
+- **Dynamic Trade Execution Matrix**: Calculates asymmetric entry zones, ATR-calibrated stop-losses, target take-profit (TP1), and risk/reward ratios converted to your selected base currency.
+- **Instant 1-Click Actions**: Add directly to Watchlist or open Deep-Dive in the Terminal.
 
 ---
 
-## 2. Thematic Sectors & ESG Universe
+## 2. Interface Architecture & Layout
 
-### 1. Clean Energy & Decarbonization (`eco_esg`)
-- Elite ESG ratings (85–98/100) and low-carbon leaders: Enphase (`ENPH`), First Solar (`FSLR`), SolarEdge (`SEDG`), Brookfield Renewable (`BEPC`), Vestas (`VWS.CO`), Ørsted (`ORSTED.CO`), NIBE (`NIBE-B.ST`), Sunrun (`RUN`), Daqo (`DQ`), HA Sustainable (`HASI`).
+### Unified Split Hero Header
+The top hero section consolidates scanner controls and universe expansion into a single coordinated card:
+- **Left Field (`.scanner-hero-field-left`)**:
+  - **Stock Scanner Title & Status Badge**: Features the cyan Lucide radar icon and a live status indicator (`Autonomous & Live` synced badge or pulsing `Scanning in progress...` badge).
+  - **Description**: Concise summary of the background screening mechanics.
+  - **Administrator Interval & Refresh Controls**: Scan interval selector and asynchronous Force Update trigger (visible to administrators).
+- **Desktop Vertical Split Divider**: Clean hairline divider separating configuration from expansion actions.
+- **Right Field (`.scanner-hero-field-right`)**:
+  - **Expand Monitoring Universe**: Header displaying total monitored assets count (`300+ Stocks`).
+  - **Aligned Action Controls**: Vertically stacked on desktop with identical dimensions (206px × 33px):
+    - `Add Stock to Universe` button (opens global ticker search modal).
+    - `✨ Exclude Watchlist Stocks` checkbox with highlight styling.
+  - **Responsive Mobile Layout**: On tablets and mobile screens (≤ 992px), fields stack vertically while action controls transition to a horizontal flex flow.
 
-### 2. Pure AI Silicon & Quantum Deep Tech (`ai_tech`)
-- Semiconductor and compute infrastructure: Arm (`ARM`), Supermicro (`SMCI`), Broadcom (`AVGO`), Arista (`ANET`), Qualcomm (`QCOM`), Marvell (`MRVL`), Palantir (`PLTR`), ASML (`ASML`), IonQ (`IONQ`).
-
-### 3. Cybersecurity & Cloud Infrastructure (`cyber`)
-- Enterprise cloud and zero-trust security: CrowdStrike (`CRWD`), Palo Alto Networks (`PANW`), Cloudflare (`NET`), Datadog (`DDOG`), Snowflake (`SNOW`).
-
-### 4. Healthcare, Biotech & Genomics (`biotech`)
-- Next-gen oncology and precision medicine: Vertex (`VRTX`), Regeneron (`REGN`), CRISPR Therapeutics (`CRSP`), Intuitive Surgical (`ISRG`), Eli Lilly (`LLY`).
-
-### 5. Fintech & Digital Commerce (`fintech`)
-- Global payments and digital finance: Adyen (`ADYEN.AS`), Block (`SQ`), Coinbase (`COIN`), Nu Holdings (`NU`), MercadoLibre (`MELI`).
-
-### 6. Industrial Automation & Smart Grids (`automation`)
-- Electrification and grid robotics: Siemens AG (`SIEGn.DE`), Schneider Electric (`SCHN.PA`), ABB (`ABB`), Siemens Energy (`ENR.DE`), Rivian (`RIVN`).
-
----
-
-## 3. Filter & Parameter Controls
-
-- **Sector / Industry**: Filter by specific thematic category or scan the entire global universe.
-- **Theme & ESG Profile**: Filter by *Clean & Green / ESG Focus*, *Pure AI & Quantum*, *High Momentum Breakouts*, or *Cash Flow Leaders*.
-- **Market Capitalization**: Mega Cap ($200B+), Large Cap ($10B – $200B), Mid Cap ($2B – $10B).
-- **Minimum AI Conviction Score**: Any (≥50%), Bullish (≥65%), Strong Bullish (≥75%), Elite Alpha (≥85%).
+### Scanner Summary Statistics Bar
+- **Universe Scanned**: Total assets evaluated in the background pool (e.g. `276+ Assets`).
+- **Matching Opportunities**: Real-time count of stocks matching active strategy, market, conviction, and exclusion filters.
+- **Highest Conviction**: Peak AI conviction score among current matches (e.g. `94%`).
+- **Last Scan / Next Due**: Exact timestamp pair (e.g. `Last: 12:15:00 PM • Next: 12:45:00 PM`) paired with live ticking countdown (`(in 28m 45s)`).
 
 ---
 
-## 4. Quick Presets
+## 3. Global Universe & Regional Markets
 
-| Preset Chip | Focus & Filters Applied |
+| Regional Market | Included Indices & Equities |
 | :--- | :--- |
-| **🌐 All Sectors** | Scans entire global universe with minimum 75% AI conviction and SuperTrend confirmation. |
-| **🌿 Clean Energy & ESG Alpha** | Filters Clean Energy sector, Eco/ESG theme, CMF accumulation, and SuperTrend support. |
-| **⚡ AI & Quantum Deep Tech** | Filters Technology sector, AI/DeepTech theme, and minimum 75% conviction. |
-| **🌊 Institutional Accumulation** | Requires Chaikin Money Flow > +0.02 and minimum 75% conviction. |
-| **🚀 SuperTrend Momentum** | Requires SuperTrend Bullish and MACD positive histogram. |
-| **🎯 Oversold Quality Dip Buys** | Requires RSI < 55 oversold mean-reversion setup with strong fundamental scoring. |
+| **🌐 All Global Markets** | Complete cross-border institutional equity universe. |
+| **🏛️ US Markets** | S&P 500 core leaders and NASDAQ 100 innovators (`NVDA`, `MSFT`, `AAPL`, `AMZN`, `GOOGL`, `META`, `TSLA`, `AVGO`, `ARM`, `PLTR`, etc.). |
+| **🏰 European Blue Chips** | German DAX 40, French CAC 40, Swiss SMI, and Nordic equities (`SAP.DE`, `SIEGn.DE`, `IFX.DE`, `AIR.PA`, `MC.PA`, `NESN.SW`, `NOVN.SW`, `ASML.AS`, etc.). |
+| **🌏 Asia-Pacific** | High-growth Asian champions (`TSM`, `6758.T`, `7203.T`, `BABA`, `TCEHY`, `INFY`, etc.). |
+| **⚡ Emerging Markets** | High-beta emerging market equities and regional conglomerates. |
+| **🌿 Clean Energy** | Solar, wind, and storage leaders (`ENPH`, `FSLR`, `SEDG`, `BEPC`, `VWS.CO`, `ORSTED.CO`, `NEL.OL`, `RUN`). |
+| **📊 Benchmark & Sector ETFs** | Major asset allocation baskets (`SPY`, `QQQ`, `SMH`, `ICLN`, `EXS1.DE`, `VGK`, `EEM`, `XLE`, `XLV`, `XLF`). |
 
 ---
 
-## 5. Opportunity Card Anatomy
+## 4. Algorithmic Screener Strategies
+
+1. **🔥 Breaking Positive News & Parabolic Catalysts (`viral_news_catalysts`)**:
+   Filters for stocks with confirmed high-impact viral catalysts, earnings blowout beats, FDA approvals, and volume explosions.
+2. **🚀 High Momentum Breakouts (`momentum_breakout`)**:
+   Requires active SuperTrend Bullish state, positive 30-day slope, and relative volume confirmation.
+3. **💎 Deep Value & Mean-Reversion (`deep_value_reversion`)**:
+   Flags oversold dip-buying candidates ($RSI < 55$) with high institutional consensus and discount valuation.
+4. **👑 Dividend Aristocrats & Cash Flow (`dividend_aristocrats`)**:
+   Screens defensive yield leaders with robust balance sheets and consistent multi-year payouts.
+5. **⚡ TTM Squeeze Volatility Breakouts (`ttm_squeeze`)**:
+   Detects volatility compression inside Bollinger Bands & Keltner Channels anticipating explosive directional expansions.
+
+---
+
+## 5. Benchmark ETF & Index Baskets
+
+Users can focus the scanner exclusively on the top holdings of premier benchmark funds:
+- **`SPY`** — S&P 500 Core Leaders
+- **`QQQ`** — NASDAQ 100 Tech Innovators
+- **`SMH`** — Pure-Play Semiconductors
+- **`ICLN`** — Global Clean Energy Champions
+- **`EXS1.DE`** — German DAX 40 Blue Chips
+- **`VGK`** — Vanguard European Equities
+- **`EEM`** — Emerging Markets Growth
+- **`XLE`** — Energy & Natural Gas Leaders
+- **`XLV`** — Healthcare & BioPharma Giants
+- **`XLF`** — Tier-1 Banking & Financials
+
+---
+
+## 6. Opportunity Card Anatomy & Catalyst Box
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ FSLR — First Solar, Inc.   [🌿 Thin-Film Solar PV]   [Clean]│
-│ Live Quote: $224.50 (+4.18%)        AI Conviction: 88% Strong│
+│ NVDA — NVIDIA Corp.        [⚡ AI Silicon]         [🏛️ US]  │
+│ Live Quote: $128.50 (+5.20%)         AI Conviction: 92%     │
 ├─────────────────────────────────────────────────────────────┤
 │ [============= SVG 30-Day Trend Sparkline =================]│
-│ Jul 14 ─────────────── 30D Trend: +14.20% ──────────── Aug 23│
+│ Aug 01 ─────────────── 30D Trend: +18.40% ──────────── Aug 30│
 ├─────────────────────────────────────────────────────────────┤
-│ SuperTrend: 🟢 Bull • RSI: 52.1 • CMF: +0.14 • VWAP: $218.4 │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ 🔥 Viral Catalyst                           2.4x Vol    │ │  <── Clickable
+│ │ Record Data Center Demand & Blackwell Chip Scale-Out    │ │      Catalyst
+│ │ Financial Wire • Active Session        News & AI ↗      │ │      Box
+│ └─────────────────────────────────────────────────────────┘ │
 ├─────────────────────────────────────────────────────────────┤
-│ 🎯 Entry Zone: $221.10 – $227.80                             │
-│ 🛑 Stop-Loss: $210.50 (-6.2%)                                │
-│ 🚀 Take-Profit 1: $252.00 (+12.2%)                           │
-│ ⚖️ Risk / Reward: 2.8:1                                      │
+│ SuperTrend: 🟢 Bull • RSI: 58.4 • CMF: +0.22 • VWAP: $125.1 │
 ├─────────────────────────────────────────────────────────────┤
-│ 🧠 AI Thesis & ESG Catalyst:                                 │
-│ US-based thin-film photovoltaic manufacturer with industry-  │
-│ leading low carbon footprint. Confirmed SuperTrend support   │
-│ with institutional accumulation at CMF +0.14.                │
+│ 🎯 Entry Zone: $126.20 – $129.50                             │
+│ 🛑 Stop-Loss: $121.80 (-5.2%)                                │
+│ 🚀 Take-Profit 1: $144.00 (+12.1%)                           │
+│ ⚖️ Risk / Reward: 2.9:1                                      │
 ├─────────────────────────────────────────────────────────────┤
-│ [+ Add to Watchlist]             [Deep-Dive in Terminal →]  │
+│ 🧠 AI Thesis & Strategy Confluence:                         │
+│ Multi-factor breakout confirmed by SuperTrend Bullish state │
+│ and 2.4x volume accumulation on explosive datacenter demand.│
+├─────────────────────────────────────────────────────────────┤
+│ [ + Add to Watchlist ]           [ Deep-Dive in Terminal → ]│
 └─────────────────────────────────────────────────────────────┘
 ```
 
+### Interactive Catalyst Popover
+Scanner cards with active market catalysts display a glowing amber **Pulsing Catalyst Dot** next to the directional bias badge. Hovering over the dot reveals an interactive **Catalyst Popover** with:
+- Volume surge metrics ($RVOL$)
+- Breaking wire headline & story summary
+- 1-click shortcut to the **Global News Modal**
+
 ---
 
-## 6. REST API Reference
+## 7. Admin Scheduling & Engine Controls
+
+Administrators have direct controls integrated into the scanner hero header:
+- **Scan Interval Selector (`#adminSelectScanInterval`)**:
+  - Options: `15 min`, `30 min`, `45 min`, `60 min`, `2 hours`.
+  - Updating the dropdown immediately persists the configuration, signals the background worker to reschedule, and updates the `Last Scan / Next Due` stat card with the newly computed epoch.
+- **Asynchronous Force Update (`#btnForceScannerRefresh`)**:
+  - Triggers an immediate background scan cycle asynchronously without blocking the caller or freezing the web UI.
+  - The status badge transitions to `Scanning in progress...` with a live pulsing animation until the background pass finishes.
+
+---
+
+## 8. REST API Reference
+
+### `GET /api/scanner/cached`
+Fetches warm in-memory precalculated opportunities, universe count, custom universe tickers, and timing statistics (<5ms response time).
 
 ### `POST /api/scanner/run`
-Executes multi-threaded quantitative scanning across the thematic universe.
+Executes an in-memory filtered query against the cached opportunities or triggers on-demand multi-factor evaluation:
 
-#### Request Body
 ```json
 {
-  "sector": "Clean Energy",
-  "theme": "eco_esg",
-  "marketCap": "large",
-  "minConviction": 75,
+  "market": "us",
+  "strategy": "viral_news_catalysts",
+  "etfBasket": "SMH",
+  "sector": "all",
+  "theme": "all",
+  "minConviction": 85,
   "excludeWatchlist": true,
-  "requiredIndicators": [
-    "supertrend_bullish",
-    "cmf_accumulation"
-  ]
+  "forceRefresh": false,
+  "limit": 28
 }
 ```
 
-#### Response Structure
+### `POST /api/scanner/config` *(Admin Only)*
+Dynamically updates the background scan interval:
+
+```json
+{
+  "intervalMinutes": 30
+}
+```
+
+**Response**:
 ```json
 {
   "success": true,
-  "timestamp": "2026-08-28T23:45:00",
-  "totalUniverseScanned": 15,
-  "opportunitiesCount": 4,
-  "opportunities": [
-    {
-      "ticker": "FSLR",
-      "name": "First Solar",
-      "sector": "Clean Energy",
-      "theme": "eco_esg",
-      "esgRating": "Leader (91/100)",
-      "ecoBadge": "🌿 Thin-Film Utility Solar PV",
-      "currentPrice": 224.50,
-      "convictionScore": 88,
-      "directionalBias": "Strong Buy",
-      "executionMatrix": {
-        "entryZone": "$221.10 – $227.80",
-        "stopLoss": "$210.50",
-        "stopLossPercent": "-6.2%",
-        "takeProfit1": "$252.00",
-        "takeProfit1Percent": "+12.2%",
-        "riskRewardRatio": "2.8:1"
-      },
-      "aiThesis": "US-based thin-film photovoltaic manufacturer...",
-      "isInWatchlist": false
-    }
-  ]
+  "intervalMinutes": 30,
+  "scanIntervalMinutes": 30,
+  "lastScanTime": "12:15:00 PM",
+  "nextScanTime": "12:45:00 PM",
+  "nextScanEpoch": 1788605100,
+  "nextScanInSeconds": 1800
+}
+```
+
+### `POST /api/scanner/force-update` *(Admin Only)*
+Triggers an immediate background scan cycle asynchronously without blocking.
+
+### `POST /api/scanner/universe/add`
+Adds a new global stock or ETF ticker to the persistent custom universe (`data/scanner_custom_universe.json`):
+
+```json
+{
+  "ticker": "PLTR"
 }
 ```

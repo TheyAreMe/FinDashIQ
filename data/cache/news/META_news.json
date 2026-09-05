@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109381.2891562,
+  "ticker": "META",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Meta Settlement a Start, But Incomplete: Senator",
+      "summary": "",
+      "url": "https://www.barrons.com/livecoverage/sunday0830/card/meta-settlement-a-start-but-incomplete-senator-qyakzyMU0CkIRrvumww0?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Today 11:49AM",
+      "timestamp": 1788109382,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Meta's 9.9% Jio Stake Finally Gets a Public Scoreboard",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/metas-9-9-jio-stake-222758011.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:27PM",
+      "timestamp": 1788109382,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Chamber Of Commerce Backs Meta In Monopoly Battle",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/c24bf905-30ac-3246-a11c-0c52916a50ef/chamber-of-commerce-backs.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:51PM",
+      "timestamp": 1788109382,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "GOOGL Rides on Strong Advertising Revenues: Can It Beat RDDT and META?",
+      "summary": "",
+      "url": "https://qz.com/googl-rides-on-strong-advertising-revenues-can-it-beat-rddt-and-meta",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:31PM",
+      "timestamp": 1788109382,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Metas Newspaper Ad Blitz Ups Pressure on Social Media Rivals",
+      "summary": "",
+      "url": "https://finance.yahoo.com/media-advertising/articles/meta-newspaper-ad-blitz-ups-162017911.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:20PM",
+      "timestamp": 1788109382,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

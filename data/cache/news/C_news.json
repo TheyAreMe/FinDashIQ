@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109647.578188,
+  "ticker": "C",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Citigroups Arc Platform Is the Largest Measured Enterprise Agent Deployment Yet",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/citigroup-arc-platform-largest-measured-194520812.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 03:45PM",
+      "timestamp": 1788109648,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Aggressive Treasury yield cap could weigh on dollar, says Citi's asset allocation head",
+      "summary": "",
+      "url": "https://finance.yahoo.com/economy/policy/articles/aggressive-treasury-yield-cap-could-160951190.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:09PM",
+      "timestamp": 1788109648,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Citi opens upside catalyst watches on BMW and Forvia",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/citi-opens-upside-catalyst-watches-112216867.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "07:22AM",
+      "timestamp": 1788109648,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Act Now or Pay Later: Coalition of Top Companies Tells World to Get Its Act Together on Cybersecurity",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/b4b06b57-90d9-3ad9-9b44-d876b907dbb9/act-now-or-pay-later%3A.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:01AM",
+      "timestamp": 1788109648,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Citi cuts Abercrombie rating after stock surge, lifts price target",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/citi-cuts-abercrombie-rating-stock-145945219.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 10:59AM",
+      "timestamp": 1788109648,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

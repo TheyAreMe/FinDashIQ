@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108530.2855814,
+  "ticker": "INTU",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "5 big analyst AI moves: Downgrades for SAP and Intuit; AMD lifted to Strong Buy",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/5-big-analyst-ai-moves-144401731.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-29-26 10:44AM",
+      "timestamp": 1788108530,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Intuit's Real Problem Is Not On Its Income Statement",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/56e2742c-0736-3f30-89c0-6e9d09e381a8/intuit%27s-real-problem-is-not.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 04:29PM",
+      "timestamp": 1788108530,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Intuit faces AI-driven growth pressure as BofA cuts rating to Neutral",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/intuit-faces-ai-driven-growth-205740038.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 04:57PM",
+      "timestamp": 1788108530,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Mailchimp Goes Missing: Intuit Says It Is Now A Separate Operating Segment",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/cf65c8c8-c947-3b05-8206-186ae6c20ed3/mailchimp-goes-missing%3A.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 04:16PM",
+      "timestamp": 1788108530,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Bank of America Revamps Intuit Stock Target",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/bank-america-revamps-intuit-stock-193336898.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:33PM",
+      "timestamp": 1788108530,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

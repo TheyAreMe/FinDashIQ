@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108550.1028779,
+  "ticker": "WMT",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Kevin O'Leary, worth $400 million, compares paper towel prices at Walmart as grocery costs climb 5.9%",
+      "summary": "",
+      "url": "https://finance.yahoo.com/economy/articles/kevin-oleary-worth-400-million-143000770.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-29-26 10:30AM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Walmart To Pay $50M To Settle DOJ Lawsuit Over Invalid Opioid Prescriptions WMT Stock In Focus",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/dbc6abbf-9ed0-3053-b5e7-72f945ffedc7/walmart-to-pay-%2450m-to-settle.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 08:02PM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Walmart Closes Difficult Chapter With High-Stakes Move",
+      "summary": "",
+      "url": "https://finance.yahoo.com/healthcare/articles/walmart-closes-difficult-chapter-high-222246534.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:22PM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Walmart reaches settlement in DOJ opioid case. What to know",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/69ab6f03-07ed-3ef5-9f75-44cce209e728/walmart-reaches-settlement-in.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "02:46PM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Walmart Ends a Federal Opioid Fight Without Naming the Price",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/walmart-ends-federal-opioid-fight-174326414.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:43PM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

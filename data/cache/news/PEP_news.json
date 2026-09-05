@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108552.7609162,
+  "ticker": "PEP",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Jim Cramer Says Falling Oil Prices Make PepsiCo His Next Stock Pick",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/0a12782c-97b4-3f48-85a5-fabd3eaea155/jim-cramer-says-falling-oil.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 11:05PM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Self-driving truck startup Gatik raises $200M following PepsiCo deal",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/articles/self-driving-truck-startup-gatik-141026309.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:00AM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "PepsiCo Announces Timing and Availability of Third-Quarter 2026 Financial Results",
+      "summary": "",
+      "url": "/news/385180/pepsico-announces-timing-and-availability-of-third-quarter-2026-financial-results",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:00AM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Top Research Reports for Amgen, Thermo Fisher &amp; Pepsi",
+      "summary": "",
+      "url": "/news/385028/top-research-reports-for-amgen-thermo-fisher-pepsi",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-24-26 05:34PM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Why Olipop's founder hasn't sold out to Pepsi or Coca-Cola",
+      "summary": "",
+      "url": "https://finance.yahoo.com/economy/article/why-olipops-founder-hasnt-sold-out-to-pepsi-or-coca-cola-103107433.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:31AM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109668.5525687,
+  "ticker": "LOW",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "LOWE'S COMPANIES, INC. DECLARES CASH DIVIDEND",
+      "summary": "",
+      "url": "/news/386671/lowes-companies-inc-declares-cash-dividend",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 04:30PM",
+      "timestamp": 1788109669,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "The Cash Machine The Market Put On Sale: LOW",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/a3998743-62eb-3b9c-9f86-9dbf0ebb52fa/the-cash-machine-the-market.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 08:45PM",
+      "timestamp": 1788109669,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Home Depot Or Lowes? Morningstar Says One Home-Improvement Stock Looks Cheaper",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/0f179541-6921-3e71-9ef9-9e14a2e8aa69/home-depot-or-lowe%E2%80%99s%3F.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "05:08AM",
+      "timestamp": 1788109669,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Lowes narrows FY26 guidance as DIY demand softens",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/2d54e7c0-43cc-3ccb-896a-091ae962edab/lowe%E2%80%99s-narrows-fy26-guidance.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "05:24AM",
+      "timestamp": 1788109669,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Lowe's Companies, Inc. Q2 2027 Earnings Call Summary",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/5cf692f1-29e4-3b97-80f4-ef2770d6a41f/lowe%27s-companies%2C-inc.-q2.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-19-26 05:03PM",
+      "timestamp": 1788109669,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

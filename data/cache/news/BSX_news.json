@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109656.008016,
+  "ticker": "BSX",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Boston Scientific says cyberattack has disrupted product manufacturing",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/6885b1f2-397c-37a0-9a41-54f6be6ee086/boston-scientific-says.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 08:05AM",
+      "timestamp": 1788109656,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Has BSX Stock Fallen Far Enough To Buy?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/f341d9db-103e-372f-abb5-299300230788/has-bsx-stock-fallen-far.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 12:29PM",
+      "timestamp": 1788109656,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Boston Scientific impacted by ongoing cyberattack",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/56941425-ca69-36bf-9e4f-5c892817db00/boston-scientific-impacted-by.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:53AM",
+      "timestamp": 1788109656,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Time To Squeeze 14% Yield Out Of Battered BSX Stock?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/8c8f2e9d-96f3-3bbb-bb51-9ce829bb8635/time-to-squeeze-14%25-yield-out.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 03:51PM",
+      "timestamp": 1788109656,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Boston Scientific Stock Slides After Cyberattack Caused Global Disruption",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/2803dc21-9ced-3ad1-92c7-aa642e8e72e4/boston-scientific-stock.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:15PM",
+      "timestamp": 1788109656,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

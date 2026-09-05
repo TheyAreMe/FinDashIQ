@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108538.5976267,
+  "ticker": "BAC",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Bank of America Pays $72.5 Million to Close Epstein Claims",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/bank-america-pays-72-5-175242578.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 01:52PM",
+      "timestamp": 1788108539,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Wall St banks turn on each other as capital fight nears endgame",
+      "summary": "",
+      "url": "https://finance.yahoo.com/economy/policy/articles/wall-st-banks-turn-other-100619143.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:06AM",
+      "timestamp": 1788108539,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Bank of America Spots Bigger Nvidia Catalyst Before Earnings",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/bank-america-spots-bigger-nvidia-193831689.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 03:38PM",
+      "timestamp": 1788108539,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Bank of America Revamps Intuit Stock Target",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/bank-america-revamps-intuit-stock-193336898.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:33PM",
+      "timestamp": 1788108539,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Banks Fought Against Stablecoins. Now They Are Considering Launching Their Own.",
+      "summary": "",
+      "url": "https://www.wsj.com/finance/banking/banks-fought-against-stablecoins-now-they-are-considering-launching-their-own-896b691e?mod=wsj_FV",
+      "publisher": "Wall Street Journal",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:59AM",
+      "timestamp": 1788108539,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

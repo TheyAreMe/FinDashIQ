@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108546.0201206,
+  "ticker": "ABT",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Abbott wins CE mark for new LAA closure device",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/785e3ed0-7505-3d1f-87ad-48f2af3cc038/abbott-wins-ce-mark-for-new.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 06:15AM",
+      "timestamp": 1788108546,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Abbott's next-generation Amulet 360 device receives CE Mark to treat people with atrial fibrillation at risk of stroke",
+      "summary": "",
+      "url": "/news/386236/abbotts-next-generation-amulet-360-device-receives-ce-mark-to-treat-people-with-atrial-fibrillation-at-risk-of-stroke",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:00AM",
+      "timestamp": 1788108546,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Dexcom, Abbott await Medicare coverage expansion for CGMs",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/80f51da2-0094-37fd-8f56-4aa9fad16da2/dexcom%2C-abbott-await-medicare.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:09AM",
+      "timestamp": 1788108546,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Abbott receives FDA authorization for world's first dual glucose-ketone sensing technology for people with diabetes",
+      "summary": "",
+      "url": "/news/385424/abbott-receives-fda-authorization-for-worlds-first-dual-glucose-ketone-sensing-technology-for-people-with-diabetes",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "02:49PM",
+      "timestamp": 1788108546,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "MiniMed starts shipping new insulin pump with Abbott-made sensor",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/8ea0ab12-4b36-392c-9db3-2c477695299e/minimed-starts-shipping-new.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-24-26 06:00AM",
+      "timestamp": 1788108546,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

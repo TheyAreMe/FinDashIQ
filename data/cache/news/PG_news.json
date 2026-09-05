@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108551.4654052,
+  "ticker": "PG",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "SpaceX upgraded, Trade Desk downgraded: Wall Street's top analyst calls",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/spacex-initiation-apple-downgrade-among-133025602.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-07-26 09:45AM",
+      "timestamp": 1788108552,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Procter &amp; Gamble to Acquire Thorne for $3.8B, Expanding Personal Health Care Portfolio",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/870c1429-dd56-33af-88b1-79028ed8531d/procter-%26-gamble-to-acquire.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-04-26 02:04PM",
+      "timestamp": 1788108552,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "L Catterton Announces Sale of Thorne to The Procter &amp; Gamble Company for $3.8 Billion",
+      "summary": "",
+      "url": "/news/376951/l-catterton-announces-sale-of-thorne-to-the-procter-gamble-company-for-38-billion",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:45PM",
+      "timestamp": 1788108552,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Procter &amp; Gamble is buying supplement brand Thorne for $3.8 billion",
+      "summary": "",
+      "url": "https://qz.com/procter-gamble-acquiring-thorne-supplements-3-8-billion-080426",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:31PM",
+      "timestamp": 1788108552,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Procter &amp; Gamble to acquire Thorne for $3.8 billion, CEO says",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/procter-gamble-acquire-thorne-3-171509011.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:15PM",
+      "timestamp": 1788108552,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108595.4775543,
+  "ticker": "XLV",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Amid the chip bear market, healthcare is breaking out: Chart of the Day",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/article/amid-the-chip-bear-market-healthcare-is-breaking-out-chart-of-the-day-100000172.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-21-26 06:00AM",
+      "timestamp": 1788108596,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Healthcare Stocks Have Been Forgotten. Eli Lilly, McKesson, and 9 More to Buy.",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/healthcare-stocks-eli-lilly-mckesson-humana-a11231dc?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-05-26 03:31PM",
+      "timestamp": 1788108596,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Time To Take Profits In XLV?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/e418ab23-9f4e-3f6f-8ccb-a904b54d1414/time-to-take-profits-in-xlv%3F.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-29-26 09:30AM",
+      "timestamp": 1788108596,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Healthcare stocks have become a haven for investors ditching tech",
+      "summary": "",
+      "url": "https://www.marketwatch.com/story/healthcare-stocks-have-become-a-haven-for-investors-ditching-tech-81c544d0?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jun-26-26 02:39PM",
+      "timestamp": 1788108596,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "UnitedHealth, Eli Lilly Lead Healthcare Rebound as Investors Seek Stability",
+      "summary": "",
+      "url": "https://finance.yahoo.com/sectors/healthcare/articles/unitedhealth-eli-lilly-lead-healthcare-183218104.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jun-05-26 02:32PM",
+      "timestamp": 1788108596,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

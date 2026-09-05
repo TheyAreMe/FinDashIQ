@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109739.6415124,
+  "ticker": "XLB",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Three Sectors to Target When Inflation is a Primary Threat",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/three-sectors-target-inflation-primary-050100578.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-20-26 01:01AM",
+      "timestamp": 1788109740,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Avoid Tech Stock Volatility. The Case for Owning a Materials ETF.",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/tech-stock-volatility-materials-54f8fde9?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-02-26 02:51PM",
+      "timestamp": 1788109740,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Vulcan Materials Stock: Is VMC Outperforming the Basic Material Sector?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/1b9ee7a1-7115-3c8d-a394-3f1dc8f09a77/vulcan-materials-stock%3A-is.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Mar-11-26 12:13PM",
+      "timestamp": 1788109740,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Wall Street's Hottest Sector ETFs Right Now Are Dirty, Unglamorous And Pulling In Billions",
+      "summary": "",
+      "url": "/news/333944/wall-streets-hottest-sector-etfs-right-now-are-dirty-unglamorous-and-pulling-in-billions",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Mar-09-26 11:32AM",
+      "timestamp": 1788109740,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Where Should You Put $10,000 Today? Look at These 3 Sectors That Are Winning While Tech Slumps.",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/d33b5922-dfa0-3a83-ad7b-f52942f02140/where-should-you-put-%2410%2C000.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Mar-04-26 04:10PM",
+      "timestamp": 1788109740,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

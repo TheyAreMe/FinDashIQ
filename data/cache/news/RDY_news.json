@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109709.4130847,
+  "ticker": "RDY",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Dr. Reddys Announces the First-to-Market Launch of Sugammadex Injection 200 mg/2 mL (100 mg/mL) and 500 mg/5 mL (100 mg/mL) Single-Dose Vials, a Generic Equivalent of Bridion, in the United States",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260729613216/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-04-26 01:39AM",
+      "timestamp": 1788109710,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Dr Reddy's Laboratories Ltd (RDY) Q1 2027 Earnings Call Highlights: Navigating Challenges and ...",
+      "summary": "",
+      "url": "https://finance.yahoo.com/healthcare/articles/dr-reddys-laboratories-ltd-rdy-010134110.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-27-26 09:01PM",
+      "timestamp": 1788109710,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Dr. Reddys Laboratories Limited Announces Filing of Annual Report on Form 20-F",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260626184427/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jun-26-26 11:10AM",
+      "timestamp": 1788109710,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Dr. Reddys Announces the First-to-Market Launch of Bosutinib Tablets 400mg, a Generic Equivalent of Bosulif, in the United States",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260613138727/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jun-13-26 06:22AM",
+      "timestamp": 1788109710,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Dr. Reddy's Laboratories Launches its Generic Semaglutide Injection in Canada",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260515689507/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "May-16-26 03:18AM",
+      "timestamp": 1788109710,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

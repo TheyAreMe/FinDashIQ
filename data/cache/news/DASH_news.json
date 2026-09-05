@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109580.03965,
+  "ticker": "DASH",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Kohl's partners with DoorDash for fast delivery",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/d38d64f7-127a-36e4-8897-30d3d2795e7b/kohl%27s-partners-with-doordash.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 06:06AM",
+      "timestamp": 1788109580,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Amazon, Uber, DoorDash, and Walmart are taking the delivery wars to the skies",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/articles/amazon-uber-doordash-walmart-taking-070300525.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-21-26 03:03AM",
+      "timestamp": 1788109580,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Gap and Gap Factory Land on DoorDash Just in Time for First-Day Fits",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260818857298/en/Shop",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-18-26 09:00AM",
+      "timestamp": 1788109580,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Serve Robotics shares jump as DoorDash and Grubhub partnerships expand",
+      "summary": "",
+      "url": "/news/382883/serve-robotics-shares-jump-as-doordash-and-grubhub-partnerships-expand",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-17-26 09:36AM",
+      "timestamp": 1788109580,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "SERV Stock Rallies On Grubhub Partnership, DoorDash Deal Expansion CEO Calls It 'Clearest Signal Yet Of Where We're Headed'",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/b9d36eef-43f3-3d87-b0a9-9e47ade4248a/serv-stock-rallies-on-grubhub.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:52AM",
+      "timestamp": 1788109580,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

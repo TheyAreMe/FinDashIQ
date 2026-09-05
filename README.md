@@ -4,9 +4,19 @@
 
 > ⚠️ **Primary Purpose & Disclaimer**: FinDashIQ is designed primarily as a **self-hosted, private personal financial dashboard with artificial intelligence for private usage**. This platform is developed strictly for personal utility, educational exploration, and quantitative market research. **No liability or responsibility is assumed** for any financial, trading, or investment decisions, outcomes, losses, or software inaccuracies. Always perform your own due diligence.
 
-<p align="center">
-  <img src="static/img/dashboard.png" alt="FinDashIQ Quantitative AI Dashboard" width="100%">
-</p>
+<details>
+  <summary><b>🌙 Dark Mode (Default)</b> <i>(Click to expand / switch)</i></summary>
+  <p align="center">
+    <img src="static/img/dashboard_dark.png" alt="FinDashIQ Dashboard - Dark Mode" width="100%">
+  </p>
+</details>
+
+<details>
+  <summary><b>☀️ Bright Mode</b> <i>(Click to expand / switch)</i></summary>
+  <p align="center">
+    <img src="static/img/dashboard_light.png" alt="FinDashIQ Dashboard - Bright Mode" width="100%">
+  </p>
+</details>
 
 FinDashIQ provides a privacy-first, web-based financial analytics terminal that combines multi-factor quantitative indicators, persistent watchlist intelligence, dynamic strategy backtesting, automated AI investment synthesis, and real-time signal change notification rules. Built with a modular Python/Flask backend and a sleek glassmorphism frontend powered by ApexCharts and Lucide Icons.
 
@@ -14,80 +24,63 @@ FinDashIQ provides a privacy-first, web-based financial analytics terminal that 
 
 ## 🌟 Key Architecture & Features
 
-### 1. 📊 Watchlist & Market Intelligence Hub (Top Tab 1 - Default)
-- **Persistent Server-Side Storage**: Tracked stocks and ETF baskets are stored server-side (`data/watchlist.json`) in addition to local storage, surviving browser cache clears.
-- **Default Asset Basket**: Pre-configured with major technology leaders and global index ETFs: `NVDA`, `MSFT`, `IFX.DE`, `TSM`, `SPCX`, `EXXT.DE` (iShares Nasdaq 100), and `XDWT.DE` (Xtrackers MSCI World Tech).
-- **Interactive Asset Controls**: Quickly add new tickers (`+ Add Stock`), remove assets (`✕`), force refresh live data, or reset to defaults with one click.
-- **Recommendation Mini-Cards Grid**:
-  - **Live Price & Change Badge**: Real-time market quote and daily percentage change.
-  - **Dynamic Trend Sparklines**: Responsive SVG price trajectory curves with gradient fills.
-  - **AI Conviction & Stance Gauge**: Score (0–100%) and bias (*Strong Bullish*, *Bullish*, *Neutral*, *Bearish*).
-  - **Quantitative Metric Bar**: Key values for RSI(14), SuperTrend status, Chaikin Money Flow (CMF), and Volume-Weighted Average Price (VWAP).
-  - **AI News Catalyst & Sentiment Synthesis**: Executive synthesis of breaking market catalysts and sentiment.
-  - **One-Click Deep-Dive Transition**: Seamlessly routes directly into the terminal with that single asset loaded.
+### 1. 📊 Watchlist & Market Intelligence Hub (Tab 1)
+
+<p align="center">
+  <img src="static/img/dashboard_dark.png" alt="Watchlist & Market Intelligence Hub" width="100%">
+</p>
+
+* **Persistent Server-Side Storage**: Tracked stocks and ETF baskets survive browser cache clears (`data/watchlist.json`).
+* **Live Quotes & Sparklines**: Real-time pricing, 1-day change deltas, and 30-day SVG trend sparklines.
+* **AI Conviction & Multi-Source Synthesis**: Quant momentum scoring (0–100%) paired with live breaking news synthesis.
+* **Quantitative Indicators**: At-a-glance metrics for SuperTrend, RSI(14), Chaikin Money Flow (CMF), and VWAP.
+* **1-Click Deep-Dive**: Direct routing into the technical analysis terminal for any tracked asset.
 
 ---
 
-### 2. 🔍 Stock Deep-Dive & Terminal (Top Tab 2)
-Independent single-stock and multi-stock search terminal housing 4 specialized sub-tabs:
+### 2. 🔍 Stock Deep-Dive & Quantitative Terminal (Tab 2)
 
-#### 🧠 Sub-Tab 1: Financial Intelligence & Copilot
-- ** Conviction Gauge & Directional Bias**: Quantitative momentum score.
-- **Executive Thesis & Tailwinds**: Fundamental drivers, key catalysts, and invalidation risk factors.
-- **30-Day Probabilistic Scenarios**: Bull, Base, and Bear case target prices with scenario rationale.
-- **Execution Matrix**: Dynamic entry zones, volatility-based stop-loss levels, asymmetric take-profit targets, and risk/reward ratios.
-- **Live Real-Time Market News Feed**: Breaking headlines, publisher attribution, timestamps, and direct article links.
-- **AI Market Catalyst Synthesis**: Dedicated LLM breakdown of current news sentiment and price drivers.
-- **Interactive AI Copilot**: Context-aware chat assistant answering technical, strategic, and risk questions with fallback heuristics.
+<p align="center">
+  <img src="static/img/tab_deepdive.png" alt="Stock Deep-Dive & Quantitative Terminal" width="100%">
+</p>
 
-#### 📈 Sub-Tab 2: Dynamic Charts & Technical Oscillators
-- **Primary Price Chart**: Candlestick and Area modes with timeframe selection (`1M`, `3M`, `6M`, `1Y`, `2Y`, `5Y`, `MAX`).
-- **Dynamic Overlays**: SuperTrend (10, 3), Volume-Weighted Average Price (VWAP), SMA 20/50/200, EMA 20/50/200, Bollinger Bands (20, 2), and Keltner Channels (20, 1.5).
-- **4 Sub-Oscillator Panels**:
-  - **Stochastic Oscillator (14, 3, 3)** with overbought (>80) and oversold (<20) zones.
-  - **Relative Strength Index (RSI 14)** with critical 70/30 thresholds.
-  - **MACD (12, 26, 9)** with colored expansion/contraction histogram.
-  - **Chaikin Money Flow (CMF 20)** measuring institutional accumulation vs. distribution.
-
-#### 🧪 Sub-Tab 3: Strategy Backtesting & Order Execution Log
-- **Multi-Strategy Simulation**: Test historical performance on **Multi-Factor Quant**, **SuperTrend**, or **MACD + RSI Momentum** strategies.
-- **Performance Scorecards**: Total strategy return vs. Buy & Hold benchmark, Alpha, Win Rate, Profit Factor, and Max Drawdown.
-- **Dynamic Equity Curve**: Visualizes portfolio compounding from $10,000 against market hold.
-- **Simulated Order Execution Log**: Full ledger of entry/exit dates, prices, trade PnL ($ and %), and exact signal trigger rationale.
-
-#### 🛡️ Sub-Tab 4: Multi-Factor Consensus & Fundamentals
-- **Algorithmic Consensus Verdict**: Verdict rating (*Strong Buy*, *Buy*, *Neutral*, *Sell*, *Strong Sell*) backed by individual indicator signal breakdowns.
-- **Visual Signal Meter**: Real-time distribution bar of bullish, neutral, and bearish technical signals.
-- **Fundamental Statistics**: Market cap, Trailing and Forward P/E, Beta, Dividend Yield, Average Volume, ATR, and interactive 52-Week Price Range slider.
+* **AI Intelligence & Copilot**: Execution matrix (entry zone, volatility stop-loss, take-profit targets), 30-day probabilistic scenarios, and interactive AI market copilot.
+* **Dynamic Charts & Oscillators**: Candlestick & area charts powered by ApexCharts with SuperTrend, VWAP, Bollinger Bands, and sub-panels for RSI, MACD, Stochastic, and CMF.
+* **Strategy Backtesting**: Simulate Multi-Factor Quant, SuperTrend, or MACD+RSI strategies against Buy & Hold with full equity curves and trade ledger.
+* **Consensus & Fundamentals**: Multi-factor signal consensus meter (*Strong Buy* to *Strong Sell*), valuation multiples, and 52-week price range.
 
 ---
 
-### 3. 🛰️ Quantitative Stock Scanner & Opportunity Discovery (Top Tab 3)
-- **Uncovered Alpha Screener**: Automated radar designed specifically to uncover high-conviction buy recommendations for assets **not currently in the user's watchlist**.
-- **Thematic & Ecological Universe**: Dedicated filtering across **Clean Energy & Solar/Wind Decarbonization**, **Pure AI & Quantum Silicon**, **Cybersecurity & Cloud Observability**, **Biotech & Genomics**, **Fintech**, and **Industrial Automation**.
-- **Multi-Factor Indicator Concurrency**: Concurrently evaluates SuperTrend trendline support, RSI oversold dip-buys (<55), Chaikin Money Flow accumulation (>+0.05), and VWAP benchmark positioning.
-- **Dynamic Trade Execution Matrix**: Automated entry zones, volatility stop-losses, take-profit targets (TP1), and risk/reward ratios.
-- **Investment Thesis & ESG Scoring**: Contextual narrative breakdown with Elite/Leader ESG sustainability ratings.
-- **1-Click Actions**: Instantly add discovered stocks to server-persisted watchlist (`+ Add to Watchlist`) or route directly into Terminal (`Deep-Dive →`).
+### 3. 🛰️ Autonomous Stock Scanner (Tab 3)
+
+<p align="center">
+  <img src="static/img/tab_scanner.png" alt="Autonomous Stock Scanner" width="100%">
+</p>
+
+* **Autonomous Background Screening**: Background engine screens 280+ global equities on configurable schedules without frontend dependencies.
+* **Multi-Market & Thematic Filters**: Screen by region (US, Europe, Asia, Clean Energy), sector, and parent ETF baskets (SPY, QQQ, SMH, etc.).
+* **High-Conviction Setups**: Immediate filtering for elite asymmetric setups (≥ 85% conviction) with automated entry zones and stop-loss levels.
+* **Admin Controls & Local Timezone Sync**: Live countdown timer and "Last Scan / Next Due" display formatted in your local browser timezone.
 
 ---
 
-### 4. 🔔 Signal Change Alerts & Notifications Hub (Top Tab 4)
-- **Configurable Trigger Rules**:
-  - **Target Asset**: Select from watchlist or enter custom ticker.
-  - **Signal Conditions**: SuperTrend Trend Flips, AI Conviction shifts (>75% / <40%), MACD Golden/Death Crosses, RSI Oversold/Overbought (<30 / >70), CMF Institutional Accumulation (>+0.10), or Price Target / Stop-Loss breaches.
-  - **Delivery Channels**: Telegram Bot, Email Webhook, Discord Webhook, Browser Push Notification.
-- **Active Rule Manager**: Enable, pause, or delete rules with persistent server-side storage (`data/alerts.json`).
-- **Simulated Trigger Testing**: Click **"Test"** on any rule to simulate and verify instant message delivery.
-- **Live Notification Activity Log**: Real-time stream of dispatched alert messages.
+### 4. 🔔 Signal Alerts & Notifications Hub (Tab 4)
+
+<p align="center">
+  <img src="static/img/tab_alerts.png" alt="Signal Alerts & Notifications Hub" width="100%">
+</p>
+
+* **Multi-Factor Trigger Rules**: Alerts based on SuperTrend flips, AI conviction shifts, MACD crosses, RSI oversold/overbought, or target price breaches.
+* **Omnichannel Delivery**: Automated dispatch via Telegram Bot, Discord Webhooks, Email, or Browser Push Notifications.
+* **Simulator & Activity Ledger**: One-click test button to verify webhook delivery and review real-time notification logs.
 
 ---
 
-### 5. 👤 Role-Based Authentication & User Profiles
-- **Initial Admin Account**: Default administrator account initialized (`admin` / `admin123`) with instant password changing.
-- **Admin-Only Account Creation**: Administrators can create new accounts (Admin or Standard User), assign roles, and manage the user directory. Normal users cannot add or delete accounts.
-- **Per-User Isolated Storage**: Watchlists, notification rules, visual theme modes (Dark / Bright), and preferences are strictly isolated per user account.
-- **Profile Modal & Top-Right Header**: Top-right user avatar badge with quick dropdown for Theme Mode toggle (Dark 🌙 / Bright ☀️), Profile & Preferences, AI Settings, Security/Password, and Admin User Management.
+### 5. 👤 Role-Based Authentication & Multi-User Support
+
+* **Administrator & User Roles**: Role-based access control with separate permissions and user directory management.
+* **Per-User Isolation**: Watchlists, alert rules, and visual theme preferences (Dark 🌙 / Bright ☀️) are strictly isolated per account.
+* **Bring-Your-Own-Key (BYOK)**: Secure in-app AI settings supporting custom Gemini and OpenAI API keys.
 
 ---
 
@@ -172,6 +165,7 @@ FinDashIQ/
 
 5. **Start the application**:
    ```powershell
+   cp .env.example .env (Do not forget to replace the example tokens with your own tokens!)
    python app.py
    ```
 
@@ -211,6 +205,7 @@ FinDashIQ/
 
 5. **Run the application**:
    ```bash
+   cp .env.example .env (Do not forget to replace the example tokens with your own tokens!)
    python3 app.py
    ```
 

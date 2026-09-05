@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108589.3724473,
+  "ticker": "INFY",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Infosys Collaborates with Knorr-Bremse to Accelerate AI-Enabled Enterprise Transformation",
+      "summary": "",
+      "url": "/news/383076/infosys-collaborates-with-knorr-bremse-to-accelerate-ai-enabled-enterprise-transformation",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-18-26 06:25AM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Infosys and Metsa Group Expand Strategic Collaboration to Drive AI-led IT Transformation",
+      "summary": "",
+      "url": "/news/377315/infosys-and-metsa-group-expand-strategic-collaboration-to-drive-ai-led-it-transformation",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-05-26 06:14AM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Investec Selects Infosys Finacle SaaS Platform on Microsoft Azure for Digital Banking Transformation",
+      "summary": "",
+      "url": "/news/374701/investec-selects-infosys-finacle-saas-platform-on-microsoft-azure-for-digital-banking-transformation",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-30-26 06:14AM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Infosys Powers NTN Corporation's Digital Growth with Seamless SAP Commerce Cloud Adoption",
+      "summary": "",
+      "url": "/news/373114/infosys-powers-ntn-corporations-digital-growth-with-seamless-sap-commerce-cloud-adoption",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-28-26 12:39AM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Infosys downgraded by JPMorgan, HSBC after earnings miss and weaker growth outlook",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/infosys-downgraded-jpmorgan-hsbc-earnings-132414691.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:24AM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

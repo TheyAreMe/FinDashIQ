@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108540.8634655,
+  "ticker": "MS",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "CRSP Stock Slips 3% Despite Encouraging CTX310 Data Morgan Stanley Says Investor Focus Is Further Ahead",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/28bfad77-2266-344e-97c3-bb44862d4d4a/crsp-stock-slips-3%25-despite.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 03:19PM",
+      "timestamp": 1788108541,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Morgan Stanley sees SpaceX $100B Louisiana site as unpriced orbital AI catalyst",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/morgan-stanley-sees-spacex-100b-133620901.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:36AM",
+      "timestamp": 1788108541,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Elon Musk Envisions SpaceX Revenue To Hit $3.5 Trillion, Seven Years Ahead Of Morgan Stanley Estimates",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/92be925c-3f73-362c-9d9b-35546af52bac/elon-musk-envisions-spacex.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 07:45PM",
+      "timestamp": 1788108541,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Elon Musk and Morgan Stanleys SpaceX Predictions Are 7 Years Apart",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/ba0f54ef-8b3c-3671-81e1-a7c8b01b7015/elon-musk-and-morgan.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "05:31PM",
+      "timestamp": 1788108541,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Morgan Stanley Sees Bigger Trouble Ahead for HP",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/morgan-stanley-sees-bigger-trouble-190604910.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:06PM",
+      "timestamp": 1788108541,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

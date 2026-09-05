@@ -1,39 +1,44 @@
-# ⚡ FinDashIQ v0.1.0 — Initial Release
+# ⚡ FinDashIQ v0.1.3 — Stock Scanner Enhancements & UX Polish
 
-We are excited to announce the initial release of **FinDashIQ (v0.1.0)** — a self-hosted, privacy-first quantitative financial intelligence platform and AI-driven market analytics terminal.
+FinDashIQ **v0.1.3** delivers key enhancements to the automated Stock Scanner, including autonomous background engine execution, admin interval controls, timezone-aware live countdowns, elevated default conviction screening, and a unified split hero layout.
 
 ---
 
-### 🚀 Highlights & Features
+### 🚀 Highlights in v0.1.3 (Brief Summary)
 
-* 📊 **Watchlist & Market Intelligence Hub**:
-  * Persistent server-side asset tracking and customizable ETF/stock baskets.
-  * Live quote badges, interactive trend sparklines, and real-time quantitative health bars (RSI, CMF, VWAP, SuperTrend).
-  * Automated AI conviction scoring and market bias indicators.
+* ⚡ **Default Conviction (≥ 85%)**: Elevated initial screening threshold to focus on high-conviction setups (≥ 85%).
+* 🔄 **Autonomous Background Scanner**: Decoupled scanning from the frontend to run entirely in the background, with configurable scan intervals adjustable by admins directly from the scanner tab.
+* ⏱️ **Live Timing & Local Timezone Sync**: "Last Scan / Next Due" timestamps automatically render in the user's local browser timezone with an active countdown timer.
+* ☀️ **Bright Mode & UX Polish**: Fixed contrast across the admin controls, universe cards, and ticker addition modals.
 
-* 🔍 **Quantitative Deep-Dive Terminal**:
-  * **Interactive Technical Charts**: High-performance multi-timeframe charts with SuperTrend, VWAP, Bollinger Bands, Keltner Channels, and moving averages.
-  * **Oscillator Suite**: Integrated Stochastic (14, 3, 3), RSI (14), MACD (12, 26, 9), and Chaikin Money Flow (CMF).
-  * **Strategy Backtesting Engine**: Simulate historical returns, calculate Alpha, Win Rate, and Profit Factor against Buy & Hold benchmarks with an interactive simulated trade execution log.
-  * **Multi-Factor Consensus**: Algorithmic verdict ratings (*Strong Buy* to *Strong Sell*) backed by composite technicals and fundamentals.
+---
 
-* 🧠 **AI Financial Intelligence & Copilot**:
-  * Automated executive thesis generation, catalyst synthesis, and invalidation risk factors.
-  * 30-day probabilistic price scenarios (*Bull*, *Base*, *Bear*).
-  * Dynamic Trade Execution Matrix with suggested entry zones, stop-losses, and take-profit targets.
-  * Context-aware interactive AI Copilot for market and risk queries.
+## ⚡ Previous Releases
 
-* 🛰️ **Opportunity Discovery Scanner**:
-  * Automated screener scanning high-conviction opportunities across Clean Energy, AI & Silicon, Biotech, Cloud/Cybersecurity, and more.
-  * 1-click routing directly into the terminal or to your personal watchlist.
+### FinDashIQ v0.1.2 — Global Stock Scanner & Expanded Universe
 
-* 🔔 **Signal Change Alerts & Notifications**:
-  * Configurable alert triggers for technical crossovers, trend flips, and AI conviction shifts.
-  * Support for Discord Webhooks, Telegram, Email, and Browser Push notifications.
+We are pleased to release **FinDashIQ (v0.1.2)**, introducing an expanded global screening universe of 276+ liquid institutional assets, high-speed vectorized data ingestion, interactive catalyst indicators with hover popovers, and streamlined market selection filters.
 
-* 🛡️ **Role-Based Security & Glassmorphism UI**:
-  * Isolated per-user storage, admin role management, and session security.
-  * Modern glassmorphic theme with instant Dark 🌙 / Bright ☀️ mode switching.
+---
+
+### 🚀 Highlights & New Features in v0.1.2
+
+* 🌐 **Expanded Global Multi-Market Universe (276+ Assets)**:
+  * Comprehensive coverage across **US Markets** (S&P 500, NASDAQ 100), **European Blue Chips** (DAX 40, CAC 40, SMI, FTSE), **Asia-Pacific**, **Emerging Markets**, **Clean Energy**, and **Sector Benchmark ETFs**.
+  * Enriched fundamental classification including ESG sustainability ratings, thematic tags, and parent ETF mappings.
+
+* ⚡ **High-Speed Vectorized Ingestion & Sub-10ms Queries**:
+  * Single-batch vectorized price data streaming with decoupled bulk news aggregation.
+  * In-memory indicator calculation across all 276 assets in sub-second RAM matrices, dramatically accelerating scan and update speeds.
+
+* 🔥 **Interactive Catalyst Indicator & Hover Popover**:
+  * Subtle pulsing catalyst indicator dot in the card header for stocks experiencing viral catalysts or volume surges.
+  * Rich, responsive hover popovers displaying volume surge metrics, breaking headlines, story summaries, and instant news wire links.
+  * Smart viewport collision detection and stacking elevation ensuring smooth readability on mobile, tablet, and desktop screens.
+
+* 🎯 **Streamlined Scanner Controls & Regional Selectors**:
+  * Universal cross-platform market selectors with distinct separation between Asia-Pacific and Emerging Markets.
+  * Refined screening controls with repositioned watchlist exclusion and uniform card grid alignment.
 
 ---
 
@@ -47,7 +52,10 @@ cd FinDashIQ
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Launch application
+# 3. Configure environment
+cp .env.example .env
+
+# 4. Launch application
 python app.py
 ```
 *Access the dashboard at `http://localhost:5000` (Default credentials: `admin` / `admin123`).*

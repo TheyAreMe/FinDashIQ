@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108588.8167605,
+  "ticker": "BIDU",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Baidu Provides Update on Voluntary Conversion to Dual-Primary Listing on the Main Board of the Hong Kong Stock Exchange",
+      "summary": "",
+      "url": "/news/385986/baidu-provides-update-on-voluntary-conversion-to-dual-primary-listing-on-the-main-board-of-the-hong-kong-stock-exchange",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 08:00PM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Baidu Announces Results of Extraordinary General Meeting",
+      "summary": "",
+      "url": "/news/385533/baidu-announces-results-of-extraordinary-general-meeting",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:30AM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Uber Launches Baidus Fully Driverless Apollo Go in Dubai, Establishing the First Multi-Partner Autonomous Network Globally",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260819810612/en/Apollo",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-20-26 02:30AM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Baidu's Apollo Go Goes Live on Uber in Dubai, Offering a New Way for Users to Hail Fully Driverless Rides",
+      "summary": "",
+      "url": "/news/383929/baidus-apollo-go-goes-live-on-uber-in-dubai-offering-a-new-way-for-users-to-hail-fully-driverless-rides",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "02:30AM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "BIDU Stock Alert: Morgan Stanley Downgrades Baidu Stock on Rising AI Costs",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/bidu-stock-alert-morgan-stanley-200726752.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:07PM",
+      "timestamp": 1788108589,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

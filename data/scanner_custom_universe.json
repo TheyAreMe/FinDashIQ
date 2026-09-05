@@ -1,0 +1,62 @@
+[
+  {
+    "ticker": "SAP",
+    "name": "SAP  SE",
+    "market": "us",
+    "sector": "Equities",
+    "themes": [
+      "momentum"
+    ],
+    "parentETF": "",
+    "marketCapClass": "large",
+    "esgRating": "Standard (80/100)",
+    "ecoBadge": "\ud83d\udcc8 Community Opportunity",
+    "addedAt": "2026-09-05T11:24:19.376204",
+    "addedBy": "admin"
+  },
+  {
+    "ticker": "8968.T",
+    "name": "FUKUOKA REIT CORP",
+    "market": "asia",
+    "sector": "Equities",
+    "themes": [
+      "momentum"
+    ],
+    "parentETF": "",
+    "marketCapClass": "large",
+    "esgRating": "Standard (80/100)",
+    "ecoBadge": "\ud83d\udcc8 Community Opportunity",
+    "addedAt": "2026-09-05T11:33:47.315794",
+    "addedBy": "user"
+  },
+  {
+    "ticker": "5803.T",
+    "name": "FUJIKURA",
+    "market": "asia",
+    "sector": "Equities",
+    "themes": [
+      "momentum"
+    ],
+    "parentETF": "",
+    "marketCapClass": "large",
+    "esgRating": "Standard (80/100)",
+    "ecoBadge": "\ud83d\udcc8 Community Opportunity",
+    "addedAt": "2026-09-05T15:20:26.261630",
+    "addedBy": "admin"
+  },
+  {
+    "ticker": "BTC-USD",
+    "name": "Bitcoin USD",
+    "market": "us",
+    "sector": "Equities",
+    "themes": [
+      "momentum"
+    ],
+    "parentETF": "",
+    "marketCapClass": "large",
+    "esgRating": "Standard (80/100)",
+    "ecoBadge": "\ud83d\udcc8 Community Opportunity",
+    "addedAt": "2026-09-05T15:28:21.034454",
+    "addedBy": "admin"
+  }
+]

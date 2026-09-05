@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109578.193253,
+  "ticker": "TTD",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Gracenote Strikes First DSP Deal, Provides Show-Level CTV Data To Trade Desk",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/65d4ae71-701a-3780-8aba-5b1f89f5f168/gracenote-strikes-first-dsp.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:00AM",
+      "timestamp": 1788109578,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Gracenote Strikes Deal With The Trade Desk",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/65d4ae71-701a-3780-8aba-5b1f89f5f168/gracenote-strikes-deal-with.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:00AM",
+      "timestamp": 1788109578,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "The Trade Desk Took Its Workloads In House, Then The Margin Guide Cracked",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/1c6492a6-312b-3d22-9a32-fa1471acf5da/the-trade-desk-took-its.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-11-26 11:03AM",
+      "timestamp": 1788109578,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Can The Trade Desk Fend Off A New Digital Media Push?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/8eea7ae0-6119-3ca7-823f-d739460c19a5/can-the-trade-desk-fend-off-a.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:42AM",
+      "timestamp": 1788109578,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Why Did TTD, PZZA, EBS Stocks Plummet To 52 Week Lows?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/79dabbdb-e28f-3f4f-b2b5-d2b70d99ecc0/why-did-ttd%2C-pzza%2C-ebs-stocks.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:02AM",
+      "timestamp": 1788109578,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

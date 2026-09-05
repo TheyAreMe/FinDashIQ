@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108586.7813027,
+  "ticker": "BABA",
+  "country": "China",
+  "flag": "🇨🇳",
+  "news": [
+    {
+      "title": "Alibaba Just Made Its AI Model Much Cheaper to Run",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/alibaba-just-made-ai-model-120856592.html",
+      "publisher": "Yahoo Finance",
+      "country": "China",
+      "flag": "🇨🇳",
+      "publishedAt": "Aug-27-26 08:08AM",
+      "timestamp": 1788108587,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Alibaba Stock Rises After New Qwen AI Model Takes Aim at Costs",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/alibaba-stock-rises-qwen-ai-172833207.html",
+      "publisher": "Yahoo Finance",
+      "country": "China",
+      "flag": "🇨🇳",
+      "publishedAt": "Aug-26-26 01:28PM",
+      "timestamp": 1788108587,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Kaplan Fox Encourages Alibaba Group Holding Limited (BABA) Investors with Losses to Contact the Firm Before October 5, 2026",
+      "summary": "",
+      "url": "https://www.newsfilecorp.com/release/311213/Kaplan-Fox-Encourages-Alibaba-Group-Holding-Limited-BABA-Investors-with-Losses-to-Contact-the-Firm-Before-October-5-2026",
+      "publisher": "Financial Wire",
+      "country": "China",
+      "flag": "🇨🇳",
+      "publishedAt": "10:35AM",
+      "timestamp": 1788108587,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Alibaba Group Announced Completion of HK$80 Billion Placing of New Shares in Hong Kong",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260826143256/en/",
+      "publisher": "Financial Wire",
+      "country": "China",
+      "flag": "🇨🇳",
+      "publishedAt": "06:56AM",
+      "timestamp": 1788108587,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Jack Ma's Buying Does Little to Ease Alibaba Share Sale Fallout",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/jack-mas-buying-does-little-to-ease-alibaba-share-sale-fallout-075425041.html",
+      "publisher": "Yahoo Finance",
+      "country": "China",
+      "flag": "🇨🇳",
+      "publishedAt": "03:54AM",
+      "timestamp": 1788108587,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

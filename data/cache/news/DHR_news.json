@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109654.563328,
+  "ticker": "DHR",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Danaher promotes Julie Sawyer Montgomery to CEO",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/7cb46d23-8b23-30d2-ac3e-54a55821d4eb/danaher-promotes-julie-sawyer.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-04-26 06:56AM",
+      "timestamp": 1788109655,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Danaher Appoints Julie Sawyer Montgomery as President and Chief Executive Officer",
+      "summary": "",
+      "url": "/news/376301/danaher-appoints-julie-sawyer-montgomery-as-president-and-chief-executive-officer",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-03-26 04:15PM",
+      "timestamp": 1788109655,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Reading Between The Lines Of DHR's Latest Call",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/75223145-7f2a-381d-85f1-f346b9e65a98/reading-between-the-lines-of.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:23AM",
+      "timestamp": 1788109655,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Danaher Corp. stock underperforms Thursday when compared to competitors despite daily gains",
+      "summary": "",
+      "url": "https://www.marketwatch.com/data-news/danaher-corp-stock-underperforms-thursday-when-compared-to-competitors-despite-daily-gains-aa05491c-cee5ed9c6613?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-23-26 04:30PM",
+      "timestamp": 1788109655,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Don't Quit on Danaher Stock After Horrific Earnings Reaction",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/danaher-stock-stay-invested-after-horrific-earnings-reaction-88718388?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "05:06AM",
+      "timestamp": 1788109655,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

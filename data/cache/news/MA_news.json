@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108537.0811892,
+  "ticker": "MA",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "These charts show how leverage-happy investors are transforming the stock market",
+      "summary": "A rush of retail investors and quant funds has caused a shift toward more borrowed money and more short-term trading.",
+      "url": "https://www.marketwatch.com/story/these-charts-show-how-leverage-happy-investors-are-transforming-the-stock-market-d4e350c3?mod=mw_rss_topstories",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788108537,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "5 affordable cities to retire in the U.S. right now",
+      "summary": "You don’t have to leave the country to find an affordable place that matches your retirement vision.",
+      "url": "https://www.marketwatch.com/story/5-cheap-u-s-cities-to-retire-in-if-you-can-deal-with-this-one-thing-fbda5d1a?mod=mw_rss_topstories",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788108537,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Mastercard to Participate in Upcoming Investor Conference",
+      "summary": "",
+      "url": "/news/386457/mastercard-to-participate-in-upcoming-investor-conference",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 04:30PM",
+      "timestamp": 1788108537,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Mastercard Restarts Syrian Payments After 15 Years--and Visa Arrives Too",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/mastercard-restarts-syrian-payments-15-192859110.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:28PM",
+      "timestamp": 1788108537,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Major tech companies call for defensive surge to defeat AI-driven hacks",
+      "summary": "",
+      "url": "https://finance.yahoo.com/news/major-tech-companies-call-defensive-170210641.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:02PM",
+      "timestamp": 1788108537,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

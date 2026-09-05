@@ -47,7 +47,7 @@
     "passwordHash": "scrypt:32768:8:1$QfIRXe0G2iZa6RTz$2c8aa4120bf916656bb8aa810ee3d7ac0d4c95225dba708ef3524b4cba253445c334d6ea4a6f4cd50c3e40e35573ba025ffaae38d6637c43b34a5c850131013e",
     "role": "user",
     "displayName": "user",
-    "email": "usermail@googlemail.com",
+    "email": "user@findashiq.internal",
     "avatar": "user",
     "riskProfile": "Balanced",
     "baseCurrency": "USD",
@@ -60,7 +60,9 @@
       "SPCX",
       "EXXT.DE",
       "XDWT.DE",
-      "NEL.OL"
+      "NEL.OL",
+      "PYPL",
+      "SAP.DE"
     ],
     "alerts": [
       {

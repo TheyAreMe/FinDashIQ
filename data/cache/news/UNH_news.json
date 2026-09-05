@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108542.3134544,
+  "ticker": "UNH",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Can a $68 Billion Payout Save UNH Stock?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/71a40cf2-60ed-3db8-a4dd-edb2e0200746/can-a-%2468-billion-payout-save.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 07:26PM",
+      "timestamp": 1788108542,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "UnitedHealth Stock's Biggest Risk Sits In The Commercial Book",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/ac26749b-3089-320a-aa5a-134401890e94/unitedhealth-stock%27s-biggest.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-24-26 01:04PM",
+      "timestamp": 1788108542,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is The Pullback In UNH Stock A Glitch Or A Warning?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/7ee67ed4-7b67-3aed-90bc-58f8f6bc666f/is-the-pullback-in-unh-stock.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-21-26 04:58PM",
+      "timestamp": 1788108542,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "The IRS is scrutinizing how UnitedHealth moved money through foreign subsidiariesand whether it underpaid taxes",
+      "summary": "",
+      "url": "https://finance.yahoo.com/economy/policy/articles/irs-scrutinizing-unitedhealth-moved-money-070400880.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-19-26 03:04AM",
+      "timestamp": 1788108542,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "UnitedHealthcare Expands Access to Child and Family Behavioral Coaching to 13 Million Commercial Members",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260818516566/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:00AM",
+      "timestamp": 1788108542,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

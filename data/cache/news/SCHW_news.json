@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109646.980805,
+  "ticker": "SCHW",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Week's Best: Schwab Hikes Minimum for Client Referrals",
+      "summary": "",
+      "url": "https://www.barrons.com/advisor/articles/weeks-best-schwab-hikes-minimum-for-client-referrals-d934e232?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 03:12PM",
+      "timestamp": 1788109647,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Charles Schwab expands crypto access with Solana, Avalanche, and Chainlink",
+      "summary": "",
+      "url": "https://finance.yahoo.com/video/charles-schwab-expands-crypto-access-182000719.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "02:20PM",
+      "timestamp": 1788109647,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Charles Schwab Expands Crypto Trading Beyond Bitcoin and Ethereum",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/c81e4cc7-fabf-37e3-92cf-506a501ce719/charles-schwab-expands-crypto.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:39PM",
+      "timestamp": 1788109647,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Charles Schwab to Expand Crypto Offering for Clients. What to Know.",
+      "summary": "",
+      "url": "https://www.barrons.com/advisor/articles/charles-schwab-cryptocurrency-trading-b03d7b72?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 12:06PM",
+      "timestamp": 1788109647,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Solana Price Targets $120 as Schwab Adds SOL, ETF Inflows Rise",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/crypto/articles/solana-price-targets-120-schwab-153152972.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "11:31AM",
+      "timestamp": 1788109647,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

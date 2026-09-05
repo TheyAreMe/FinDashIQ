@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108546.6677,
+  "ticker": "XOM",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "The Number ExxonMobil No Longer Puts In Front Of Its Results",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/c2120aa7-b2b2-3612-9a87-6dfba38655ea/the-number-exxonmobil-no.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 04:50PM",
+      "timestamp": 1788108547,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Top Stock Reports for NVIDIA, ExxonMobil &amp; HSBC",
+      "summary": "",
+      "url": "/news/386688/top-stock-reports-for-nvidia-exxonmobil-hsbc",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "04:22PM",
+      "timestamp": 1788108547,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Exxon Slips Below $159 as Hormuz Hope Hits Crude Again",
+      "summary": "",
+      "url": "https://finance.yahoo.com/energy/articles/exxon-slips-below-159-hormuz-182608586.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 02:26PM",
+      "timestamp": 1788108547,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "ExxonMobil Stock's Biggest Risk Is The Shortage Ending",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/705b841c-1481-3531-b188-3c2dc39492a1/exxonmobil-stock%27s-biggest.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:19PM",
+      "timestamp": 1788108547,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "ExxonMobil to Speak at Barclays 40th Annual Energy-Power Conference",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260826193086/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:00AM",
+      "timestamp": 1788108547,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

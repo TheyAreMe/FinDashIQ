@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108553.3973188,
+  "ticker": "MCD",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "The $37 Billion Consolation Prize For MCD Shareholders",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/3a0ddd0f-b4dd-3d20-b0a7-b680ede0f256/the-%2437-billion-consolation.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 06:26PM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "McDonald's Makes Major Menu Move as Shares Struggle",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/mcdonalds-makes-major-menu-move-141859451.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:18AM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Why Did NKE, NIO, MCD Stocks Plunge To 52-Week Lows Today?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/330d1fb4-1f8c-3db3-80d9-f246db91e7fa/why-did-nke%2C-nio%2C-mcd-stocks.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 11:15PM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Consumer spending, Burger King, McDonald's",
+      "summary": "",
+      "url": "https://www.nrn.com/restaurant-finance/consumer-spending-burger-king-mcdonald-s",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 12:30PM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "McDonald's is bringing back its spicy chicken nuggets for the first time in two years",
+      "summary": "",
+      "url": "https://qz.com/mcdonalds-spicy-chicken-mcnuggets-return-fall-2026-082626",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:10AM",
+      "timestamp": 1788108553,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

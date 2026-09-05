@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109671.1844444,
+  "ticker": "SBUX",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Starbucks investors push to split chair and CEO roles held by Niccol",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/starbucks-investors-push-split-chair-135627808.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:56AM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is Starbucks Pumpkin Spice Latte basic? Martha Stewart answers in new ads",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/b5d2812b-91de-32d8-b15f-bb446f3265fa/is-starbucks%E2%80%99-pumpkin-spice.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:00AM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Starbucks Union Calls for Boycott in Latest Test of Company Turnaround",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/starbucks-stock-union-boycott-fd830bd1?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-25-26 03:20PM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Starbucks Workers United Calls For Boycott Why Union Says SBUX Leaves Us With No Other Choice",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/37f6ab2c-7d30-3196-81e4-f01a0d7272d4/starbucks-workers-united.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "02:57PM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Did Starbucks Corporation Insiders Breach their Fiduciary Duties to Shareholders?",
+      "summary": "",
+      "url": "/news/385365/did-starbucks-corporation-insiders-breach-their-fiduciary-duties-to-shareholders",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:11AM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

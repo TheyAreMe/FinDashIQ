@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109670.581095,
+  "ticker": "LULU",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "NKE, LULU Stocks Head For Weekly Losses: Wall Street Turns Wary, Says Consumer Recovery Isnt Here Yet",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/e0abaa32-1327-3dc6-9e00-8abca2d6c747/nke%2C-lulu-stocks-head-for.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 03:52AM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "lululemon athletica inc. stock underperforms Tuesday when compared to competitors",
+      "summary": "",
+      "url": "https://www.marketwatch.com/data-news/lululemon-athletica-inc-stock-underperforms-tuesday-when-compared-to-competitors-3db0d9b9-b9c16740754b?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-25-26 04:30PM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Lululemon May Cut Annual Earnings Outlook Amid Weak US, China Sales, Warns UBS",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/bc601eee-69d5-311a-901c-ee4ff1b882d0/lululemon-may-cut-annual.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:04PM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Michael Burry Says LULU Stock Is Screaming Cheap While Apple Shares Are Permacostly Like Costco",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/4ea5bec1-3f31-31aa-ac33-906e07885d7e/michael-burry-says-lulu-stock.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-24-26 06:32AM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Lululemon Promotes China Head to Lead APAC, Hires Former Louis Vuitton Executive for Regional Role",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/e3e0a8fb-58d2-3a26-ac93-b6196e3dbcd2/lululemon-promotes-china-head.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-23-26 09:38AM",
+      "timestamp": 1788109671,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

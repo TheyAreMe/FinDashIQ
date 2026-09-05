@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109578.7593205,
+  "ticker": "SPOT",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Spotify Upsizes Share Repurchase Program by $1.5 Billion",
+      "summary": "",
+      "url": "/news/384357/spotify-upsizes-share-repurchase-program-by-15-billion",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-20-26 04:15PM",
+      "timestamp": 1788109579,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Buy Signal Flashing for Surging Spotify Stock",
+      "summary": "",
+      "url": "/news/383803/buy-signal-flashing-for-surging-spotify-stock",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-19-26 02:04PM",
+      "timestamp": 1788109579,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Spotify Stock Drops 4.9% Despite Reaching 300 Million Subscribers",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/spotify-stock-drops-4-9-143843492.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:38AM",
+      "timestamp": 1788109579,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is Spotify turning your playlist into AI?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/video/spotify-turning-playlist-ai-132034030.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:34AM",
+      "timestamp": 1788109579,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Spotify Technology S.A. Q2 2026 Earnings Call Summary",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/09475b1d-0541-344c-bbc5-e2e6b74b5102/spotify-technology-s.a.-q2.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-04-26 04:57PM",
+      "timestamp": 1788109579,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

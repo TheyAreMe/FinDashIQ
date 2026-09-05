@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109708.7834802,
+  "ticker": "WIT",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Wipro Stock Falls as Nifty 50 Exit Looms",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/wipro-stock-falls-nifty-50-190146053.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-11-26 03:01PM",
+      "timestamp": 1788109709,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Meta Scales Back Wipro Outsourcing Following AI-Led Business Restructuring",
+      "summary": "",
+      "url": "/news/375787/meta-scales-back-wipro-outsourcing-following-ai-led-business-restructuring",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-03-26 06:08AM",
+      "timestamp": 1788109709,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Wipro Partners With Databricks to Enable Enterprises to Modernize Data and Deploy AI at Scale",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260727025637/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-27-26 07:54AM",
+      "timestamp": 1788109709,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Wipro Ltd (WIT) Q1 2027 Earnings Call Highlights: Navigating Growth and Challenges with ...",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/wipro-ltd-wit-q1-2027-210036427.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-16-26 05:00PM",
+      "timestamp": 1788109709,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Wipro Announces Results for the Quarter Ended June 30, 2026",
+      "summary": "",
+      "url": "https://www.businesswire.com/news/home/20260716208701/en/",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:15AM",
+      "timestamp": 1788109709,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

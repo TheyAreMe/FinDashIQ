@@ -199,6 +199,7 @@ const state = {
         }
     })(),
     watchlistData: {},
+    scannerUniverseTickers: new Set(),
     alerts: [],
     stocksData: {},
     overlays: {
@@ -390,8 +391,13 @@ async function handleCurrencyChange(newCurrency) {
     // Dynamically recalculate & re-render all open views with new currency
     if (typeof renderActiveStock === 'function') renderActiveStock();
     if (typeof renderWatchlist === 'function') renderWatchlist();
-    const scannerOpps = state.scannerResults?.opportunities || (Array.isArray(state.scannerResults) ? state.scannerResults : null);
-    if (typeof renderScannerResults === 'function' && scannerOpps) renderScannerResults(scannerOpps);
+    const scannerSearchInput = document.getElementById('scannerSearchQuery');
+    if (typeof handleScannerSearchFilter === 'function' && scannerSearchInput && scannerSearchInput.value.trim()) {
+        handleScannerSearchFilter(scannerSearchInput.value);
+    } else {
+        const scannerOpps = state.scannerResults?.opportunities || (Array.isArray(state.scannerResults) ? state.scannerResults : null);
+        if (typeof renderScannerResults === 'function' && scannerOpps) renderScannerResults(scannerOpps);
+    }
     if (typeof renderBacktest === 'function') renderBacktest();
     if (typeof renderAlerts === 'function') renderAlerts();
     if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -808,6 +814,7 @@ function setAppAuthState(isAuthenticated) {
         clearUserSessionDOM();
     }
     renderUserHeader();
+    syncScannerAdminControls(state.scannerResults);
     lucide.createIcons();
 }
 
@@ -1367,7 +1374,12 @@ async function handleUpdateProfile() {
             if (typeof renderActiveStock === 'function') renderActiveStock();
             if (typeof renderWatchlist === 'function') renderWatchlist();
             if (typeof renderScannerResults === 'function' && state.scannerResults) {
-                renderScannerResults(state.scannerResults.opportunities || []);
+                const scannerSearchInput = document.getElementById('scannerSearchQuery');
+                if (scannerSearchInput && scannerSearchInput.value.trim()) {
+                    handleScannerSearchFilter(scannerSearchInput.value);
+                } else {
+                    renderScannerResults(state.scannerResults.opportunities || []);
+                }
             }
             if (typeof renderBacktest === 'function') renderBacktest();
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -2380,12 +2392,19 @@ function renderNewsIntelligence(stock) {
 // Global News Modal Functions
 let currentModalNewsFilter = 'all';
 let currentModalNewsQuery = '';
+let currentModalCatalystItem = null;
 
-function openGlobalNewsModal() {
+function openGlobalNewsModal(customTicker = null, initialQuery = '', initialFilter = 'all', catalystItem = null) {
     const modal = document.getElementById('globalNewsModal');
     if (!modal) return;
 
-    const stock = state.stocksData[state.activeTicker];
+    if (customTicker) {
+        state.activeTicker = customTicker;
+    }
+
+    currentModalCatalystItem = catalystItem || null;
+
+    const stock = state.stocksData[state.activeTicker] || state.watchlistData[state.activeTicker];
     const compName = getAssetCompanyName(state.activeTicker, stock);
     const badgeEl = document.getElementById('newsModalStockBadge');
     if (badgeEl) {
@@ -2394,15 +2413,21 @@ function openGlobalNewsModal() {
 
     const searchInput = document.getElementById('globalNewsSearchInput');
     if (searchInput) {
-        searchInput.value = '';
+        searchInput.value = initialQuery || '';
     }
-    currentModalNewsQuery = '';
-    currentModalNewsFilter = 'all';
+    currentModalNewsQuery = String(initialQuery || '').trim().toLowerCase();
+    currentModalNewsFilter = initialFilter || 'all';
 
     ['newsFilterAllBtn', 'newsFilterCatalystsBtn', 'newsFilterTier1Btn'].forEach(id => {
         document.getElementById(id)?.classList.remove('active');
     });
-    document.getElementById('newsFilterAllBtn')?.classList.add('active');
+    if (initialFilter === 'catalysts') {
+        document.getElementById('newsFilterCatalystsBtn')?.classList.add('active');
+    } else if (initialFilter === 'tier1') {
+        document.getElementById('newsFilterTier1Btn')?.classList.add('active');
+    } else {
+        document.getElementById('newsFilterAllBtn')?.classList.add('active');
+    }
 
     renderGlobalNewsModalList();
     modal.style.display = 'flex';
@@ -2436,8 +2461,24 @@ function renderGlobalNewsModalList() {
     const footerCount = document.getElementById('globalNewsModalFooterCount');
     if (!container) return;
 
-    const stock = state.stocksData[state.activeTicker];
-    const news = stock?.news || [];
+    const stock = state.stocksData[state.activeTicker] || state.watchlistData[state.activeTicker];
+    let news = stock?.news ? [...stock.news] : [];
+
+    if (currentModalCatalystItem) {
+        const headline = currentModalCatalystItem.headline || '';
+        const exists = news.some(n => (n.title || '').toLowerCase() === headline.toLowerCase());
+        if (!exists && headline) {
+            news.unshift({
+                title: currentModalCatalystItem.headline,
+                publisher: currentModalCatalystItem.publisher || 'Financial Wire',
+                time: currentModalCatalystItem.time || 'Active Session',
+                summary: currentModalCatalystItem.summary || `Breaking market catalyst event detected with relative volume of ${currentModalCatalystItem.volRatio || 'elevated'}.`,
+                url: currentModalCatalystItem.link || `https://finance.yahoo.com/quote/${state.activeTicker}/news`,
+                country: 'US',
+                flag: '🇺🇸'
+            });
+        }
+    }
 
     let filtered = news.filter(item => {
         if (currentModalNewsQuery) {
@@ -2483,7 +2524,7 @@ function renderGlobalNewsModalList() {
         const timeAgo = item.timeAgo || item.time || 'Recent';
         const title = escapeHtml(item.title || '');
         const summary = escapeHtml(item.summary || '');
-        const url = escapeHtml(item.url || '#');
+        const url = escapeHtml(item.url || item.link || '#');
 
         return `
             <div class="news-modal-card" style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; transition: border-color 0.2s ease;">
@@ -3719,10 +3760,25 @@ function switchTopTab(tabKey) {
     } else if (tabKey === 'watchlist') {
         renderWatchlist();
     } else if (tabKey === 'scanner') {
-        if (state.scannerResults && state.scannerResults.opportunities) {
-            renderScannerResults(state.scannerResults.opportunities);
+        if (state.scannerResults && state.scannerResults.opportunities && state.scannerResults.opportunities.length > 0) {
+            const searchInput = document.getElementById('scannerSearchQuery');
+            if (searchInput && searchInput.value.trim()) {
+                handleScannerSearchFilter(searchInput.value);
+            } else {
+                renderScannerResults(state.scannerResults.opportunities);
+            }
+            updateScannerTimingDisplay(state.scannerResults);
+            syncScannerAdminControls(state.scannerResults);
+
+            // Always check for background updates when opening tab if due or stale (>30s)
+            const nowSec = Date.now() / 1000;
+            const nextEpoch = state.scannerResults.nextScanEpoch || 0;
+            const lastEpoch = state.scannerResults.timestamp_epoch || 0;
+            if (nowSec >= nextEpoch || (nowSec - lastEpoch) > 30) {
+                silentRefreshScannerCache();
+            }
         } else {
-            handleRunScanner(false);
+            initScanner();
         }
     } else if (tabKey === 'notifications') {
         populateAlertTickerOptions();
@@ -4006,6 +4062,23 @@ function formatShortDate(dateStr) {
     }
 }
 
+function formatTablePeriodChange(timeseries) {
+    if (!timeseries || timeseries.length < 2) return '<span style="color: var(--text-muted); font-size: 0.75rem;">--</span>';
+    const closes = timeseries.map(p => p.close).filter(c => typeof c === 'number' && !isNaN(c));
+    if (closes.length < 2) return '<span style="color: var(--text-muted); font-size: 0.75rem;">--</span>';
+
+    const startPrice = closes[0];
+    const endPrice = closes[closes.length - 1];
+    const periodChangePct = startPrice > 0 ? ((endPrice - startPrice) / startPrice) * 100 : 0;
+    const isBull = periodChangePct >= 0;
+
+    return `
+        <span class="badge-pill ${isBull ? 'badge-bullish' : 'badge-bearish'}" style="font-size: 0.75rem; padding: 2px 8px;">
+            ${isBull ? '+' : ''}${periodChangePct.toFixed(2)}%
+        </span>
+    `;
+}
+
 function generateTableSparkline(timeseries, isBullish) {
     if (!timeseries || timeseries.length < 2) return '<span style="color: var(--text-muted); font-size: 0.75rem;">--</span>';
     const points = timeseries.slice(-24);
@@ -4123,6 +4196,78 @@ function generateSvgSparkline(timeseries, isBullish) {
     `;
 }
 
+function detectWatchlistCatalyst(ticker, stock) {
+    if (!stock || stock.error) return null;
+
+    // 1. Direct viral catalyst if already computed (e.g. from scanner dataset)
+    if (stock.viralCatalyst) return stock.viralCatalyst;
+
+    const profile = stock.profile || {};
+    const signals = stock.signals || {};
+    const ai = stock.aiAnalysis || {};
+    const indicators = signals.indicators || {};
+    const changePercent = profile.changePercent || 0;
+    const volRatio = profile.volumeRatio || 1.0;
+    const news = stock.news || [];
+    const rsiVal = indicators.RSI ? indicators.RSI.value : (indicators.RSI?.val || null);
+
+    // 2. High-impact catalyst keyword detection in breaking news items
+    const catalystKeywords = [
+        'takeover', 'buyout', 'acquisition', 'surge', 'soar', 'skyrocket', 
+        'short squeeze', 'rally', 'beat', 'record profit', 'fda approval', 
+        'breakout', 'partnership', 'expansion', 'ai platform', 'upgrade', 'contract', 'growth'
+    ];
+
+    let foundNews = null;
+    for (const n of news.slice(0, 8)) {
+        const title = (n.title || '').toLowerCase();
+        for (const kw of catalystKeywords) {
+            if (title.includes(kw)) {
+                foundNews = n;
+                break;
+            }
+        }
+        if (foundNews) break;
+    }
+
+    if (foundNews && (volRatio >= 1.15 || Math.abs(changePercent) >= 1.5)) {
+        return {
+            catalystType: '🔥 Viral Catalyst',
+            headline: foundNews.title,
+            summary: foundNews.summary || foundNews.description || '',
+            publisher: foundNews.publisher || 'Financial Wire',
+            time: foundNews.time || 'Active Session',
+            volRatio: `${volRatio.toFixed(1)}x Vol`
+        };
+    }
+
+    // 3. Heavy Institutional Volume Surge or Massive Session Price Mover
+    if (volRatio >= 1.35 || Math.abs(changePercent) >= 3.0) {
+        return {
+            catalystType: '⚡ Volume Surge',
+            headline: `Heavy Session Momentum (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}% | ${volRatio.toFixed(1)}x Vol)`,
+            summary: `Significant institutional activity detected (${volRatio.toFixed(1)}x vs 20-day SMA) with ${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}% session price movement.`,
+            publisher: 'Exchange Tape Flow',
+            time: 'Active Session',
+            volRatio: `${volRatio.toFixed(1)}x Vol`
+        };
+    }
+
+    // 4. Extreme RSI Oversold Mean-Reversion setup
+    if (rsiVal !== null && rsiVal <= 28) {
+        return {
+            catalystType: '💎 Deep Oversold',
+            headline: `Deep RSI Oversold Extreme (${rsiVal.toFixed(1)})`,
+            summary: `RSI dropped to ${rsiVal.toFixed(1)}, entering historic oversold territory for asymmetric mean-reversion opportunity.`,
+            publisher: 'Quantitative Scanner',
+            time: 'Active Signal',
+            volRatio: `${volRatio.toFixed(1)}x Vol`
+        };
+    }
+
+    return null;
+}
+
 function renderWatchlistCards() {
     const grid = document.getElementById('watchlistCardsGrid');
     if (!grid) return;
@@ -4224,6 +4369,8 @@ function renderWatchlistCards() {
         const synthText = ai.newsSynthesis?.summary || ai.executiveThesis || (stock.isFastHydration ? '⚡ Live quotes, sparklines & indicators loaded. Synthesizing AI catalysts & backtests in background...' : `Technical indicators and quantitative momentum signals are actively tracked for ${ticker}.`);
 
         const compName = getAssetCompanyName(ticker, stock);
+        const catalyst = detectWatchlistCatalyst(ticker, stock);
+
         card.innerHTML = `
             <div class="watchlist-card-header">
                 <div class="watchlist-card-title-col">
@@ -4232,6 +4379,26 @@ function renderWatchlistCards() {
                             <i data-lucide="grip-vertical" style="width: 14px; height: 14px;"></i>
                         </div>
                         <span class="watchlist-card-symbol">${ticker}</span>
+                        ${catalyst ? `
+                        <div class="catalyst-indicator-wrapper" onmouseenter="positionCatalystPopover(this)" onclick="handleScannerCatalystClick('${ticker}', event)" title="View Catalyst News">
+                            <span class="catalyst-dot-pulse" aria-label="Market Catalyst Active"></span>
+                            <div class="catalyst-hover-popover">
+                                <div class="popover-cat-header">
+                                    <span class="popover-cat-tag">${catalyst.catalystType || '🔥 Catalyst'}</span>
+                                    <span class="popover-cat-vol mono">${catalyst.volRatio || ''}</span>
+                                </div>
+                                <div class="popover-cat-headline">${escapeHtml(catalyst.headline || '')}</div>
+                                ${catalyst.summary ? `<div class="popover-cat-summary">${escapeHtml(catalyst.summary)}</div>` : ''}
+                                <div class="popover-cat-footer">
+                                    <span>${escapeHtml(catalyst.publisher || 'Wire')} • ${escapeHtml(catalyst.time || 'Active')}</span>
+                                    <button type="button" class="popover-cat-btn" onclick="handleScannerCatalystClick('${ticker}', event)" title="Open Full News Story">
+                                        <span>View News</span>
+                                        <i data-lucide="external-link" style="width: 10px; height: 10px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
                     <div class="watchlist-card-name" title="${compName}">${compName}</div>
                 </div>
@@ -4425,8 +4592,9 @@ function renderWatchlistTable() {
         const stStatus = indicators.SuperTrend ? (indicators.SuperTrend.status === 'bullish' ? '🟢 Bull' : '🔴 Bear') : '--';
         const cmfVal = profile.cmf !== null && profile.cmf !== undefined ? `${profile.cmf > 0 ? '+' : ''}${profile.cmf.toFixed(2)}` : '--';
 
-        const sparklineMini = generateTableSparkline(timeseries, isBullish);
+        const sixMonthHtml = formatTablePeriodChange(timeseries);
         const synthHtml = formatTableSynthesis(ai, stock);
+        const catalyst = detectWatchlistCatalyst(ticker, stock);
 
         const compName = getAssetCompanyName(ticker, stock);
         tr.innerHTML = `
@@ -4452,7 +4620,7 @@ function renderWatchlistTable() {
                 </span>
             </td>
             <td style="text-align: center;">
-                <div style="display: flex; justify-content: center;">${sparklineMini}</div>
+                ${sixMonthHtml}
             </td>
             <td style="text-align: center;">
                 <span class="badge-pill ${indicators.SuperTrend?.status === 'bullish' ? 'badge-bullish' : 'badge-bearish'}" style="font-size: 0.72rem; padding: 2px 7px;">
@@ -4468,7 +4636,29 @@ function renderWatchlistTable() {
             <td style="text-align: center;">
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
                     <span class="mono" style="font-weight: 800; font-size: 0.88rem; color: ${stanceColor === 'bullish' ? 'var(--accent-green)' : (stanceColor === 'bearish' ? 'var(--accent-red)' : 'var(--accent-blue)')};">${conviction}%</span>
-                    <span class="badge-pill ${stanceColor === 'bullish' ? 'badge-bullish' : (stanceColor === 'bearish' ? 'badge-bearish' : 'badge-neutral')}" style="font-size: 0.65rem; padding: 1px 6px;">${bias}</span>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                        <span class="badge-pill ${stanceColor === 'bullish' ? 'badge-bullish' : (stanceColor === 'bearish' ? 'badge-bearish' : 'badge-neutral')}" style="font-size: 0.65rem; padding: 1px 6px;">${bias}</span>
+                        ${catalyst ? `
+                        <div class="catalyst-indicator-wrapper" onmouseenter="positionCatalystPopover(this)" onclick="handleScannerCatalystClick('${ticker}', event)" title="View Market Catalyst">
+                            <span class="catalyst-dot-pulse" style="width: 8px; height: 8px;" aria-label="Market Catalyst Active"></span>
+                            <div class="catalyst-hover-popover" style="text-align: left;">
+                                <div class="popover-cat-header">
+                                    <span class="popover-cat-tag">${catalyst.catalystType || '🔥 Catalyst'}</span>
+                                    <span class="popover-cat-vol mono">${catalyst.volRatio || ''}</span>
+                                </div>
+                                <div class="popover-cat-headline">${escapeHtml(catalyst.headline || '')}</div>
+                                ${catalyst.summary ? `<div class="popover-cat-summary">${escapeHtml(catalyst.summary)}</div>` : ''}
+                                <div class="popover-cat-footer">
+                                    <span>${escapeHtml(catalyst.publisher || 'Wire')} • ${escapeHtml(catalyst.time || 'Active')}</span>
+                                    <button type="button" class="popover-cat-btn" onclick="handleScannerCatalystClick('${ticker}', event)" title="Open Full News Story">
+                                        <span>View News</span>
+                                        <i data-lucide="external-link" style="width: 10px; height: 10px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
                 </div>
             </td>
             <td style="text-align: center;">
@@ -4478,7 +4668,7 @@ function renderWatchlistTable() {
                 <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
                     <button type="button" class="btn-table-action" onclick="openStockDeepDive('${ticker}')" title="Deep-Dive Single Stock Analysis">
                         <i data-lucide="arrow-right-circle" style="width: 14px; height: 14px;"></i>
-                        <span>Analyze</span>
+                        <span>Deep Dive</span>
                     </button>
                     <button type="button" class="btn-table-remove" onclick="removeWatchlistTicker('${ticker}')" title="Remove ${ticker} from Watchlist" aria-label="Remove ${ticker}">
                         <i data-lucide="x" style="width: 14px; height: 14px;"></i>
@@ -4627,7 +4817,7 @@ async function reorderWatchlistTickers(draggedTicker, targetTicker, isAfter) {
     await saveWatchlistServer();
 }
 
-async function openStockDeepDive(ticker) {
+async function openStockDeepDive(ticker, targetSubtab = null) {
     if (!ticker) return;
     ticker = ticker.trim().toUpperCase();
     state.activeTicker = ticker;
@@ -4637,6 +4827,9 @@ async function openStockDeepDive(ticker) {
 
     // Switch to Terminal top tab
     switchTopTab('terminal');
+    if (targetSubtab) {
+        switchMainTab(targetSubtab);
+    }
 
     if (state.stocksData && state.stocksData[ticker] && !state.stocksData[ticker].error) {
         renderStockSelector([ticker]);
@@ -4651,6 +4844,50 @@ async function openStockDeepDive(ticker) {
 
     // Scroll to dashboard content
     document.getElementById('dashboardContent')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function handleScannerCatalystClick(ticker, event) {
+    if (event) {
+        event.stopPropagation();
+    }
+    if (!ticker) return;
+    const cleanTicker = ticker.trim().toUpperCase();
+
+    const opp = state.scannerResults?.opportunities?.find(o => o.ticker === cleanTicker);
+    const catalyst = opp?.viralCatalyst || null;
+
+    // 1. Set active ticker for modal context
+    state.activeTicker = cleanTicker;
+
+    // 2. Open Global News Modal with catalyst preloaded (stays on current scanner page)
+    const headlineQuery = catalyst?.headline ? catalyst.headline.slice(0, 32) : '';
+    openGlobalNewsModal(cleanTicker, headlineQuery, 'all', catalyst);
+}
+
+function positionCatalystPopover(wrapper) {
+    if (!wrapper) return;
+    const popover = wrapper.querySelector('.catalyst-hover-popover');
+    if (!popover) return;
+
+    // Reset inline styles to read natural layout dimensions
+    popover.style.left = '0px';
+    popover.style.right = 'auto';
+
+    const rect = popover.getBoundingClientRect();
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const pad = 14;
+
+    // If popover bleeds past the right viewport boundary:
+    if (rect.right > viewportWidth - pad) {
+        const overflow = rect.right - (viewportWidth - pad);
+        popover.style.left = `-${Math.ceil(overflow)}px`;
+    }
+
+    // Check if adjustment causes left overflow:
+    const adjustedRect = popover.getBoundingClientRect();
+    if (adjustedRect.left < pad) {
+        popover.style.left = `${Math.ceil(pad - rect.left)}px`;
+    }
 }
 
 async function removeWatchlistTicker(ticker) {
@@ -4692,7 +4929,7 @@ function escapeHtml(str) {
 let stockSearchDebounceTimer = null;
 let activeSearchAbortController = null;
 
-let stockSearchModalMode = 'watchlist'; // 'watchlist' | 'deep-dive' | 'alert'
+let stockSearchModalMode = 'watchlist'; // 'watchlist' | 'deep-dive' | 'alert' | 'universe'
 
 function openAddStockModal(mode = 'watchlist', initialQuery = '') {
     stockSearchModalMode = mode;
@@ -4718,6 +4955,15 @@ function openAddStockModal(mode = 'watchlist', initialQuery = '') {
         if (subtitleEl) subtitleEl.textContent = 'Search by company name or ticker symbol to analyze in Deep-Dive terminal';
         if (iconEl) iconEl.innerHTML = `<i data-lucide="sparkles" style="color: var(--accent-cyan); width: 22px; height: 22px;"></i>`;
         if (footerNoteEl) footerNoteEl.textContent = 'Select any exchange listing to load full technical and AI analysis in the Deep-Dive terminal.';
+    } else if (mode === 'universe' || mode === 'scanner') {
+        if (titleEl) titleEl.textContent = 'Add Stock to Monitoring Universe';
+        if (subtitleEl) subtitleEl.textContent = 'Search global stocks & ETFs to expand automated background scanner coverage';
+        if (iconEl) iconEl.innerHTML = `<i data-lucide="layers-plus" style="color: var(--accent-blue); width: 22px; height: 22px;"></i>`;
+        if (footerNoteEl) footerNoteEl.textContent = 'Added stocks are validated via live market data feeds and continuously monitored in background scans.';
+
+        if (!state.scannerUniverseTickers || state.scannerUniverseTickers.size === 0) {
+            loadScannerUniverseTickers();
+        }
     } else {
         if (titleEl) titleEl.textContent = 'Add Stock to Watchlist';
         if (subtitleEl) subtitleEl.textContent = 'Search by company name or ticker symbol with exchange disambiguation';
@@ -4843,23 +5089,43 @@ async function performStockSearch(query) {
                 const batchData = await batchResp.json();
                 const resolved = batchData.resolved || [];
                 if (resolved.length > 0) {
-                    const unadded = resolved.filter(r => !state.watchlistTickers.includes(r.ticker));
-                    const batchHeaderHtml = (stockSearchModalMode === 'watchlist' && unadded.length > 1) ? `
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: var(--radius-sm); margin-bottom: 8px;">
-                            <span style="font-size: 0.82rem; font-weight: 600; color: var(--accent-cyan);">${resolved.length} stocks resolved</span>
-                            <button type="button" class="btn-stock-search-add" onclick="handleAddBatchStocksModal(${JSON.stringify(unadded.map(u => u.ticker)).replace(/"/g, '&quot;')})">
-                                <i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
-                                <span>Add All (${unadded.length})</span>
-                            </button>
-                        </div>
-                    ` : '';
+                    const isUniMode = stockSearchModalMode === 'universe' || stockSearchModalMode === 'scanner';
+                    const inWatchlist = (t) => state.watchlistTickers.includes(t);
+                    const inUniverse = (t) => Boolean(state.scannerUniverseTickers && state.scannerUniverseTickers.has(t.toUpperCase()));
+
+                    const unaddedWatchlist = resolved.filter(r => !inWatchlist(r.ticker));
+                    const unaddedUniverse = resolved.filter(r => !inUniverse(r.ticker));
+
+                    let batchHeaderHtml = '';
+                    if (stockSearchModalMode === 'watchlist' && unaddedWatchlist.length > 1) {
+                        batchHeaderHtml = `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: var(--radius-sm); margin-bottom: 8px;">
+                                <span style="font-size: 0.82rem; font-weight: 600; color: var(--accent-cyan);">${resolved.length} stocks resolved</span>
+                                <button type="button" class="btn-stock-search-add" onclick="handleAddBatchStocksModal(${JSON.stringify(unaddedWatchlist.map(u => u.ticker)).replace(/"/g, '&quot;')})">
+                                    <i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
+                                    <span>Add All (${unaddedWatchlist.length})</span>
+                                </button>
+                            </div>
+                        `;
+                    } else if (isUniMode && unaddedUniverse.length > 1) {
+                        batchHeaderHtml = `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-sm); margin-bottom: 8px;">
+                                <span style="font-size: 0.82rem; font-weight: 600; color: var(--accent-blue);">${resolved.length} stocks resolved</span>
+                                <button type="button" class="btn-stock-search-add" onclick="handleAddBatchStocksUniverseModal(${JSON.stringify(unaddedUniverse.map(u => u.ticker)).replace(/"/g, '&quot;')})" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-color: transparent; color: #fff;">
+                                    <i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
+                                    <span>Add All to Universe (${unaddedUniverse.length})</span>
+                                </button>
+                            </div>
+                        `;
+                    }
 
                     resultsList.innerHTML = batchHeaderHtml + resolved.map(item => {
                         const ticker = escapeHtml(item.ticker);
                         const name = escapeHtml(item.name || item.ticker);
                         const exchange = escapeHtml(item.exchange || 'Global');
                         const type = escapeHtml(item.type || 'EQUITY');
-                        const isTracked = state.watchlistTickers.includes(item.ticker);
+                        const isTracked = inWatchlist(item.ticker);
+                        const isUni = inUniverse(item.ticker);
 
                         if (stockSearchModalMode === 'alert') {
                             return `
@@ -4902,6 +5168,36 @@ async function performStockSearch(query) {
                                             <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i>
                                             <span>Open Deep Dive</span>
                                         </button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        if (isUniMode) {
+                            return `
+                                <div class="stock-search-item">
+                                    <div class="stock-search-item-left">
+                                        <div class="stock-search-ticker-badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.35);">${ticker}</div>
+                                        <div class="stock-search-details">
+                                            <div class="stock-search-company-name" title="${name}">${name}</div>
+                                            <div class="stock-search-meta-row">
+                                                <span class="stock-search-tag exchange" title="Listing Exchange">${exchange}</span>
+                                                <span class="stock-search-tag type">${type}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        ${isUni ? `
+                                            <button type="button" class="btn-stock-search-add added" disabled>
+                                                <i data-lucide="check" style="width: 13px; height: 13px;"></i>
+                                                <span>In Universe</span>
+                                            </button>
+                                        ` : `
+                                            <button type="button" class="btn-stock-search-add" onclick="handleAddStockToUniverseFromModal('${ticker}', this)" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-color: transparent; color: #fff;">
+                                                <i data-lucide="plus" style="width: 13px; height: 13px;"></i>
+                                                <span>Add to Universe</span>
+                                            </button>
+                                        `}
                                     </div>
                                 </div>
                             `;
@@ -4975,6 +5271,8 @@ async function performStockSearch(query) {
                 const type = escapeHtml(item.type || 'EQUITY');
                 const sector = item.sector ? escapeHtml(item.sector) : '';
                 const isTracked = state.watchlistTickers.includes(item.ticker);
+                const isUni = Boolean(state.scannerUniverseTickers && state.scannerUniverseTickers.has(item.ticker.toUpperCase()));
+                const isUniMode = stockSearchModalMode === 'universe' || stockSearchModalMode === 'scanner';
 
                 if (stockSearchModalMode === 'alert') {
                     return `
@@ -5019,6 +5317,37 @@ async function performStockSearch(query) {
                                     <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i>
                                     <span>Open Deep Dive</span>
                                 </button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (isUniMode) {
+                    return `
+                        <div class="stock-search-item">
+                            <div class="stock-search-item-left">
+                                <div class="stock-search-ticker-badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.35);">${ticker}</div>
+                                <div class="stock-search-details">
+                                    <div class="stock-search-company-name" title="${name}">${name}</div>
+                                    <div class="stock-search-meta-row">
+                                        <span class="stock-search-tag exchange" title="Listing Exchange">${exchange}</span>
+                                        <span class="stock-search-tag type">${type}</span>
+                                        ${sector ? `<span class="stock-search-tag sector">${sector}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                ${isUni ? `
+                                    <button type="button" class="btn-stock-search-add added" disabled>
+                                        <i data-lucide="check" style="width: 13px; height: 13px;"></i>
+                                        <span>In Universe</span>
+                                    </button>
+                                ` : `
+                                    <button type="button" class="btn-stock-search-add" onclick="handleAddStockToUniverseFromModal('${ticker}', this)" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-color: transparent; color: #fff;">
+                                        <i data-lucide="plus" style="width: 13px; height: 13px;"></i>
+                                        <span>Add to Universe</span>
+                                    </button>
+                                `}
                             </div>
                         </div>
                     `;
@@ -5088,6 +5417,89 @@ async function handleAddStockFromModal(ticker, btnElement) {
         renderWatchlistTags();
         await saveWatchlistServer();
         await fetchWatchlistAnalysis();
+    }
+}
+
+async function handleAddStockToUniverseFromModal(ticker, btnElement) {
+    if (!ticker) return;
+    const cleanTicker = ticker.trim().toUpperCase();
+
+    if (btnElement) {
+        btnElement.disabled = true;
+        btnElement.innerHTML = `<div class="spinner-sm" style="width: 12px; height: 12px; border-width: 2px;"></div> <span>Adding...</span>`;
+    }
+
+    try {
+        const res = await fetch('/api/scanner/universe/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticker: cleanTicker })
+        });
+        const data = await res.json();
+
+        if (res.status === 409 || (!res.ok && data.message && data.message.includes('already in monitoring universe'))) {
+            if (state.scannerUniverseTickers) state.scannerUniverseTickers.add(cleanTicker);
+            showAddUniverseAlert(data.message || `Stock ${cleanTicker} is already in monitoring universe`, 'duplicate');
+            if (btnElement) {
+                btnElement.classList.add('added');
+                btnElement.disabled = true;
+                btnElement.innerHTML = `<i data-lucide="check" style="width: 13px; height: 13px;"></i> <span>In Universe</span>`;
+            }
+            return;
+        }
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || `Failed to add ${cleanTicker} to universe.`);
+        }
+
+        if (state.scannerUniverseTickers) state.scannerUniverseTickers.add(cleanTicker);
+
+        if (btnElement) {
+            btnElement.classList.add('added');
+            btnElement.disabled = true;
+            btnElement.innerHTML = `<i data-lucide="check" style="width: 13px; height: 13px;"></i> <span>In Universe</span>`;
+        }
+
+        if (data.totalUniverse) {
+            const uniCountBadge = document.getElementById('scanUniverseCountBadge');
+            const statUni = document.getElementById('scanStatUniverse');
+            if (uniCountBadge) uniCountBadge.textContent = `${data.totalUniverse} Stocks`;
+            if (statUni) statUni.textContent = `${data.totalUniverse} Assets`;
+        }
+
+        // Close the modal so the user can see the scanner page and the success alert.
+        // The new stock is queued for background analysis — it will appear after the next scan.
+        closeAddStockModal();
+
+        // Show the success alert on the now-visible scanner page.
+        showAddUniverseAlert(
+            `${data.message || `Added ${cleanTicker} to universe`} — it will appear in results after the next background scan.`,
+            'success'
+        );
+
+        // Clear any stale ticker search query so results render in full.
+        const searchInput = document.getElementById('scannerSearchQuery');
+        if (searchInput) searchInput.value = '';
+
+        // Immediately re-render existing results from memory — the new stock isn't in
+        // the opportunity cache yet, but the existing ones should display right away.
+        const currentOpps = state.allScannerOpportunities || state.scannerResults?.opportunities || [];
+        if (currentOpps.length > 0) {
+            renderScannerResults(currentOpps);
+        } else {
+            // Fallback: hit the server if local state is empty (e.g. cold-start edge case).
+            await silentRefreshScannerCache();
+        }
+
+    } catch (err) {
+        console.error('Add stock to universe error:', err);
+        showAddUniverseAlert(err.message || 'Error adding stock to universe', 'error');
+        if (btnElement) {
+            btnElement.disabled = false;
+            btnElement.innerHTML = `<i data-lucide="plus" style="width: 13px; height: 13px;"></i> <span>Add to Universe</span>`;
+        }
+    } finally {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 }
 
@@ -5374,6 +5786,31 @@ async function handleAddBatchStocksModal(tickersList) {
     }
 }
 
+async function handleAddBatchStocksUniverseModal(tickersList) {
+    if (!Array.isArray(tickersList) || tickersList.length === 0) return;
+    let addedCount = 0;
+    for (const tk of tickersList) {
+        const cleanTicker = String(tk || '').trim().toUpperCase();
+        if (!cleanTicker) continue;
+        try {
+            const res = await fetch('/api/scanner/universe/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ticker: cleanTicker })
+            });
+            if (res.ok) {
+                addedCount++;
+                if (state.scannerUniverseTickers) state.scannerUniverseTickers.add(cleanTicker);
+            }
+        } catch (e) {}
+    }
+    if (addedCount > 0) {
+        showAddUniverseAlert(`Added ${addedCount} stocks to monitoring universe.`, 'success');
+        closeAddStockModal();
+        await silentRefreshScannerCache();
+    }
+}
+
 function selectDeepDiveStock(ticker, event) {
     if (event) event.stopPropagation();
     const dropdown = document.getElementById('deepDiveSearchDropdown');
@@ -5420,134 +5857,644 @@ async function refreshWatchlistData() {
 }
 
 // =============================================================
-// AI QUANTITATIVE STOCK SCANNER & OPPORTUNITY DISCOVERY
-// =============================================================
+// Global scanner countdown timer ID
+let scannerCountdownTimerId = null;
 
 async function initScanner() {
     try {
         state.scannerViewMode = localStorage.getItem('findashiq_scanner_view') || 'cards';
         let cached = null;
-        const cachedRaw = localStorage.getItem('findashiq_scanner_cache');
-        if (cachedRaw) {
-            try {
-                cached = JSON.parse(cachedRaw);
-            } catch (e) { }
+
+        // 1. Fetch live precalculated state and timing from server warm cache (<5ms)
+        try {
+            const res = await fetch('/api/scanner/cached');
+            if (res.ok) {
+                const serverCached = await res.json();
+                if (serverCached && serverCached.opportunities) {
+                    cached = {
+                        timestamp: new Date(serverCached.timestamp || Date.now()).getTime(),
+                        criteria: serverCached.criteria || {},
+                        results: serverCached
+                    };
+                    try {
+                        localStorage.setItem('findashiq_scanner_cache', JSON.stringify(cached));
+                    } catch (e) { }
+                }
+            }
+        } catch (e) {
+            console.warn('Could not fetch server scanner cache:', e);
         }
 
-        // If local cache is empty, attempt to fetch server disk cache from /api/scanner/cached
+        // 2. Fallback to localStorage cache if server was unreachable
         if (!cached || !cached.results || !cached.results.opportunities || cached.results.opportunities.length === 0) {
-            try {
-                const res = await fetch('/api/scanner/cached');
-                if (res.ok) {
-                    const serverCached = await res.json();
-                    if (serverCached && serverCached.opportunities) {
-                        cached = {
-                            timestamp: new Date(serverCached.timestamp || Date.now()).getTime(),
-                            criteria: serverCached.criteria || {},
-                            results: serverCached
-                        };
-                        try {
-                            localStorage.setItem('findashiq_scanner_cache', JSON.stringify(cached));
-                        } catch (e) { }
-                    }
-                }
-            } catch (e) { }
+            const cachedRaw = localStorage.getItem('findashiq_scanner_cache');
+            if (cachedRaw) {
+                try {
+                    cached = JSON.parse(cachedRaw);
+                } catch (e) { }
+            }
         }
 
         if (cached && cached.results && cached.results.opportunities) {
             state.scannerResults = cached.results;
+            state.allScannerOpportunities = cached.results.opportunities || [];
 
-            // Restore form criteria if saved
+            // Restore form criteria if saved (ensure minConviction defaults to 85)
             if (cached.criteria) {
                 const c = cached.criteria;
+                const mkt = document.getElementById('scannerSelectMarket');
+                const strat = document.getElementById('scannerSelectStrategy');
+                const etf = document.getElementById('scannerSelectEtfBasket');
                 const sec = document.getElementById('scannerSelectSector');
                 const thm = document.getElementById('scannerSelectTheme');
-                const cap = document.getElementById('scannerSelectMarketCap');
                 const cnv = document.getElementById('scannerSelectMinConviction');
+                if (mkt && c.market) mkt.value = c.market;
+                if (strat && c.strategy) strat.value = c.strategy;
+                if (etf && c.etfBasket) etf.value = c.etfBasket;
                 if (sec && c.sector) sec.value = c.sector;
                 if (thm && c.theme) thm.value = c.theme;
-                if (cap && c.marketCap) cap.value = c.marketCap;
-                if (cnv && c.minConviction) cnv.value = c.minConviction;
+                if (cnv && c.minConviction && c.minConviction !== '50') cnv.value = c.minConviction;
             }
 
-            // Update summary metrics instantly
+            // Sync timing display & countdown
+            updateScannerTimingDisplay(cached.results);
+
+            // Sync admin-only controls (Force Update & Interval selector)
+            syncScannerAdminControls(cached.results);
+
+            // Update summary metrics for universe size
             const statUni = document.getElementById('scanStatUniverse');
-            const statOpp = document.getElementById('scanStatOpportunities');
-            const statConv = document.getElementById('scanStatTopConviction');
-            const statTimestamp = document.getElementById('scanStatTimestamp');
-            const topBadge = document.getElementById('topScannerBadge');
+            const uniCountBadge = document.getElementById('scanUniverseCountBadge');
 
-            const opps = cached.results.opportunities || [];
-            if (statUni) statUni.textContent = `${cached.results.totalUniverseScanned || 35} Assets`;
-            if (statOpp) statOpp.textContent = `${opps.length} Found`;
-            if (statConv) statConv.textContent = opps.length > 0 ? `${opps[0].convictionScore}%` : '--%';
+            const totalUni = cached.results.totalUniverseScanned || cached.results.totalUniverse || (cached.results.opportunities || []).length;
+            if (statUni) statUni.textContent = `${totalUni} Assets`;
+            if (uniCountBadge) uniCountBadge.textContent = `${totalUni} Stocks`;
 
-            const ageMinutes = Math.floor((Date.now() - (cached.timestamp || Date.now())) / 60000);
-            const timeText = ageMinutes <= 1 ? 'Just now' : (ageMinutes < 60 ? `${ageMinutes}m ago` : `${Math.floor(ageMinutes / 60)}h ago`);
-            if (statTimestamp) statTimestamp.textContent = `Cached (${timeText})`;
-            if (topBadge) topBadge.textContent = `${opps.length} Setups`;
+            if (cached.results.universeTickers && Array.isArray(cached.results.universeTickers)) {
+                state.scannerUniverseTickers = new Set(cached.results.universeTickers.map(t => t.toUpperCase()));
+            } else if (!state.scannerUniverseTickers || state.scannerUniverseTickers.size === 0) {
+                loadScannerUniverseTickers();
+            }
 
-            renderScannerResults(opps);
+            // Execute fast in-memory filter according to active criteria (defaults to minConviction >= 85%)
+            await handleRunScanner(false, 100, true);
         }
     } catch (e) {
-        console.warn('Error restoring scanner cache:', e);
+        console.warn('Error initializing scanner:', e);
     }
 }
 
-async function handleRunScanner(forceRefresh = false) {
-    const btn = document.getElementById('btnRunScanner');
-    const btnForce = document.getElementById('btnForceScannerRefresh');
-    const resultsGrid = document.getElementById('scannerResultsGrid');
-
-    const sector = document.getElementById('scannerSelectSector')?.value || 'all';
-    const theme = document.getElementById('scannerSelectTheme')?.value || 'all';
-    const marketCap = document.getElementById('scannerSelectMarketCap')?.value || 'all';
-    const minConviction = parseInt(document.getElementById('scannerSelectMinConviction')?.value || '50', 10);
-    const excludeWatchlist = document.getElementById('scanCheckExcludeWatchlist')?.checked ?? true;
-
-    const requiredIndicators = [];
-    if (document.getElementById('scanCheckSuperTrend')?.checked) requiredIndicators.push('supertrend_bullish');
-    if (document.getElementById('scanCheckRSI')?.checked) requiredIndicators.push('rsi_oversold_bounce');
-    if (document.getElementById('scanCheckCMF')?.checked) requiredIndicators.push('cmf_accumulation');
-    if (document.getElementById('scanCheckVWAP')?.checked) requiredIndicators.push('price_above_vwap');
-    if (document.getElementById('scanCheckMACD')?.checked) requiredIndicators.push('macd_bullish');
-
-    if (forceRefresh) {
-        if (btnForce) {
-            btnForce.disabled = true;
-            btnForce.innerHTML = `<div class="spinner" style="width: 12px; height: 12px; border-width: 2px; margin-right: 4px;"></div> <span>Updating...</span>`;
+async function loadScannerUniverseTickers() {
+    try {
+        const res = await fetch('/api/scanner/universe');
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.data) {
+                const items = data.data.items || [];
+                state.scannerUniverseTickers = new Set(items.map(it => (it.ticker || '').toUpperCase()));
+                if (data.data.tickers && Array.isArray(data.data.tickers)) {
+                    data.data.tickers.forEach(t => state.scannerUniverseTickers.add(t.toUpperCase()));
+                }
+                const uniCountBadge = document.getElementById('scanUniverseCountBadge');
+                const statUni = document.getElementById('scanStatUniverse');
+                if (uniCountBadge && data.data.totalUniverse) {
+                    uniCountBadge.textContent = `${data.data.totalUniverse} Stocks`;
+                }
+                if (statUni && data.data.totalUniverse) {
+                    statUni.textContent = `${data.data.totalUniverse} Assets`;
+                }
+            }
         }
+    } catch (e) {
+        console.warn('Failed to fetch scanner universe tickers:', e);
+    }
+}
+
+function setScannerSyncStatus(status, text) {
+    const el = document.getElementById('scannerSyncStatusText');
+    const dot = document.getElementById('scannerSyncDot');
+    const badge = document.getElementById('scannerSyncBadge');
+    if (!el) return;
+
+    el.textContent = text;
+    if (badge) {
+        badge.className = `sync-status-badge ${status}`;
+    }
+    if (dot) {
+        dot.className = `sync-status-dot ${status}`;
+    }
+}
+
+function formatScannerLocalTime(epochOrIso) {
+    if (!epochOrIso) return null;
+    let date;
+    if (typeof epochOrIso === 'number') {
+        // Handle seconds or milliseconds epoch
+        const ms = epochOrIso > 1e11 ? epochOrIso : epochOrIso * 1000;
+        date = new Date(ms);
     } else {
+        date = new Date(epochOrIso);
+    }
+    if (isNaN(date.getTime())) return null;
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+}
+
+function updateScannerTimingDisplay(data) {
+    if (!data) return;
+    const lastScanEl = document.getElementById('scannerLiveLastScan');
+    const nextScanEl = document.getElementById('scannerLiveNextScan');
+    const statTimestamp = document.getElementById('scanStatTimestamp');
+    const scanningBadge = document.getElementById('scannerScanningBadge');
+    const syncBadge = document.getElementById('scannerSyncBadge');
+
+    // Resolve epoch timestamps (UTC seconds) to format in user's local timezone
+    const lastEpoch = data.lastScanEpoch || data.timestamp_epoch || state.scannerResults?.lastScanEpoch || state.scannerResults?.timestamp_epoch;
+    const nextEpoch = data.nextScanEpoch || state.scannerResults?.nextScanEpoch;
+
+    let userTz = 'Local Timezone';
+    try {
+        if (typeof Intl !== 'undefined' && Intl.DateTimeFormat) {
+            userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Local Timezone';
+        }
+    } catch (e) { }
+
+    const lastTime = (lastEpoch ? formatScannerLocalTime(lastEpoch) : null) || data.lastScanTime || state.scannerResults?.lastScanTime || 'Initial';
+    const nextTime = (nextEpoch ? formatScannerLocalTime(nextEpoch) : null) || data.nextScanTime || state.scannerResults?.nextScanTime || 'Pending';
+
+    if (lastScanEl) lastScanEl.textContent = lastTime;
+    if (nextScanEl) nextScanEl.textContent = nextTime;
+    if (statTimestamp) {
+        statTimestamp.textContent = `Last: ${lastTime} • Next: ${nextTime}`;
+        statTimestamp.title = `Times formatted in your local browser timezone (${userTz})`;
+    }
+
+    if (data.isScanning) {
+        if (scanningBadge) scanningBadge.style.display = 'inline-flex';
+        if (syncBadge) syncBadge.style.display = 'none';
+        setScannerSyncStatus('syncing', 'Scanning in progress...');
+    } else {
+        if (scanningBadge) scanningBadge.style.display = 'none';
+        if (syncBadge) syncBadge.style.display = 'inline-flex';
+        setScannerSyncStatus('synced', 'Live & Synced');
+    }
+
+    // Start live countdown timer to nextScanEpoch
+    const targetEpoch = data.nextScanEpoch || state.scannerResults?.nextScanEpoch;
+    if (targetEpoch) {
+        startScannerCountdown(targetEpoch);
+    } else if (data.nextScanInSeconds || state.scannerResults?.nextScanInSeconds) {
+        const sec = data.nextScanInSeconds || state.scannerResults?.nextScanInSeconds;
+        startScannerCountdown((Date.now() / 1000) + sec);
+    }
+}
+
+let isScannerPollingRefresh = false;
+
+function startScannerCountdown(nextScanEpoch) {
+    if (scannerCountdownTimerId) {
+        clearInterval(scannerCountdownTimerId);
+        scannerCountdownTimerId = null;
+    }
+
+    const countdownEl = document.getElementById('scannerCountdownTimer');
+    if (!countdownEl || !nextScanEpoch || nextScanEpoch <= 0) {
+        if (countdownEl) countdownEl.textContent = '';
+        return;
+    }
+
+    let pollCounter = 0;
+
+    const updateTimer = () => {
+        const nowSec = Date.now() / 1000;
+        const diff = Math.floor(nextScanEpoch - nowSec);
+
+        if (diff <= 0) {
+            // Background scan is due or currently computing on the server
+            countdownEl.textContent = '(Updating...)';
+            setScannerSyncStatus('syncing', 'Scanning in progress...');
+
+            // Poll every 4 seconds until the server publishes the updated scan results
+            pollCounter++;
+            if (pollCounter === 1 || pollCounter % 4 === 0) {
+                if (!isScannerPollingRefresh) {
+                    isScannerPollingRefresh = true;
+                    silentRefreshScannerCache().finally(() => {
+                        isScannerPollingRefresh = false;
+                    });
+                }
+            }
+            return;
+        }
+
+        // Active future countdown
+        pollCounter = 0;
+        const mins = Math.floor(diff / 60);
+        const secs = diff % 60;
+        countdownEl.textContent = `(in ${mins}m ${secs < 10 ? '0' : ''}${secs}s)`;
+    };
+
+    updateTimer();
+    scannerCountdownTimerId = setInterval(updateTimer, 1000);
+}
+
+async function silentRefreshScannerCache() {
+    try {
+        const res = await fetch('/api/scanner/cached');
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.opportunities) {
+                if (data.universeTickers && Array.isArray(data.universeTickers)) {
+                    state.scannerUniverseTickers = new Set(data.universeTickers.map(t => t.toUpperCase()));
+                }
+
+                updateScannerTimingDisplay(data);
+                syncScannerAdminControls(data);
+
+                // Update summary metrics for universe size
+                const statUni = document.getElementById('scanStatUniverse');
+                const uniCountBadge = document.getElementById('scanUniverseCountBadge');
+                const totalUni = data.totalUniverseScanned || data.totalUniverse || (data.opportunities || []).length;
+                if (statUni) statUni.textContent = `${totalUni} Assets`;
+                if (uniCountBadge) uniCountBadge.textContent = `${totalUni} Stocks`;
+
+                // Re-evaluate opportunities against active criteria (conviction, market, strategy, etc.)
+                await handleRunScanner(false, 100, true);
+            }
+        }
+    } catch (e) {
+        console.warn('[Scanner] Silent refresh error:', e);
+    }
+}
+
+// Background sync & tab visibility listeners
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        if (state.activeTopTab === 'scanner') {
+            silentRefreshScannerCache();
+        }
+    }
+});
+
+// Periodic heartbeat: every 30s ensure timing and cache are synchronized
+setInterval(() => {
+    if (state.activeTopTab === 'scanner') {
+        const nowSec = Date.now() / 1000;
+        const nextEpoch = state.scannerResults?.nextScanEpoch || 0;
+        if (nowSec >= nextEpoch - 5 || !scannerCountdownTimerId) {
+            silentRefreshScannerCache();
+        }
+    }
+}, 30000);
+
+function syncScannerAdminControls(data) {
+    const isAdmin = state.user ? (state.user.role === 'admin') : Boolean(data?.isAdmin);
+    const btnForce = document.getElementById('btnForceScannerRefresh');
+    const intervalGroup = document.getElementById('adminScannerIntervalGroup');
+    const intervalSelect = document.getElementById('adminSelectScanInterval');
+
+    if (btnForce) btnForce.style.display = isAdmin ? 'inline-flex' : 'none';
+    if (intervalGroup) intervalGroup.style.display = isAdmin ? 'inline-flex' : 'none';
+
+    const intervalMins = data?.scanIntervalMinutes || state.scannerResults?.scanIntervalMinutes;
+    if (intervalSelect && intervalMins) {
+        intervalSelect.value = String(intervalMins);
+    }
+}
+
+async function handleAdminForceUpdate() {
+    const btn = document.getElementById('btnForceScannerRefresh');
+    const scanningBadge = document.getElementById('scannerScanningBadge');
+    const syncBadge = document.getElementById('scannerSyncBadge');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<div class="spinner" style="width: 12px; height: 12px; border-width: 2px; margin-right: 4px;"></div> <span>Triggering...</span>`;
+    }
+    if (scanningBadge) scanningBadge.style.display = 'inline-flex';
+    if (syncBadge) syncBadge.style.display = 'none';
+    setScannerSyncStatus('syncing', 'Scanning in progress...');
+
+    try {
+        const res = await fetch('/api/scanner/force-update', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || 'Failed to trigger background scan.');
+        }
+
+        showAddUniverseAlert('Background scan started, fresh data will be ready in ~5s.', 'info');
+
+        // Smooth non-blocking poll until scan completes
+        let attempts = 0;
+        const pollInterval = setInterval(async () => {
+            attempts++;
+            try {
+                const sRes = await fetch('/api/scanner/status');
+                if (sRes.ok) {
+                    const status = await sRes.json();
+                    if (!status.isScanning || attempts > 15) {
+                        clearInterval(pollInterval);
+                        if (scanningBadge) scanningBadge.style.display = 'none';
+                        if (syncBadge) syncBadge.style.display = 'inline-flex';
+                        setScannerSyncStatus('synced', 'Live & Synced');
+                        await initScanner();
+                        showAddUniverseAlert('Background scan completed! Fresh market data is live.', 'success');
+                    }
+                }
+            } catch (e) {
+                clearInterval(pollInterval);
+            }
+        }, 1500);
+
+    } catch (err) {
+        console.error('Force update error:', err);
+        showAddUniverseAlert(err.message, 'error');
+        if (scanningBadge) scanningBadge.style.display = 'none';
+        if (syncBadge) syncBadge.style.display = 'inline-flex';
+        setScannerSyncStatus('synced', 'Live & Synced');
+    } finally {
         if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = `<div class="spinner" style="width: 14px; height: 14px; border-width: 2px; margin-right: 4px;"></div> <span>Scanning...</span>`;
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> <span>Force Update</span>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+}
+
+async function handleAdminChangeInterval(minutes) {
+    try {
+        const res = await fetch('/api/scanner/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ intervalMinutes: parseInt(minutes, 10) })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || 'Failed to update scan interval.');
+        }
+
+        const formattedInterval = `${minutes} min`;
+        const localNextTime = data.nextScanEpoch ? formatScannerLocalTime(data.nextScanEpoch) : (data.nextScanTime || 'scheduled');
+        showAddUniverseAlert(`Scan interval updated to ${formattedInterval}. Next background scan: ${localNextTime}.`, 'success');
+
+        // Update local scanner state
+        if (!state.scannerResults) {
+            state.scannerResults = {};
+        }
+        state.scannerResults.scanIntervalMinutes = data.intervalMinutes || parseInt(minutes, 10);
+        if (data.nextScanTime) state.scannerResults.nextScanTime = data.nextScanTime;
+        if (data.lastScanTime) state.scannerResults.lastScanTime = data.lastScanTime;
+        if (data.nextScanEpoch) state.scannerResults.nextScanEpoch = data.nextScanEpoch;
+        if (data.lastScanEpoch) state.scannerResults.lastScanEpoch = data.lastScanEpoch;
+        if (data.nextScanInSeconds !== undefined) state.scannerResults.nextScanInSeconds = data.nextScanInSeconds;
+
+        // Persist updated timings to localStorage cache
+        try {
+            const cachedRaw = localStorage.getItem('findashiq_scanner_cache');
+            if (cachedRaw) {
+                const cached = JSON.parse(cachedRaw);
+                if (cached && cached.results) {
+                    if (data.nextScanTime) cached.results.nextScanTime = data.nextScanTime;
+                    if (data.lastScanTime) cached.results.lastScanTime = data.lastScanTime;
+                    if (data.nextScanEpoch) cached.results.nextScanEpoch = data.nextScanEpoch;
+                    if (data.lastScanEpoch) cached.results.lastScanEpoch = data.lastScanEpoch;
+                    if (data.nextScanInSeconds !== undefined) cached.results.nextScanInSeconds = data.nextScanInSeconds;
+                    cached.results.scanIntervalMinutes = state.scannerResults.scanIntervalMinutes;
+                    localStorage.setItem('findashiq_scanner_cache', JSON.stringify(cached));
+                }
+            }
+        } catch (e) { }
+
+        // Immediately refresh the Last Scan / Next Due display & live countdown timer
+        updateScannerTimingDisplay({
+            ...state.scannerResults,
+            ...data
+        });
+    } catch (e) {
+        console.error('Failed to change scan interval:', e);
+        showAddUniverseAlert(e.message, 'error');
+    }
+}
+
+function showAddUniverseAlert(message, type = 'success') {
+    const box = document.getElementById('addUniverseAlertBox');
+    if (!box) return;
+    box.style.display = 'flex';
+
+    if (type === 'error' || type === 'duplicate') {
+        box.style.background = 'rgba(239, 68, 68, 0.12)';
+        box.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+        box.style.color = '#f87171';
+        box.innerHTML = `<i data-lucide="alert-triangle" style="width: 16px; height: 16px; flex-shrink: 0;"></i> <span>${message}</span>`;
+    } else if (type === 'info') {
+        box.style.background = 'rgba(59, 130, 246, 0.12)';
+        box.style.border = '1px solid rgba(59, 130, 246, 0.3)';
+        box.style.color = '#60a5fa';
+        box.innerHTML = `<i data-lucide="info" style="width: 16px; height: 16px; flex-shrink: 0;"></i> <span>${message}</span>`;
+    } else {
+        box.style.background = 'rgba(16, 185, 129, 0.12)';
+        box.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+        box.style.color = '#34d399';
+        box.innerHTML = `<i data-lucide="check-circle-2" style="width: 16px; height: 16px; flex-shrink: 0;"></i> <span>${message}</span>`;
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    setTimeout(() => {
+        if (box) box.style.display = 'none';
+    }, 6500);
+}
+
+async function handleAddStockToUniverse(tickerParam) {
+    let ticker = tickerParam;
+    if (!ticker) {
+        const input = document.getElementById('inputAddStockUniverse');
+        if (input && input.value.trim()) {
+            ticker = input.value.trim().toUpperCase();
         }
     }
 
-    if (resultsGrid) {
-        resultsGrid.innerHTML = `
-            <div class="glass-card" style="grid-column: 1 / -1; padding: 48px; text-align: center; color: var(--text-muted);">
-                <div class="spinner" style="margin: 0 auto 16px auto;"></div>
-                <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary);">Scanning Thematic &amp; Ecological Markets...</div>
-                <div style="font-size: 0.82rem; margin-top: 6px; color: var(--text-secondary);">
-                    Executing multi-factor indicator validation, CMF capital flow checks, and AI Buy target generation...
-                </div>
-            </div>
-        `;
+    if (!ticker) {
+        openAddStockModal('universe');
+        return;
+    }
+
+    const btn = document.getElementById('btnAddStockUniverse') || document.getElementById('btnOpenAddUniverseModal');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<div class="spinner" style="width: 12px; height: 12px; border-width: 2px;"></div> <span>Adding...</span>`;
     }
 
     try {
+        const res = await fetch('/api/scanner/universe/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ticker })
+        });
+        const data = await res.json();
+
+        if (res.status === 409 || (!res.ok && data.message && data.message.includes('already in monitoring universe'))) {
+            if (state.scannerUniverseTickers) state.scannerUniverseTickers.add(ticker);
+            showAddUniverseAlert(data.message || `Stock ${ticker} is already in monitoring universe`, 'duplicate');
+            return;
+        }
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || `Failed to add ${ticker} to universe.`);
+        }
+
+        if (state.scannerUniverseTickers) state.scannerUniverseTickers.add(ticker);
+        showAddUniverseAlert(data.message || `Added stock ${ticker} to universe`, 'success');
+        const input = document.getElementById('inputAddStockUniverse');
+        if (input) input.value = '';
+
+        if (data.totalUniverse) {
+            const uniCountBadge = document.getElementById('scanUniverseCountBadge');
+            const statUni = document.getElementById('scanStatUniverse');
+            if (uniCountBadge) uniCountBadge.textContent = `${data.totalUniverse} Stocks`;
+            if (statUni) statUni.textContent = `${data.totalUniverse} Assets`;
+        }
+
+        // Set search query to the newly added ticker so the user immediately locates it!
+        const searchInput = document.getElementById('scannerSearchQuery');
+        if (searchInput) {
+            searchInput.value = ticker;
+            setTimeout(async () => {
+                await silentRefreshScannerCache();
+                handleScannerSearchFilter(ticker);
+            }, 1800);
+        }
+
+    } catch (err) {
+        console.error('Add stock error:', err);
+        showAddUniverseAlert(err.message, 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="plus-circle" style="width: 15px; height: 15px;"></i> <span>Add Stock to Universe</span>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    }
+}
+
+function handleScannerSearchFilter(query) {
+    const cleanQuery = (query || '').trim().toLowerCase();
+    const clearBtn = document.getElementById('btnClearScannerSearch');
+    if (clearBtn) clearBtn.style.display = cleanQuery ? 'block' : 'none';
+
+    const allOpps = state.allScannerOpportunities || state.scannerResults?.opportunities || [];
+    if (!cleanQuery) {
+        renderScannerResults(allOpps);
+        return;
+    }
+
+    const filtered = allOpps.filter(opp => {
+        const t = (opp.ticker || '').toLowerCase();
+        const n = (opp.name || '').toLowerCase();
+        const s = (opp.sector || '').toLowerCase();
+        const m = (opp.market || '').toLowerCase();
+        const cat = (opp.viralCatalyst?.headline || '').toLowerCase();
+        const thesis = (opp.aiThesis || '').toLowerCase();
+
+        return t.includes(cleanQuery) || n.includes(cleanQuery) || s.includes(cleanQuery) || 
+               m.includes(cleanQuery) || cat.includes(cleanQuery) || thesis.includes(cleanQuery);
+    });
+
+    renderScannerResults(filtered);
+}
+
+function clearScannerSearch() {
+    const input = document.getElementById('scannerSearchQuery');
+    if (input) input.value = '';
+    handleScannerSearchFilter('');
+}
+
+function handleScannerFilterChange(source) {
+    const mkt = document.getElementById('scannerSelectMarket');
+    const strat = document.getElementById('scannerSelectStrategy');
+    const etf = document.getElementById('scannerSelectEtfBasket');
+
+    // Harmonize conflicting dropdowns
+    if (source === 'etf' && etf && etf.value !== 'all') {
+        if (mkt) mkt.value = 'all';
+    } else if (source === 'market' && mkt && mkt.value !== 'all') {
+        if (etf && etf.value !== 'all') {
+            etf.value = 'all';
+        }
+    }
+
+    handleRunScanner(false, 100);
+}
+
+function resetScannerFilters() {
+    const mkt = document.getElementById('scannerSelectMarket');
+    const strat = document.getElementById('scannerSelectStrategy');
+    const etf = document.getElementById('scannerSelectEtfBasket');
+    const sec = document.getElementById('scannerSelectSector');
+    const thm = document.getElementById('scannerSelectTheme');
+    const cnv = document.getElementById('scannerSelectMinConviction');
+    const chkWl = document.getElementById('scanCheckExcludeWatchlist');
+    const searchInput = document.getElementById('scannerSearchQuery');
+
+    if (chkWl) chkWl.checked = true;
+    if (sec) sec.value = 'all';
+    if (thm) thm.value = 'all';
+    if (mkt) mkt.value = 'all';
+    if (strat) strat.value = 'all';
+    if (etf) etf.value = 'all';
+    if (cnv) cnv.value = '85';
+    if (searchInput) searchInput.value = '';
+
+    handleRunScanner(false, 100);
+}
+
+function applyScannerPreset(presetKey) {
+    resetScannerFilters();
+}
+
+async function handleRunScanner(forceRefresh = false, customLimit = null, silent = false) {
+    const btn = document.getElementById('btnRunScanner');
+    const market = document.getElementById('scannerSelectMarket')?.value || 'all';
+    const strategy = document.getElementById('scannerSelectStrategy')?.value || 'all';
+    const etfBasket = document.getElementById('scannerSelectEtfBasket')?.value || 'all';
+    const sector = document.getElementById('scannerSelectSector')?.value || 'all';
+    const theme = document.getElementById('scannerSelectTheme')?.value || 'all';
+    const marketCap = 'all';
+    const minConviction = parseInt(document.getElementById('scannerSelectMinConviction')?.value || '85', 10);
+    const excludeWatchlist = document.getElementById('scanCheckExcludeWatchlist')?.checked ?? true;
+
+    const limit = customLimit || 100;
+    const requiredIndicators = [];
+
+    const grid = document.getElementById('scannerResultsGrid');
+    const tableWrap = document.getElementById('scannerTableWrapper');
+
+    if (!silent) {
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner" style="width: 14px; height: 14px; border-width: 2px; margin-right: 4px;"></div> <span>Filtering...</span>`;
+        }
+        if (grid) grid.style.transition = 'opacity 0.2s ease';
+        if (tableWrap) tableWrap.style.transition = 'opacity 0.2s ease';
+        if (grid) grid.style.opacity = '0.5';
+        if (tableWrap) tableWrap.style.opacity = '0.5';
+    }
+
+    try {
+        // Fast in-memory query to backend (<10ms)
         const res = await fetch('/api/scanner/run', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                market,
+                strategy,
+                etfBasket,
                 sector,
                 theme,
                 marketCap,
                 minConviction,
                 excludeWatchlist,
                 requiredIndicators,
-                forceRefresh
+                forceRefresh: false,
+                limit: limit
             })
         });
 
@@ -5556,109 +6503,63 @@ async function handleRunScanner(forceRefresh = false) {
             throw new Error(data.error || 'Failed to execute market scan.');
         }
 
-        state.scannerResults = data;
+        if (limit && data.opportunities && data.opportunities.length > limit) {
+            data.opportunities = data.opportunities.slice(0, limit);
+        }
 
-        // Persist to localStorage for instant 0ms restoration on future page loads
+        state.scannerResults = data;
+        state.allScannerOpportunities = data.opportunities || [];
+
         try {
             localStorage.setItem('findashiq_scanner_cache', JSON.stringify({
                 timestamp: Date.now(),
                 results: data,
-                criteria: { sector, theme, marketCap, minConviction }
+                criteria: { market, strategy, etfBasket, sector, theme, marketCap, minConviction, limit }
             }));
         } catch (e) { }
 
-        // Update stats
+        // Update stats aligned with actual matching opportunities
         const statUni = document.getElementById('scanStatUniverse');
         const statOpp = document.getElementById('scanStatOpportunities');
         const statConv = document.getElementById('scanStatTopConviction');
-        const statTimestamp = document.getElementById('scanStatTimestamp');
+        const subBadge = document.getElementById('scanResultsSubBadge');
+        const uniCountBadge = document.getElementById('scanUniverseCountBadge');
         const topBadge = document.getElementById('topScannerBadge');
 
         const opps = data.opportunities || [];
-        if (statUni) statUni.textContent = `${data.totalUniverseScanned || 0} Assets`;
-        if (statOpp) statOpp.textContent = `${opps.length} Found`;
+        const totalUni = data.totalUniverseScanned || data.totalUniverse || 0;
+        const matchingCount = typeof data.opportunitiesCount === 'number' ? data.opportunitiesCount : opps.length;
+        if (statUni) statUni.textContent = `${totalUni} Assets`;
+        if (uniCountBadge) uniCountBadge.textContent = `${totalUni} Stocks`;
+        if (statOpp) statOpp.textContent = `${matchingCount} Found`;
         if (statConv) statConv.textContent = opps.length > 0 ? `${opps[0].convictionScore}%` : '--%';
-        if (statTimestamp) statTimestamp.textContent = 'Cached (Just now)';
-        if (topBadge) topBadge.textContent = `${opps.length} Setups`;
+        if (subBadge) subBadge.textContent = `${matchingCount} Setups`;
+        if (topBadge) topBadge.textContent = `${matchingCount} Stock${matchingCount === 1 ? '' : 's'}`;
 
-        renderScannerResults(opps);
+        updateScannerTimingDisplay(data);
+        syncScannerAdminControls(data);
+
+        // Apply recommendation search query if user typed something
+        const searchInput = document.getElementById('scannerSearchQuery');
+        if (searchInput && searchInput.value.trim()) {
+            handleScannerSearchFilter(searchInput.value);
+        } else {
+            renderScannerResults(opps);
+        }
 
     } catch (err) {
-        console.error('Scanner error:', err);
-        if (resultsGrid) {
-            resultsGrid.innerHTML = `
-                <div class="glass-card" style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--accent-red);">
-                    <div style="font-size: 1.5rem; margin-bottom: 8px;">⚠️</div>
-                    <div style="font-weight: 700;">Scanner Error</div>
-                    <div style="font-size: 0.82rem; margin-top: 4px; color: var(--text-secondary);">${err.message || 'Failed to complete market scan.'}</div>
-                </div>
-            `;
-        }
+        console.error('Scanner filter error:', err);
     } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = `<i data-lucide="sparkles" style="width: 17px; height: 17px;"></i> <span>Run Scan</span>`;
+        if (!silent) {
+            if (grid) grid.style.opacity = '1';
+            if (tableWrap) tableWrap.style.opacity = '1';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="sparkles" style="width: 17px; height: 17px;"></i> <span>Run Scan</span>`;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
         }
-        if (btnForce) {
-            btnForce.disabled = false;
-            btnForce.innerHTML = `<i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> <span>Force Update</span>`;
-        }
-        lucide.createIcons();
     }
-}
-
-function applyScannerPreset(presetKey) {
-    document.querySelectorAll('.scanner-preset-chip').forEach(chip => {
-        chip.classList.toggle('active', chip.getAttribute('onclick')?.includes(`'${presetKey}'`));
-    });
-
-    const sec = document.getElementById('scannerSelectSector');
-    const thm = document.getElementById('scannerSelectTheme');
-    const cnv = document.getElementById('scannerSelectMinConviction');
-    const cap = document.getElementById('scannerSelectMarketCap');
-    const chkSt = document.getElementById('scanCheckSuperTrend');
-    const chkRsi = document.getElementById('scanCheckRSI');
-    const chkCmf = document.getElementById('scanCheckCMF');
-    const chkVwap = document.getElementById('scanCheckVWAP');
-    const chkMacd = document.getElementById('scanCheckMACD');
-
-    if (chkSt) chkSt.checked = false;
-    if (chkRsi) chkRsi.checked = false;
-    if (chkCmf) chkCmf.checked = false;
-    if (chkVwap) chkVwap.checked = false;
-    if (chkMacd) chkMacd.checked = false;
-    if (cap) cap.value = 'all';
-
-    if (presetKey === 'eco') {
-        if (thm) thm.value = 'eco_esg';
-        if (sec) sec.value = 'all';
-        if (cnv) cnv.value = '50';
-    } else if (presetKey === 'ai') {
-        if (thm) thm.value = 'ai_deeptech';
-        if (sec) sec.value = 'all';
-        if (cnv) cnv.value = '50';
-    } else if (presetKey === 'cmf') {
-        if (thm) thm.value = 'all';
-        if (sec) sec.value = 'all';
-        if (chkCmf) chkCmf.checked = true;
-        if (cnv) cnv.value = '50';
-    } else if (presetKey === 'supertrend') {
-        if (thm) thm.value = 'all';
-        if (sec) sec.value = 'all';
-        if (chkSt) chkSt.checked = true;
-        if (cnv) cnv.value = '50';
-    } else if (presetKey === 'dip') {
-        if (thm) thm.value = 'all';
-        if (sec) sec.value = 'all';
-        if (chkRsi) chkRsi.checked = true;
-        if (cnv) cnv.value = '50';
-    } else {
-        if (thm) thm.value = 'all';
-        if (sec) sec.value = 'all';
-        if (cnv) cnv.value = '50';
-    }
-
-    handleRunScanner(false);
 }
 
 function setScannerViewMode(mode) {
@@ -5675,8 +6576,14 @@ function setScannerViewMode(mode) {
         btnTable.classList.toggle('active', cleanMode === 'table');
     }
 
-    const oppList = state.scannerResults?.opportunities || [];
-    renderScannerResults(oppList);
+    const searchInput = document.getElementById('scannerSearchQuery');
+    const q = (searchInput?.value || '').trim();
+    if (q) {
+        handleScannerSearchFilter(q);
+    } else {
+        const oppList = state.allScannerOpportunities || state.scannerResults?.opportunities || [];
+        renderScannerResults(oppList);
+    }
 }
 
 // =============================================================
@@ -5784,7 +6691,7 @@ function setupScannerTableRowDragAndDrop(row, ticker) {
 
     row.addEventListener('dragend', () => {
         row.classList.remove('is-table-dragging', 'drag-over-top', 'drag-over-bottom');
-        document.querySelectorAll('.scanner-table-row').forEach(r => {
+        document.querySelectorAll('.scanner-table tbody tr').forEach(r => {
             r.classList.remove('is-table-dragging', 'drag-over-top', 'drag-over-bottom');
         });
         scannerDragState.draggedTicker = null;
@@ -5793,7 +6700,6 @@ function setupScannerTableRowDragAndDrop(row, ticker) {
 }
 
 function reorderScannerOpportunities(draggedTicker, targetTicker, isAfter) {
-    if (!draggedTicker || !targetTicker || draggedTicker === targetTicker) return;
     const oppList = state.scannerResults?.opportunities;
     if (!Array.isArray(oppList)) return;
 
@@ -5834,12 +6740,27 @@ function renderScannerResults(opportunities) {
     const btnCards = document.getElementById('btnScannerViewCards');
     const btnTable = document.getElementById('btnScannerViewTable');
     const subBadge = document.getElementById('scanResultsSubBadge');
+    const topBadge = document.getElementById('topScannerBadge');
     if (btnCards && btnTable) {
         btnCards.classList.toggle('active', viewMode === 'cards');
         btnTable.classList.toggle('active', viewMode === 'table');
     }
     if (subBadge) {
-        subBadge.textContent = `${oppList.length} Setups`;
+        const searchInput = document.getElementById('scannerSearchQuery');
+        const q = (searchInput?.value || '').trim();
+        const totalCount = (state.allScannerOpportunities || state.scannerResults?.opportunities || []).length;
+        if (q && totalCount > 0) {
+            subBadge.textContent = `Showing ${oppList.length} of ${totalCount} opportunities`;
+        } else {
+            subBadge.textContent = `${oppList.length} Setups`;
+        }
+    }
+    if (topBadge) {
+        topBadge.textContent = `${oppList.length} Stock${oppList.length === 1 ? '' : 's'}`;
+    }
+    const statOpp = document.getElementById('scanStatOpportunities');
+    if (statOpp) {
+        statOpp.textContent = `${oppList.length} Found`;
     }
 
     const cardsGrid = document.getElementById('scannerResultsGrid');
@@ -5865,21 +6786,38 @@ function renderScannerCards(oppList) {
     grid.innerHTML = '';
 
     if (!oppList || oppList.length === 0) {
+        const searchInput = document.getElementById('scannerSearchQuery');
+        const isSearch = searchInput && searchInput.value.trim().length > 0;
         grid.innerHTML = `
             <div class="glass-card" style="grid-column: 1 / -1; padding: 48px 20px; text-align: center; color: var(--text-muted);">
                 <div style="font-size: 2rem; margin-bottom: 8px;">🔍</div>
-                <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">No Opportunities Matched Current Filters</div>
+                <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">${isSearch ? 'No Opportunities Matched Search Query' : 'No Opportunities Matched Current Filters'}</div>
                 <div style="font-size: 0.82rem; margin-top: 4px; color: var(--text-secondary); max-width: 480px; margin: 6px auto 16px auto;">
-                    Try lowering the Minimum AI Conviction threshold, clearing specific technical signal requirements, or unchecking "Exclude Watchlist".
+                    ${isSearch ? `No assets matching "${escapeHtml(searchInput.value)}" found in current scan recommendations.` : 'Try lowering the Minimum AI Conviction threshold, choosing a broader Regional Market, or unchecking "Exclude Watchlist".'}
                 </div>
+                ${isSearch ? `
+                    <button type="button" class="btn-scanner-run" style="margin: 0 auto; display: inline-flex;" onclick="clearScannerSearch()">
+                        <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                        <span>Clear Search Query</span>
+                    </button>
+                ` : `
+                    <button type="button" class="btn-scanner-run" style="margin: 0 auto; display: inline-flex;" onclick="resetScannerFilters()">
+                        <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+                        <span>Reset All Filters &amp; Show All</span>
+                    </button>
+                `}
             </div>
         `;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
         return;
     }
 
     oppList.forEach(item => {
         const card = document.createElement('div');
         card.className = 'scanner-card';
+        if (item.viralCatalyst) {
+            card.classList.add('has-viral-catalyst');
+        }
         setupScannerCardDragAndDrop(card, item.ticker);
 
         const isBullish = (item.changePercent || 0) >= 0;
@@ -5906,6 +6844,16 @@ function renderScannerCards(oppList) {
         const vwapDisplay = item.vwap ? formatPrice(item.vwap, instCurr, baseCurr) : '--';
         const isAlreadyInWatchlist = state.watchlistTickers.includes(item.ticker);
 
+        const marketBadgeMap = {
+            'us': '🏛️ US',
+            'europe': '🏰 Europe',
+            'asia': '🌏 Asia-Pac',
+            'emerging': '⚡ Emerging',
+            'clean_energy': '🌿 Clean Energy',
+            'global_etfs': '📊 ETF'
+        };
+        const mktBadgeText = marketBadgeMap[item.market] || '🌐 Global';
+
         const compName = getAssetCompanyName(item.ticker, item);
         card.innerHTML = `
             <div class="scanner-card-header">
@@ -5918,22 +6866,45 @@ function renderScannerCards(oppList) {
                         <span class="badge-pill ${item.badgeClass || 'badge-neutral'} scanner-bias-badge">
                             ${item.directionalBias || 'Neutral'}
                         </span>
+                        ${item.viralCatalyst ? `
+                        <div class="catalyst-indicator-wrapper" onmouseenter="positionCatalystPopover(this)" onclick="handleScannerCatalystClick('${item.ticker}', event)" title="View Catalyst News">
+                            <span class="catalyst-dot-pulse" aria-label="Market Catalyst Active"></span>
+                            <div class="catalyst-hover-popover">
+                                <div class="popover-cat-header">
+                                    <span class="popover-cat-tag">${item.viralCatalyst.catalystType || '🔥 Catalyst'}</span>
+                                    <span class="popover-cat-vol mono">${item.viralCatalyst.volRatio || ''}</span>
+                                </div>
+                                <div class="popover-cat-headline">${escapeHtml(item.viralCatalyst.headline || '')}</div>
+                                ${item.viralCatalyst.summary ? `<div class="popover-cat-summary">${escapeHtml(item.viralCatalyst.summary)}</div>` : ''}
+                                <div class="popover-cat-footer">
+                                    <span>${escapeHtml(item.viralCatalyst.publisher || 'Wire')} • ${escapeHtml(item.viralCatalyst.time || 'Active')}</span>
+                                    <button type="button" class="popover-cat-btn" onclick="handleScannerCatalystClick('${item.ticker}', event)" title="Open Full News Story">
+                                        <span>View News</span>
+                                        <i data-lucide="external-link" style="width: 10px; height: 10px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
                     <div class="scanner-card-name" title="${compName}">${compName}</div>
                 </div>
 
                 <div class="scanner-card-badges">
                     <span class="badge-pill badge-neutral" style="font-size: 0.68rem; padding: 2px 6px;">
+                        ${mktBadgeText}
+                    </span>
+                    <span class="badge-pill badge-neutral" style="font-size: 0.68rem; padding: 2px 6px;">
                         ${item.sector || 'Equities'}
                     </span>
-                    ${item.ecoBadge ? `
-                    <span class="badge-pill" style="font-size: 0.66rem; padding: 1px 6px; background: rgba(16, 185, 129, 0.12); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.25);">
-                        ${item.ecoBadge}
+                    ${item.parentETF ? `
+                    <span class="badge-pill" style="font-size: 0.66rem; padding: 1px 6px; background: rgba(59, 130, 246, 0.12); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.25);">
+                        ${item.parentETF}
                     </span>` : ''}
                 </div>
             </div>
 
-            <!-- Price & Sparkline Area -->
+            <!-- Price & AI Conviction Area -->
             <div class="scanner-card-price-row">
                 <div>
                     <span style="font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Live Quote</span>
@@ -5994,13 +6965,13 @@ function renderScannerCards(oppList) {
                 </div>
             </div>
 
-            <!-- AI Thesis & ESG Catalyst -->
+            <!-- AI Thesis & Strategy Match -->
             <div class="scanner-thesis-box">
-                <div style="font-weight: 700; font-size: 0.72rem; color: var(--accent-green); text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+                <div class="scanner-thesis-header">
                     <i data-lucide="brain" style="width: 12px; height: 12px;"></i>
-                    <span>AI Thesis &amp; Preference Match</span>
+                    <span>AI Thesis &amp; Strategy Confluence</span>
                 </div>
-                <div>${item.aiThesis}</div>
+                <div class="scanner-thesis-content">${item.aiThesis}</div>
             </div>
 
             <!-- Action Buttons -->
@@ -6011,15 +6982,14 @@ function renderScannerCards(oppList) {
                         <span>In Watchlist</span>
                     </button>
                 ` : `
-                    <button type="button" class="btn-scanner-add-wl" onclick="addScannedStockToWatchlist('${item.ticker}', this)">
+                    <button type="button" class="btn-scanner-add-wl" onclick="addTickerFromScanner('${item.ticker}')">
                         <i data-lucide="plus-circle" style="width: 13px; height: 13px;"></i>
-                        <span>+ Add to Watchlist</span>
+                        <span>Add to Watchlist</span>
                     </button>
                 `}
-
-                <button type="button" class="btn-scanner-deepdive" onclick="openStockDeepDive('${item.ticker}')">
-                    <i data-lucide="search" style="width: 13px; height: 13px;"></i>
-                    <span>Deep-Dive &rarr;</span>
+                <button type="button" class="btn-scanner-deepdive" onclick="openStockDeepDive('${item.ticker}')" title="Deep Dive ${item.ticker}">
+                    <i data-lucide="line-chart" style="width: 13px; height: 13px;"></i>
+                    <span>Deep Dive</span>
                 </button>
             </div>
         `;
@@ -6035,17 +7005,31 @@ function renderScannerTable(oppList) {
     tbody.innerHTML = '';
 
     if (!oppList || oppList.length === 0) {
+        const searchInput = document.getElementById('scannerSearchQuery');
+        const isSearch = searchInput && searchInput.value.trim().length > 0;
         tbody.innerHTML = `
             <tr>
                 <td colspan="13" style="text-align: center; padding: 48px; color: var(--text-muted);">
                     <div style="font-size: 1.8rem; margin-bottom: 8px;">🔍</div>
-                    <div style="font-weight: 700; color: var(--text-primary);">No Opportunities Matched Current Filters</div>
-                    <div style="font-size: 0.8rem; margin-top: 4px; color: var(--text-secondary);">
-                        Try adjusting your scanner filter criteria or running a fresh scan.
+                    <div style="font-weight: 700; color: var(--text-primary);">${isSearch ? 'No Opportunities Matched Search Query' : 'No Opportunities Matched Current Filters'}</div>
+                    <div style="font-size: 0.8rem; margin-top: 4px; margin-bottom: 16px; color: var(--text-secondary);">
+                        ${isSearch ? `No assets matching "${escapeHtml(searchInput.value)}" found in current scan recommendations.` : 'Try adjusting your scanner filter criteria or running a fresh scan.'}
                     </div>
+                    ${isSearch ? `
+                        <button type="button" class="btn-scanner-run" style="margin: 0 auto; display: inline-flex;" onclick="clearScannerSearch()">
+                            <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                            <span>Clear Search Query</span>
+                        </button>
+                    ` : `
+                        <button type="button" class="btn-scanner-run" style="margin: 0 auto; display: inline-flex;" onclick="resetScannerFilters()">
+                            <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+                            <span>Reset All Filters &amp; Show All</span>
+                        </button>
+                    `}
                 </td>
             </tr>
         `;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
         return;
     }
 
@@ -6078,7 +7062,7 @@ function renderScannerTable(oppList) {
         const isAlreadyInWatchlist = state.watchlistTickers.includes(item.ticker);
 
         const compName = getAssetCompanyName(item.ticker, item);
-        const sparklineMini = generateTableSparkline(item.timeseries || [], isBullish);
+        const sixMonthHtml = formatTablePeriodChange(item.timeseries || []);
 
         tr.innerHTML = `
             <td class="col-sticky-drag" style="width: 32px; padding: 12px 4px 12px 12px; text-align: center;">
@@ -6088,10 +7072,7 @@ function renderScannerTable(oppList) {
             </td>
             <td class="col-sticky-asset">
                 <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0;">
-                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                        <span class="watchlist-table-ticker">${item.ticker}</span>
-                        ${item.ecoBadge ? `<span class="badge-pill" style="font-size: 0.65rem; padding: 1px 5px; background: rgba(16, 185, 129, 0.12); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.25);">${item.ecoBadge}</span>` : ''}
-                    </div>
+                    <span class="watchlist-table-ticker">${item.ticker}</span>
                     <span class="watchlist-table-name" title="${compName}">${compName}</span>
                     <span class="watchlist-table-sector">${item.sector || 'Equities'}</span>
                 </div>
@@ -6105,7 +7086,7 @@ function renderScannerTable(oppList) {
                 </span>
             </td>
             <td style="text-align: center;">
-                <div style="display: flex; justify-content: center;">${sparklineMini}</div>
+                ${sixMonthHtml}
             </td>
             <td style="text-align: center;">
                 <span class="badge-pill ${item.superTrend === 'bullish' ? 'badge-bullish' : 'badge-bearish'}" style="font-size: 0.72rem; padding: 2px 7px;">
@@ -6119,34 +7100,40 @@ function renderScannerTable(oppList) {
                 <span class="mono" style="font-weight: 600; font-size: 0.82rem; color: ${item.cmf > 0.05 ? 'var(--accent-green)' : (item.cmf < -0.05 ? 'var(--accent-red)' : 'var(--text-muted)')};">${cmfDisplay}</span>
             </td>
             <td style="text-align: center;">
-                <span class="mono" style="font-size: 0.82rem; color: var(--text-secondary);">${vwapDisplay}</span>
-            </td>
-            <td style="text-align: center;">
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
                     <span class="mono" style="font-weight: 800; font-size: 0.88rem; color: ${item.stanceColor || 'var(--accent-green)'};">${item.convictionScore ?? 50}%</span>
                     <span class="badge-pill ${item.badgeClass || 'badge-neutral'}" style="font-size: 0.65rem; padding: 1px 6px;">${item.directionalBias || 'Neutral'}</span>
                 </div>
             </td>
-            <td style="font-size: 0.75rem;">
-                <div style="display: flex; flex-direction: column; gap: 2px; min-width: 170px;">
-                    <div><span style="color: var(--text-muted);">Entry:</span> <strong class="mono" style="color: var(--text-primary);">${matrixEntry}</strong></div>
-                    <div style="display: flex; gap: 8px; font-size: 0.72rem;">
-                        <span style="color: var(--accent-red);">SL: ${matrixStop}</span>
-                        <span style="color: var(--accent-green);">TP: ${matrixTP1}</span>
+            <td style="text-align: center;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;" title="Entry: ${matrixEntry}&#10;Stop Loss: ${matrixStop}&#10;Take Profit: ${matrixTP1}&#10;Risk/Reward: ${matrix.riskRewardRatio || '2.5:1'}">
+                    <span class="badge-pill" style="font-size: 0.72rem; padding: 2px 7px; background: rgba(6, 182, 212, 0.12); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.3); font-weight: 700; font-family: 'JetBrains Mono', monospace; cursor: help;">
+                        ${matrix.riskRewardRatio || '2.5:1'}
+                    </span>
+                    <div style="font-size: 0.68rem; color: var(--text-muted); display: flex; gap: 3px;" class="mono">
+                        <span style="color: var(--accent-red);" title="Stop Loss">${matrixStop}</span>/<span style="color: var(--accent-green);" title="Take Profit">${matrixTP1}</span>
                     </div>
-                    <div style="font-size: 0.7rem; color: var(--accent-cyan); font-weight: 700;">R/R: ${matrix.riskRewardRatio || '2.5:1'}</div>
                 </div>
             </td>
             <td style="font-size: 0.75rem; color: var(--text-secondary); max-width: 220px;">
-                <div style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.35;" title="${escapeHtml(item.aiThesis || '')}">
-                    ${item.aiThesis || '--'}
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    ${item.viralCatalyst ? `
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <span class="badge-pill clickable" style="font-size: 0.63rem; padding: 1px 6px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(239, 68, 68, 0.22)); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); cursor: pointer; display: inline-flex; align-items: center; gap: 3px;" onclick="handleScannerCatalystClick('${item.ticker}', event)" title="Click to view news: ${escapeHtml(item.viralCatalyst.headline)}">
+                            <span>${item.viralCatalyst.catalystType || '🔥 Catalyst'}</span>
+                            <i data-lucide="external-link" style="width: 8px; height: 8px;"></i>
+                        </span>
+                    </div>` : ''}
+                    <div style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.35;" title="${escapeHtml(item.aiThesis || '')}">
+                        ${item.aiThesis || '--'}
+                    </div>
                 </div>
             </td>
             <td style="text-align: center;">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
-                    <button type="button" class="btn-table-action" onclick="openStockDeepDive('${item.ticker}')" title="Deep-Dive Single Stock Analysis">
+                    <button type="button" class="btn-table-action" onclick="openStockDeepDive('${item.ticker}')" title="Deep Dive Analysis">
                         <i data-lucide="arrow-right-circle" style="width: 14px; height: 14px;"></i>
-                        <span>Analyze</span>
+                        <span>Deep Dive</span>
                     </button>
                     ${isAlreadyInWatchlist ? `
                         <button type="button" class="btn-table-action in-watchlist" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: var(--accent-green);" disabled title="Already in Watchlist">

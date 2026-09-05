@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108540.1874962,
+  "ticker": "GS",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "AI isn’t eating software after all — and the sector’s ‘epic’ rally could run through October",
+      "summary": "Months of panic that AI would replace subscription software are easing after a strong week of software earnings.",
+      "url": "https://www.marketwatch.com/story/ai-isnt-eating-software-after-all-and-the-sectors-epic-rally-could-run-through-october-a4610583?mod=mw_rss_topstories",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "",
+      "timestamp": 1788108540,
+      "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Goldman draws 3 lessons from economic research on U.S. inflation expectations",
+      "summary": "",
+      "url": "https://finance.yahoo.com/economy/policy/articles/goldman-draws-3-lessons-economic-131527730.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-29-26 09:15AM",
+      "timestamp": 1788108540,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Owner Bets Goldman Sachs Can Validate the AI Agent Model for Every Local Business",
+      "summary": "",
+      "url": "https://finance.yahoo.com/small-business/articles/owner-bets-goldman-sachs-validate-092915332.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "05:29AM",
+      "timestamp": 1788108540,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Goldman Sachs Sees Trouble for Marvell Stock Rally",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/goldman-sachs-sees-trouble-marvell-141730730.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:17AM",
+      "timestamp": 1788108540,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Goldman Sachs Crypto: Bank Raises Coinbase Target Despite Crypto Volume Slump",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/d779b6fc-ace7-3dc5-bdae-55081de7ef90/goldman-sachs-crypto%3A-bank.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "07:50AM",
+      "timestamp": 1788108540,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108550.7737703,
+  "ticker": "COST",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Costco Stock's Premium Rests On A Visit Rate That Keeps Slowing",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/fd848bf6-b8dd-3924-88e9-b69f6e804d5b/costco-stock%27s-premium-rests.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 04:58PM",
+      "timestamp": 1788108551,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Healthcare CEO partnering with Costco outlines Medicare offerings",
+      "summary": "",
+      "url": "https://finance.yahoo.com/video/healthcare-ceo-partnering-costco-outlines-212351893.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 05:23PM",
+      "timestamp": 1788108551,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Target Stock Falls 5% After Retailer Pulls Controversial Halloween Costume",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/target-stock-falls-5-retailer-122122360.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:21AM",
+      "timestamp": 1788108551,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Costco fights customers tariff suit as refunds flow in",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/438613e8-1660-3648-963f-f02ba039ec7e/costco-fights-customer%E2%80%99s.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "11:51AM",
+      "timestamp": 1788108551,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Michael Burry Says LULU Stock Is Screaming Cheap While Apple Shares Are Permacostly Like Costco",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/4ea5bec1-3f31-31aa-ac33-906e07885d7e/michael-burry-says-lulu-stock.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:32AM",
+      "timestamp": 1788108551,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

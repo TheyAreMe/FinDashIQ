@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108537.8893867,
+  "ticker": "JPM",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "JPMorgan remains positive on equities, sees rotation driving further gains",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/e688e2b0-f504-3e4a-b51e-65305e79d3e1/jpmorgan-remains-positive-on.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Today 11:09AM",
+      "timestamp": 1788108538,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "JPMorgan eases lending restrictions in push for tech wealth clients FT",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/38b20680-d3e2-374e-bbd3-45359dfcea09/jpmorgan-eases-lending.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-29-26 09:54AM",
+      "timestamp": 1788108538,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "JPMorgan Prices One Fed Formula at 61% of Quarterly Profit",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/jpmorgan-prices-one-fed-formula-191644184.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 03:16PM",
+      "timestamp": 1788108538,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "JPMorgan Flags Big Risk Ahead of IREN Earnings",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/ai/articles/jpmorgan-flags-big-risk-ahead-190400992.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:04PM",
+      "timestamp": 1788108538,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "How Much Hyperscaler Debt Can the Markets Absorb? Top JPMorgan Bond Banker Responds.",
+      "summary": "",
+      "url": "https://finance.yahoo.com/video/much-hyperscaler-debt-markets-absorb-095707158.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "05:57AM",
+      "timestamp": 1788108538,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

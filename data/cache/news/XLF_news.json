@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108594.816378,
+  "ticker": "XLF",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Financials- On an 11-Week Win Streak, and Still Looking Solid",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/financials-11-week-win-streak-050100378.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-18-26 01:01AM",
+      "timestamp": 1788108595,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Investors are rotating into financial stocks. The Fed's next move could determine how far the rally runs.",
+      "summary": "",
+      "url": "https://www.marketwatch.com/story/investors-are-rotating-into-financial-stocks-the-feds-next-move-could-determine-how-far-the-rally-runs-662c63df?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-02-26 08:00AM",
+      "timestamp": 1788108595,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Financial stocks are crushing it. These charts show why the 'breakout' rally may have just begun.",
+      "summary": "",
+      "url": "https://www.marketwatch.com/story/financial-stocks-are-crushing-it-these-charts-show-why-the-breakout-rally-may-have-just-begun-6db3cc12?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:00AM",
+      "timestamp": 1788108595,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Financial Sector ETF Hits Record High on Fintech Gains",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/financial-sector-etf-hits-record-174105097.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-28-26 01:41PM",
+      "timestamp": 1788108595,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is XLF's New High A Quiet Warning?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/098a3eb2-f4d4-3824-881e-cd0f9af9d776/is-xlf%27s-new-high-a-quiet.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-15-26 08:30AM",
+      "timestamp": 1788108595,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109669.8804352,
+  "ticker": "TJX",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Ross Stores Beats TJX and Burlington to Become Star of Off-Price Retailers",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/ross-stores-tjx-burlington-earnings-stocks-c9067bfb?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:10PM",
+      "timestamp": 1788109670,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Jefferies cuts TJX to Hold as Marmaxx stumbles and Ross pulls ahead",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/jefferies-cuts-tjx-hold-marmaxx-142618794.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:26AM",
+      "timestamp": 1788109670,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "TJX beats Q2 expectations despite self-inflicted apparel slump",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/fcb9a2ad-f570-3fc4-a86d-bd060204e370/tjx-beats-q2-expectations.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "07:02AM",
+      "timestamp": 1788109670,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "TJX cut at Citi as disappointing Marmaxx comp shows off-price isnt immune",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/tjx-cut-citi-disappointing-marmaxx-141742146.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:17AM",
+      "timestamp": 1788109670,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Etsy upgraded, TJX downgraded: Wall Street's top analyst calls",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/cigna-downgraded-humana-upgraded-wall-134340274.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:38AM",
+      "timestamp": 1788109670,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

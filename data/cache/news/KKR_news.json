@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109651.2257795,
+  "ticker": "KKR",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "KKR's $250 Million Fine Lands Outside Its Funds",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/kkrs-250-million-fine-lands-180041101.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 02:00PM",
+      "timestamp": 1788109651,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "KKR Hit With $250 Million Penalty Over Antitrust Violations (UPDATED)",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/0b1d6372-146e-3a88-9df5-a79dfd14d782/kkr-hit-with-%24250-million.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-27-26 03:19PM",
+      "timestamp": 1788109651,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "KKR to Pay Record Settlement in Premerger-Filings Case",
+      "summary": "",
+      "url": "https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-08-27-2026/card/kkr-to-pay-record-settlement-in-premerger-filings-case-goJg2dsQfnLhF13WLxKS?mod=wsj_FV",
+      "publisher": "Wall Street Journal",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:19AM",
+      "timestamp": 1788109651,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Enbridge and KKR Announce New Joint Venture to Support Investment in the Westcoast Pipeline System in BC",
+      "summary": "",
+      "url": "/news/386061/enbridge-and-kkr-announce-new-joint-venture-to-support-investment-in-the-westcoast-pipeline-system-in-bc",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "07:00AM",
+      "timestamp": 1788109651,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "SK Telecom Launches AI Data Center Infrastructure Company 'SK Horizon' and Secures Investments from KKR and IMM",
+      "summary": "",
+      "url": "/news/386016/sk-telecom-launches-ai-data-center-infrastructure-company-sk-horizon-and-secures-investments-from-kkr-and-imm",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "05:50AM",
+      "timestamp": 1788109651,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109741.5525568,
+  "ticker": "VWO",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "South Korean stocks weren't a big deal in your emerging-markets fund. Artificial intelligence changed that.",
+      "summary": "",
+      "url": "https://www.marketwatch.com/story/south-korean-stocks-werent-a-big-deal-in-your-emerging-markets-fund-artificial-intelligence-changed-that-21308089?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-20-26 10:37AM",
+      "timestamp": 1788109742,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "A Top Emerging Market ETF Has a Big Advantage: South Korea",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/korea-stocks-memory-chips-emerging-market-etf-1b866f4c?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "May-19-26 02:35PM",
+      "timestamp": 1788109742,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Should Emerging Market ETFs Play a Bigger Role in Your Portfolio?",
+      "summary": "",
+      "url": "/news/325410/should-emerging-market-etfs-play-a-bigger-role-in-your-portfolio",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Feb-27-26 11:07AM",
+      "timestamp": 1788109742,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Japan, Emerging Markets ETFs Attract Fresh Inflows Amid Trump's Tariff Surprise",
+      "summary": "",
+      "url": "/news/320800/japan-emerging-markets-etfs-attract-fresh-inflows-amid-trumps-tariff-surprise",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Feb-24-26 02:31PM",
+      "timestamp": 1788109742,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "VWO Soared 31.3% While SPY Managed Just 13.9%",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/5745a415-ebfe-3c8a-830e-d7aa7ef5e4a9/vwo-soared-31.3%25-while-spy.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Feb-10-26 08:16AM",
+      "timestamp": 1788109742,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

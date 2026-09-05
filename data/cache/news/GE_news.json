@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108555.8847597,
+  "ticker": "GE",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "GE Vernova swipes Rivian CFO",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/90fbd4ec-e9fc-36da-a370-b1ccbac5539d/ge-vernova-swipes-rivian-cfo.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 10:15AM",
+      "timestamp": 1788108556,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is GE Stock Priced For A 40% Rally Or A 30% Drop?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/12fc793e-b740-3201-94ef-58c17ccaae9f/is-ge-stock-priced-for-a-40%25.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-26-26 09:08AM",
+      "timestamp": 1788108556,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Is GE Stock Worth Its Steep Peer Premium?",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/f63f47dc-0838-3fab-be74-543009caac1e/is-ge-stock-worth-its-steep.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-25-26 01:35PM",
+      "timestamp": 1788108556,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "GE Aerospace Stock Is Priced For A Margin Repair That Has Not Happened Yet",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/6f89a866-6fe7-331e-b42c-bac796dc7efd/ge-aerospace-stock-is-priced.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-20-26 12:35PM",
+      "timestamp": 1788108556,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Honeywell Aerospace Stock Has Fallen Far Enough. Morgan Stanley Says It's Time to Buy.",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/honeywell-aerospace-stock-morgan-stanley-d7855d56?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:45AM",
+      "timestamp": 1788108556,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

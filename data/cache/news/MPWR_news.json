@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109568.4305587,
+  "ticker": "MPWR",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Monolithic Power Systems Inc. stock underperforms Friday when compared to competitors",
+      "summary": "",
+      "url": "https://www.marketwatch.com/data-news/monolithic-power-systems-inc-stock-underperforms-friday-when-compared-to-competitors-8a178bc7-b313254b0602?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-28-26 04:30PM",
+      "timestamp": 1788109568,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Did Monolithic Power Systems, Inc. Insiders Breach their Fiduciary Duties to Shareholders?",
+      "summary": "",
+      "url": "/news/382586/did-monolithic-power-systems-inc-insiders-breach-their-fiduciary-duties-to-shareholders",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-17-26 01:41AM",
+      "timestamp": 1788109568,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Bull of the Day: Monolithic Power Systems (MPWR)",
+      "summary": "",
+      "url": "/news/382242/bull-of-the-day-monolithic-power-systems-mpwr",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-14-26 05:00AM",
+      "timestamp": 1788109568,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Monolithic Power Systems Inc. stock outperforms competitors on strong trading day",
+      "summary": "",
+      "url": "https://www.marketwatch.com/data-news/monolithic-power-systems-inc-stock-outperforms-competitors-on-strong-trading-day-e18c451f-cc1700b9c210?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-31-26 04:30PM",
+      "timestamp": 1788109568,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Monolithic Power Stock Jumps 9.1% as AI Revenue Explodes",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/monolithic-power-stock-jumps-9-194438713.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "03:44PM",
+      "timestamp": 1788109568,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

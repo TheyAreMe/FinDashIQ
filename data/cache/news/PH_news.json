@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109666.4252253,
+  "ticker": "PH",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Parker Declares Quarterly Cash Dividend",
+      "summary": "",
+      "url": "/news/384406/parker-declares-quarterly-cash-dividend",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-20-26 06:00PM",
+      "timestamp": 1788109666,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Top Stock Reports for Walt Disney, Parker-Hannifin &amp; Occidental Petroleum",
+      "summary": "",
+      "url": "/news/383026/top-stock-reports-for-walt-disney-parker-hannifin-occidental-petroleum",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-17-26 04:54PM",
+      "timestamp": 1788109666,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Buy, Sell, or Hold These 4 Dividend Kings After Earnings: BDX, ED, EMR, PH",
+      "summary": "",
+      "url": "/news/381983/buy-sell-or-hold-these-4-dividend-kings-after-earnings-bdx-ed-emr-ph",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-13-26 02:44PM",
+      "timestamp": 1788109666,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Parker Completes Acquisition of Filtration Group Corporation",
+      "summary": "",
+      "url": "/news/381870/parker-completes-acquisition-of-filtration-group-corporation",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:01AM",
+      "timestamp": 1788109666,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Parker Hannifin Corp (PH) (Q4 2026) Earnings Call Highlights: Record Sales Surpass $20 Billion, ...",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/parker-hannifin-corp-ph-q4-230351363.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-06-26 07:03PM",
+      "timestamp": 1788109666,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

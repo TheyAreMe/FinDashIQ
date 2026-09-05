@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108582.7752326,
+  "ticker": "UL",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Unilever, McCormick to put Colmans up for sale",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/61ff9c5f-a0ca-3a3c-9a05-53083e6c8ba7/unilever%2C-mccormick-to-put.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "10:52AM",
+      "timestamp": 1788108583,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Death of the consumer conglomerate? Unilever bets less is more",
+      "summary": "",
+      "url": "https://finance.yahoo.com/video/death-consumer-conglomerate-unilever-bets-103424269.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:34AM",
+      "timestamp": 1788108583,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "With shackles off after Unilever split, Magnum Ice Cream takes new approach to innovation",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/e77a1945-2558-3a61-885e-01cccc27d504/with-%E2%80%98shackles-off%E2%80%99-after.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-24-26 05:00AM",
+      "timestamp": 1788108583,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Popular Ice Cream Brand Sold at Walmart Files for Bankruptcy",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/popular-ice-cream-brand-sold-200212515.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-17-26 04:02PM",
+      "timestamp": 1788108583,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "They aint got no soul: How a Ben &amp; Jerrys cofounder became his own companys biggest critic",
+      "summary": "",
+      "url": "https://finance.yahoo.com/small-business/articles/ain-t-got-no-soul-110622867.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-07-26 07:06AM",
+      "timestamp": 1788108583,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

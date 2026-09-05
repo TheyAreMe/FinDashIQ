@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788109659.6398878,
+  "ticker": "LIN",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Linde Stock Barely Moved While Its Order Book Hit A Record",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/8ee88285-d909-3fdd-b46b-7a5a13a779fc/linde-stock-barely-moved.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-03-26 05:27PM",
+      "timestamp": 1788109660,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Linde PLC (LIN) (Q2 2026) Earnings Call Highlights: Record Sales and EPS Amid Margin Pressures",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/linde-plc-lin-q2-2026-210027398.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-31-26 05:00PM",
+      "timestamp": 1788109660,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Linde plc Q2 2026 Earnings Call Summary",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/c971fc56-e103-3ac8-950f-7dc63f87f0cb/linde-plc-q2-2026-earnings.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "01:07PM",
+      "timestamp": 1788109660,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Linde: Q2 Earnings Snapshot",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/linde-q2-earnings-snapshot-130615116.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "09:06AM",
+      "timestamp": 1788109660,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Linde quarterly sales rise 9%, plans to invest $1 bln in Phoenix chip expansion",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/linde-quarterly-sales-rise-9-102038428.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "06:20AM",
+      "timestamp": 1788109660,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

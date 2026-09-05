@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108597.7361398,
+  "ticker": "EEM",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Time to Rethink Emerging Market Winners. Why a Broad Index Won't Cut It.",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/emerging-markets-investing-tech-stock-concentration-risk-818d8a8f?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jul-15-26 01:30AM",
+      "timestamp": 1788108598,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "South Koreas stock rally shifts focus to potential MSCI market upgrade",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/south-korea-stock-rally-shifts-014947207.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Jun-13-26 09:49PM",
+      "timestamp": 1788108598,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Sam Altman's Brother Calls QQQ A 'Tough Hurdle To Beat' But AI Is Fueling A New ETF Winner In 2026",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/3ec94b53-6d94-336a-8ffb-9a3e5082ef22/sam-altman%27s-brother-calls.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "May-27-26 03:00AM",
+      "timestamp": 1788108598,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "4 Active ETFs to Ride India's Comeback",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/india-stock-market-etfs-5519a3f7?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "May-20-26 02:00AM",
+      "timestamp": 1788108598,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Why emerging markets could lead global equities in 2H",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/world-indices/articles/why-emerging-markets-could-lead-004443338.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "May-15-26 08:44PM",
+      "timestamp": 1788108598,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

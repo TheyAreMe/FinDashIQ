@@ -146,6 +146,10 @@ class StockService:
 
         return clean_t
 
+    def fetch_company_name(self, ticker_symbol: str) -> str:
+        """Resolves the company name for a given ticker symbol using cached maps and fast lookups."""
+        return self._resolve_company_name(ticker_symbol, {})
+
     @staticmethod
     def get_stock_profile(ticker_obj, ticker_symbol: str, skip_info_scrape: bool = True) -> dict:
         """Extracts key fundamental metrics and company profile information using lightweight fast_info."""
@@ -1240,6 +1244,88 @@ class StockService:
             'isFastHydration': True,
             'timestamp': datetime.now().isoformat()
         }
+
+    def calculate_indicators_from_df(self, df: pd.DataFrame, ticker: str, company_name: str = '') -> tuple[list[dict], dict, dict]:
+        """
+        Fast in-memory calculator converting a raw OHLCV DataFrame into full technical timeseries,
+        oscillator signals, and current financial profile in <1ms without disk I/O.
+        """
+        if df is None or df.empty or 'Close' not in df.columns or len(df) < 5:
+            return [], {}, {}
+
+        try:
+            enriched_df = self.calculate_technical_indicators(df.copy())
+            if enriched_df.empty:
+                return [], {}, {}
+
+            last_row = enriched_df.iloc[-1]
+            prev_row = enriched_df.iloc[-2] if len(enriched_df) > 1 else last_row
+
+            curr_price = round(float(last_row.get('Close', 0.0)), 2)
+            prev_price = round(float(prev_row.get('Close', curr_price)), 2)
+            change = round(curr_price - prev_price, 2)
+            change_percent = round((change / prev_price * 100) if prev_price > 0 else 0.0, 2)
+
+            resolved_name = company_name or self._resolve_company_name(ticker, {})
+            currency = 'EUR' if ('.DE' in ticker or '.PA' in ticker or '.AS' in ticker) else ('NOK' if '.OL' in ticker else ('SEK' if '.ST' in ticker else ('JPY' if '.T' in ticker else 'USD')))
+
+            vol_val = int(last_row.get('Volume', 0)) if not pd.isna(last_row.get('Volume')) else 0
+            avg_vol_val = int(last_row.get('Volume_SMA20', vol_val)) if not pd.isna(last_row.get('Volume_SMA20')) else vol_val
+
+            profile = {
+                'ticker': ticker,
+                'name': resolved_name,
+                'currentPrice': curr_price,
+                'previousClose': prev_price,
+                'change': change,
+                'changePercent': change_percent,
+                'currency': currency,
+                'volume': vol_val,
+                'avgVolume': avg_vol_val,
+                'atr': round(float(last_row.get('ATR', 0)), 2) if not pd.isna(last_row.get('ATR')) else round(curr_price * 0.03, 2),
+                'vwap': round(float(last_row.get('VWAP', 0)), 2) if not pd.isna(last_row.get('VWAP')) else None,
+                'superTrend': round(float(last_row.get('SuperTrend', 0)), 2) if not pd.isna(last_row.get('SuperTrend')) else None,
+                'cmf': round(float(last_row.get('CMF', 0)), 2) if not pd.isna(last_row.get('CMF')) else None
+            }
+
+            signals = self.generate_technical_summary(enriched_df, news_items=[])
+
+            timeseries = []
+            def safe_val(v, decimals=2):
+                if v is None or pd.isna(v) or np.isinf(v):
+                    return None
+                return round(float(v), decimals)
+
+            for idx, row in enriched_df.tail(60).iterrows():
+                time_str = idx.strftime('%Y-%m-%d') if isinstance(idx, (pd.Timestamp, datetime)) else str(idx)
+                ts_ms = int(idx.timestamp() * 1000) if isinstance(idx, (pd.Timestamp, datetime)) else 0
+                point = {
+                    'time': time_str,
+                    'timestamp': ts_ms,
+                    'open': safe_val(row.get('Open')),
+                    'high': safe_val(row.get('High')),
+                    'low': safe_val(row.get('Low')),
+                    'close': safe_val(row.get('Close')),
+                    'volume': int(row.get('Volume', 0)) if not pd.isna(row.get('Volume')) else 0,
+                    'sma20': safe_val(row.get('SMA_20')),
+                    'sma50': safe_val(row.get('SMA_50')),
+                    'sma200': safe_val(row.get('SMA_200')),
+                    'superTrend': safe_val(row.get('SuperTrend')),
+                    'superTrendDir': int(row.get('SuperTrend_Dir', row.get('SuperTrend_Direction', 1))),
+                    'vwap': safe_val(row.get('VWAP')),
+                    'ttmSqueeze': bool(row.get('TTM_Squeeze', False)),
+                    'rsi': safe_val(row.get('RSI'), 1),
+                    'macd': safe_val(row.get('MACD')),
+                    'macdSignal': safe_val(row.get('MACD_Signal') or row.get('Signal')),
+                    'macdHist': safe_val(row.get('MACD_Hist') or row.get('Hist')),
+                    'cmf': safe_val(row.get('CMF'), 3),
+                    'atr': safe_val(row.get('ATR'))
+                }
+                timeseries.append(point)
+
+            return timeseries, signals, profile
+        except Exception:
+            return [], {}, {}
 
     def fetch_full_stock_analysis(self, tickers: list[str], period: str = '6mo', interval: str = '1d', force_refresh: bool = False, phase: str = 'full') -> dict:
         """

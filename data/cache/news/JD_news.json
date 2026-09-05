@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108587.512479,
+  "ticker": "JD",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "Burry exits Alibaba, builds large JD.com position over valuation concerns",
+      "summary": "",
+      "url": "https://finance.yahoo.com/markets/stocks/articles/burry-exits-alibaba-builds-large-185346448.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-23-26 02:53PM",
+      "timestamp": 1788108588,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "JD.com offers concessions in EU probe of Ceconomy takeover bid",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/deba372c-9875-380a-9cd6-e543b65e77b8/jd.com-offers-concessions-in.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-21-26 10:30AM",
+      "timestamp": 1788108588,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "China blocks cooperation with EU probe into JD.coms Ceconomy bid",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/3ea30561-c92c-34c4-abc2-ea267e7ee1d1/china-blocks-cooperation-with.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-20-26 11:27AM",
+      "timestamp": 1788108588,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Unitree, famous for its dancing robots, surges by 460% on its trading debut, lifting valuation to $66 billion, far ahead of U.S. competitors",
+      "summary": "",
+      "url": "https://finance.yahoo.com/technology/articles/unitree-famous-dancing-robots-surges-125135333.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-19-26 08:51AM",
+      "timestamp": 1788108588,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "JD.com returns to operating profit despite revenue decline",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/46362aab-c488-33d2-8261-022fe114f2ce/jd.com-returns-to-operating.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-14-26 05:08AM",
+      "timestamp": 1788108588,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}

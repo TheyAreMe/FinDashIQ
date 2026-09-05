@@ -1,0 +1,68 @@
+{
+  "timestamp": 1788108549.4321892,
+  "ticker": "EOG",
+  "country": "United States",
+  "flag": "🇺🇸",
+  "news": [
+    {
+      "title": "EOG Resources Inc. stock outperforms competitors on strong trading day",
+      "summary": "",
+      "url": "https://www.marketwatch.com/data-news/eog-resources-inc-stock-outperforms-competitors-on-strong-trading-day-c405c0d2-0fc75836f24e?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-10-26 04:30PM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "EOG Resources Inc. stock underperforms Wednesday when compared to competitors",
+      "summary": "",
+      "url": "https://www.marketwatch.com/data-news/eog-resources-inc-stock-underperforms-wednesday-when-compared-to-competitors-ad74051c-be4949f4d3ec?mod=mw_FV",
+      "publisher": "MarketWatch",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-05-26 04:30PM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "EOG Resources, Inc. Q2 2026 Earnings Call Summary",
+      "summary": "",
+      "url": "https://finance.yahoo.com/m/699dc09c-2ad3-3fea-bf72-3992e2b67088/eog-resources%2C-inc.-q2-2026.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "08:30AM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "EOG Resources Doubles Q2 Profit as Oil Prices and Production Rise",
+      "summary": "",
+      "url": "https://finance.yahoo.com/energy/articles/eog-resources-doubles-q2-profit-044500406.html",
+      "publisher": "Yahoo Finance",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "12:45AM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "EOG Resources Reports Second Quarter 2026 Results",
+      "summary": "",
+      "url": "/news/377119/eog-resources-reports-second-quarter-2026-results",
+      "publisher": "Financial Wire",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "Aug-04-26 04:15PM",
+      "timestamp": 1788108550,
+      "sourceType": "finviz",
+      "timeAgo": "Just now"
+    }
+  ]
+}
