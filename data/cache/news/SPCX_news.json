@@ -1,33 +1,9 @@
 {
-  "timestamp": 1788615178.2314808,
+  "timestamp": 1788722433.388891,
   "ticker": "SPCX",
   "country": "United States",
   "flag": "🇺🇸",
   "news": [
-    {
-      "title": "Anthropic Stock Isn't Public Yet, but Fund Companies Already Have Leveraged ETF Plans",
-      "summary": "",
-      "url": "https://www.barrons.com/articles/anthropic-stock-ipo-leveraged-etf-45838a05?mod=bar_FV",
-      "publisher": "Barron's",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "02:59PM",
-      "timestamp": 1788615179,
-      "sourceType": "finviz",
-      "timeAgo": "Just now"
-    },
-    {
-      "title": "Here’s what’s worth streaming in September 2026 on Netflix, Hulu, HBO Max and more",
-      "summary": "Prices are rising again, but a slew of fan-favorite shows — including Apple’s ‘Slow Horses,’ Netflix’s ‘The Gentlemen’ and Paramount’s ‘MobLand’ — are returning for new seasons",
-      "url": "https://www.marketwatch.com/story/heres-whats-worth-streaming-in-september-2026-on-netflix-hulu-hbo-max-and-more-a702e7dd?mod=mw_rss_topstories",
-      "publisher": "MarketWatch",
-      "country": "United States",
-      "flag": "🇺🇸",
-      "publishedAt": "",
-      "timestamp": 1788615178,
-      "sourceType": "rss",
-      "timeAgo": "Just now"
-    },
     {
       "title": "Forget Diversification — Investors Are Betting Everything on Tech ETFs (And the Numbers Are Jaw-Dropping) - 24/7 Wall St.",
       "summary": "Forget Diversification — Investors Are Betting Everything on Tech ETFs (And the Numbers Are Jaw-Dropping)&nbsp;&nbsp;24/7 Wall St.",
@@ -36,7 +12,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788615178,
+      "timestamp": 1788722434,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -48,7 +24,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788615178,
+      "timestamp": 1788722434,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -60,7 +36,7 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788615178,
+      "timestamp": 1788722434,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -72,19 +48,19 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788615178,
+      "timestamp": 1788722434,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
     {
-      "title": "Mega IPOs And The Passive Investor (Pending:SPCX) - Seeking Alpha",
-      "summary": "Mega IPOs And The Passive Investor (Pending:SPCX)&nbsp;&nbsp;Seeking Alpha",
-      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxOUHkyejVud0t0c253WUlTUzh2dnRsSFpuQzBLV25vZFVsVnpVMF9nSHhDOTVBdUNtWHFTQUZmbGUxYnR3V3phTi1idVdEbFNvcnlDVWMyM2pJM1BrOUtyRWFkYktuTlU0UVpvXzVzR1pxZE94aU91TWQ0YndmV1FJTw?oc=5",
+      "title": "Nasdaq, S&P 500 Futures Fall As Tesla, Alphabet Earnings Revive AI Spending Fears: Why TSLA, GOOGL, SPCX, NOW, INTC, AMD, SLS Are In Focus - Stocktwits",
+      "summary": "Nasdaq, S&P 500 Futures Fall As Tesla, Alphabet Earnings Revive AI Spending Fears: Why TSLA, GOOGL, SPCX, NOW, INTC, AMD, SLS Are In Focus&nbsp;&nbsp;Stocktwits",
+      "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxQcnRsOHNkN3NwMkE3eDZlQXZ4dzdYcW9Zbjhway1sNm45R1ZjZFZoOUloSU9xTnQ3UHcxamNETkJQZ1U1aUNsT2pMM2pIVksxZDdBRUFuanp0Sk9QUlBpeVhvcmhFLUx6MHJMQVdzOGl0bzhzcGl6ZG02eFhWd1ZjZXQzaWlmbERtRzVWS09IWHhYN09fbU5lLXBEeHJiMVdxbmlzcG95b1FKRXgtQXZGSnB3aTBid24wbzgwRURMeFFBU2JId0F2YWxmd0ZDUFNiVDdmLWF4LVZhSm8?oc=5",
       "publisher": "Google News Wire",
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788615178,
+      "timestamp": 1788722434,
       "sourceType": "rss",
       "timeAgo": "Just now"
     },
@@ -96,8 +72,20 @@
       "country": "United States",
       "flag": "🇺🇸",
       "publishedAt": "",
-      "timestamp": 1788615178,
+      "timestamp": 1788722434,
       "sourceType": "rss",
+      "timeAgo": "Just now"
+    },
+    {
+      "title": "Anthropic Stock Isn't Public Yet, but Fund Companies Already Have Leveraged ETF Plans",
+      "summary": "",
+      "url": "https://www.barrons.com/articles/anthropic-stock-ipo-leveraged-etf-45838a05?mod=bar_FV",
+      "publisher": "Barron's",
+      "country": "United States",
+      "flag": "🇺🇸",
+      "publishedAt": "02:59PM",
+      "timestamp": 1788722434,
+      "sourceType": "finviz",
       "timeAgo": "Just now"
     }
   ]

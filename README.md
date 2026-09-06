@@ -128,9 +128,18 @@ FinDashIQ/
 
 ## 💻 Installation & Setup Guide
 
-### Prerequisites
-- **Python 3.9+** (Python 3.10, 3.11, or 3.12 recommended)
-- Modern web browser (Google Chrome, Microsoft Edge, Firefox, Brave, Safari)
+### Prerequisites & Recommended Server Resources
+
+#### 🖥️ Server & Hardware Recommendations
+FinDashIQ is lightweight and optimized with server-side CSV disk caching, incremental delta downloads, and multi-threaded processing. For typical self-hosted operation:
+* **CPU**: **2 Cores** (recommended for concurrent indicator calculations, background scanner jobs, and delta synchronization)
+* **RAM**: **3 – 4 GB RAM** (recommended to comfortably handle Python/Pandas historical dataframes, Gunicorn worker threads, and AI synthesis pipelines)
+* **Storage**: **~1 – 2 GB free disk space** (for Python virtualenv dependencies and persistent cache files in `data/cache/`)
+
+#### 📦 Software Prerequisites
+* **Python 3.9+** (Python 3.10, 3.11, or 3.12 recommended)
+* Modern web browser (Google Chrome, Microsoft Edge, Firefox, Brave, Safari)
+
 
 ---
 
@@ -218,7 +227,9 @@ FinDashIQ/
 
 #### 🛡️ Optional: Running as a Background Service with Systemd (Ubuntu)
 
-Assumption: the user is "ubuntu" (you can change it in the systemd file to your user name).
+Assumptions: 
+- the user is "ubuntu" (you can change it in the systemd file to your user name).
+- gunicorn is used as the server.
 
 ```ini
 [Unit]

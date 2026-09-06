@@ -1,6 +1,6 @@
 <!-- Search & Ticker Inputs Card -->
 <div class="glass-card search-section">
-    <form id="searchForm" class="search-form" onsubmit="event.preventDefault(); handleAnalyze();">
+    <form id="searchForm" class="search-form" onsubmit="event.preventDefault(); handleAnalyze(true);">
         <div id="deepDiveSearchWrapper" class="input-wrapper search-input-wrapper-dynamic">
             <i data-lucide="search" class="input-icon"></i>
             <input 
@@ -21,10 +21,10 @@
                 onkeydown="handleDeepDiveSearchKeyDown(event)"
                 onfocus="handleDeepDiveSearchFocus()"
             >
-            <div id="deepDiveSearchSpinner" class="stock-search-spinner" style="display: none; position: absolute; right: 40px;">
+            <div id="deepDiveSearchSpinner" class="stock-search-spinner" style="display: none; position: absolute; right: 42px;">
                 <div class="spinner-sm"></div>
             </div>
-            <button type="button" id="tickerInputClearBtn" class="stock-search-clear-btn" style="display: none; position: absolute; right: 12px;" onclick="clearDeepDiveSearchInput()" title="Clear search input">
+            <button type="button" id="tickerInputClearBtn" class="stock-search-clear-btn" style="display: none; position: absolute; right: 14px;" onclick="clearDeepDiveSearchInput()" title="Clear search input">
                 <i data-lucide="x" style="width: 14px; height: 14px;"></i>
             </button>
 
@@ -37,6 +37,10 @@
                 <div id="deepDiveSearchResultsList" class="deep-dive-results-list"></div>
             </div>
         </div>
+        <button type="submit" id="deepDiveSubmitBtn" class="btn-primary" style="padding: 12px 22px; font-size: 0.92rem; height: 50px; display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0;" title="Analyze entered symbols">
+            <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i>
+            <span>Analyze</span>
+        </button>
     </form>
 
     <!-- Presets -->
@@ -60,7 +64,7 @@
         <button type="button" class="preset-chip" onclick="setPreset('SPY, QQQ, DIA, IWM')">
             <i data-lucide="pie-chart" style="width: 13px;"></i> Major ETFs
         </button>
-        <button type="button" class="preset-chip" onclick="setPreset('COIN, MSTR, SQ, PYPL')">
+        <button type="button" class="preset-chip" onclick="setPreset('COIN, MSTR, XYZ, PYPL')">
             <i data-lucide="wallet" style="width: 13px;"></i> Fintech & Crypto
         </button>
     </div>

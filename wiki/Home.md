@@ -7,10 +7,11 @@ Welcome to the **FinDashIQ Knowledge Base & Operational Documentation**. FinDash
 ## 📚 Complete Documentation Chapters
 
 ### 📊 1. Core Terminal Views
-- **[Watchlist & Market Intelligence Hub](Watchlist-and-Market-Hub.md)** — Real-time price tracking, dual Card/Table view modes, drag-and-drop reordering, SVG trend sparklines, multi-factor conviction gauges, CMF/VWAP/RSI/SuperTrend metric bars, company search modal, and asset basket management.
-- **[Stock Deep-Dive Terminal Guide](Stock-Deep-Dive-Terminal.md)** — Search terminal, multi-stock tabs, AI investment thesis, 30-day probabilistic scenarios, execution matrix, interactive AI Copilot, dynamic candlestick charts, technical oscillators, and multi-factor consensus.
-- **[AI Stock Scanner & Opportunity Discovery](AI-Stock-Scanner-Guide.md)** — Autonomous background market scanner, elite institutional conviction setups (≥85%), dynamic universe expansion (300+ stocks), live countdown timing, real-time search filter, and 1-click tracking outside active watchlist.
-- **[Strategy Backtesting & Order Execution](Strategy-Backtesting-Guide.md)** — Algorithmic strategies (Multi-Factor Quant, SuperTrend, MACD+RSI), multi-timeframe analysis (1M to MAX), alpha calculations, win rates, profit factor, drawdown scorecards, dynamic equity curves, and order execution ledgers.
+- **[Watchlist & Market Intelligence Hub](Watchlist-and-Market-Hub.md)** (Top Tab 1) — Real-time price tracking, dual Card/Table view modes, drag-and-drop reordering, SVG trend sparklines, multi-factor conviction gauges, CMF/VWAP/RSI/SuperTrend metric bars, company search modal, and asset basket management.
+- **[Stock Deep-Dive Terminal Guide](Stock-Deep-Dive-Terminal.md)** (Top Tab 2) — Search terminal, multi-stock tabs, AI investment thesis, 30-day probabilistic scenarios, execution matrix, interactive AI Copilot, dynamic candlestick charts, technical oscillators, and multi-factor consensus.
+- **[Strategy Backtesting & Simulation Studio](Strategy-Backtesting-Guide.md)** (Top Tab 3) — Dedicated quantitative simulation workspace: 8 algorithmic strategies + Omni-Consensus master ensemble, Sync to Watchlist, Long-Only vs Long & Short modes, institutional scorecards (Alpha, Sharpe, Sortino, MDD), dual compounding equity & drawdown curves, comparative benchmark matrix, simulated order execution ledger with CSV export, and live Forward Paper Trading Hub.
+- **[AI Stock Scanner & Opportunity Discovery](AI-Stock-Scanner-Guide.md)** (Top Tab 4) — Autonomous background market scanner, elite institutional conviction setups (≥85%), dynamic universe expansion (300+ stocks), live countdown timing, real-time search filter, and 1-click tracking outside active watchlist.
+- **[Configuring Notifications & Alerts Hub](Configuring-Notifications.md)** (Top Tab 5) — Multi-factor trigger rules across 5 quantitative indicator categories, global watchlist multi-asset monitoring (`*WATCHLIST*`), live test simulation, and multi-channel dispatch (Telegram, Discord, Email, Push, Webhooks).
 
 ---
 

@@ -5,8 +5,9 @@
 ### 📊 Core Terminal Views
 - **[Watchlist Hub](Watchlist-and-Market-Hub.md)**
 - **[Stock Deep-Dive Terminal](Stock-Deep-Dive-Terminal.md)**
+- **[Strategy Backtesting Studio](Strategy-Backtesting-Guide.md)**
 - **[AI Stock Scanner](AI-Stock-Scanner-Guide.md)**
-- **[Strategy Backtesting](Strategy-Backtesting-Guide.md)**
+- **[Signal Alerts Hub](Configuring-Notifications.md)**
 
 ### 🌐 Market Intelligence & Forex
 - **[Global News Wire](Global-News-and-Market-Catalysts.md)**

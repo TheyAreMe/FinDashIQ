@@ -1,0 +1,218 @@
+<!-- Modal: Forward Paper Trade Execution Modal -->
+<div id="paperTradeModal" class="modal-overlay" style="display: none;" onclick="if(event.target === this) closePaperTradeModal();">
+    <div class="modal-card paper-trade-modal-card" style="max-width: 1040px; width: 95vw;">
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="play-circle" style="color: var(--accent-green); width: 22px; height: 22px;"></i>
+                <h3 style="font-size: 1.15rem; font-weight: 700; margin: 0;">Execute Forward Paper Trade</h3>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="closePaperTradeModal()" aria-label="Close modal">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
+        </div>
+
+        <form id="paperTradeForm" onsubmit="submitPaperTradeForm(event)" style="overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; max-height: calc(85vh - 70px);">
+            <!-- Section 1: Stock Selection (Quick Pills + Global Search) -->
+            <div style="margin-bottom: 16px; background: rgba(255, 255, 255, 0.02); padding: 12px 14px; border-radius: var(--radius-sm, 8px); border: 1px solid var(--border-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="form-label" style="margin-bottom: 0; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted);">
+                        Select Stock / Asset
+                    </label>
+                    <div id="ptAssetQuoteBadge" class="mono" style="font-size: 0.8rem; font-weight: 700;"></div>
+                </div>
+
+                <!-- Quick Selection Pills for active Watchlist / Backtest stocks -->
+                <div id="ptAssetQuickPills" class="pt-asset-pills-row"></div>
+
+                <!-- Search Input for any global ticker -->
+                <div class="pt-ticker-search-wrapper" style="position: relative;">
+                    <i data-lucide="search" class="pt-ticker-search-icon" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); pointer-events: none; z-index: 2;"></i>
+                    <input
+                        type="text"
+                        id="ptTickerSearchInput"
+                        class="form-input mono"
+                        placeholder="Search any ticker or company name across global markets…"
+                        autocomplete="off"
+                        style="padding-left: 36px; padding-right: 36px; text-transform: uppercase; width: 100%; font-size: 0.86rem;"
+                        oninput="handlePtTickerSearch(this.value)"
+                        onfocus="handlePtTickerFocus(this)"
+                        onclick="this.select()"
+                        onblur="handlePtTickerBlur(this)"
+                        onkeydown="handlePtTickerKeydown(event)"
+                    >
+                    <button type="button" id="ptTickerClearBtn" class="pt-ticker-clear-btn" onclick="clearPtTickerSearch(event)" title="Clear ticker search" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <!-- Hidden actual value field -->
+                    <input type="hidden" id="ptModalTicker" required>
+                    <!-- Dropdown -->
+                    <div id="ptTickerDropdown" class="pt-ticker-dropdown" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Section 2: Trade Setup & Execution Parameters (Side, Capital, Entry Price) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <!-- Order Side Segmented Control -->
+                <div>
+                    <label class="form-label" style="font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted);">
+                        Order Side
+                    </label>
+                    <input type="hidden" id="ptModalSide" value="LONG">
+                    <div class="pt-side-toggle-group">
+                        <button type="button" id="ptSideBtnLong" class="pt-side-btn active-long" onclick="setPtOrderSide('LONG')">
+                            <span>🟢 Buy / Long</span>
+                        </button>
+                        <button type="button" id="ptSideBtnShort" class="pt-side-btn" onclick="setPtOrderSide('SHORT')">
+                            <span>🔴 Sell / Short</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulated Capital with Quick Chips -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label class="form-label" style="margin-bottom: 0; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted);">
+                            Simulated Capital ($)
+                        </label>
+                    </div>
+                    <input type="number" id="ptModalCapital" class="form-input mono" value="5000" min="50" step="50" required oninput="updatePtLiveCalculations()">
+                    <div class="pt-quick-chips">
+                        <button type="button" class="pt-chip-btn" onclick="setPtCapital(1000)">$1k</button>
+                        <button type="button" class="pt-chip-btn" onclick="setPtCapital(2500)">$2.5k</button>
+                        <button type="button" class="pt-chip-btn" onclick="setPtCapital(5000)">$5k</button>
+                        <button type="button" class="pt-chip-btn" onclick="setPtCapital(10000)">$10k</button>
+                        <button type="button" class="pt-chip-btn" onclick="setPtCapital(25000)">$25k</button>
+                    </div>
+                </div>
+
+                <!-- Entry Price with Live Price Sync Button -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label class="form-label" style="margin-bottom: 0; font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted);">
+                            Entry Price ($)
+                        </label>
+                        <button type="button" class="pt-chip-btn" onclick="revertPtToLivePrice()" title="Reset to current market quote">
+                            <span>Live Price</span>
+                        </button>
+                    </div>
+                    <input type="number" id="ptModalEntryPrice" class="form-input mono" step="0.01" min="0.01" required oninput="updatePtLiveCalculations()">
+                    <div style="font-size: 0.73rem; color: var(--text-muted); margin-top: 5px;" class="mono">
+                        Allocates approx. <span id="ptLiveSharesCalc" style="color: var(--text-primary); font-weight: 600;">0.00</span> shares
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Risk Protection (Stop Loss & Take Profit with Percentage Presets) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <!-- Dynamic Stop-Loss -->
+                <div style="background: rgba(239, 68, 68, 0.03); border: 1px solid rgba(239, 68, 68, 0.15); border-radius: var(--radius-sm, 8px); padding: 12px 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label class="form-label" style="margin-bottom: 0; color: var(--accent-red); font-size: 0.82rem; font-weight: 700;">
+                            🛡️ Stop-Loss Cutoff ($)
+                        </label>
+                        <span id="ptSlDistanceBadge" class="mono" style="font-size: 0.74rem; color: var(--accent-red);">-5.0%</span>
+                    </div>
+                    <input type="number" id="ptModalStopLoss" class="form-input mono" step="0.01" placeholder="e.g. 125.00" oninput="updatePtLiveCalculations()">
+                    <div class="pt-quick-chips">
+                        <span style="font-size: 0.7rem; color: var(--text-muted); margin-right: 2px;">Presets:</span>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtSlPreset(3)">-3%</button>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtSlPreset(5)">-5%</button>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtSlPreset(8)">-8%</button>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtSlPreset(10)">-10%</button>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtSlPreset(15)">-15%</button>
+                    </div>
+                </div>
+
+                <!-- Take-Profit Target -->
+                <div style="background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: var(--radius-sm, 8px); padding: 12px 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label class="form-label" style="margin-bottom: 0; color: var(--accent-green); font-size: 0.82rem; font-weight: 700;">
+                            🎯 Take-Profit Target ($)
+                        </label>
+                        <span id="ptTpDistanceBadge" class="mono" style="font-size: 0.74rem; color: var(--accent-green);">+12.0%</span>
+                    </div>
+                    <input type="number" id="ptModalTakeProfit" class="form-input mono" step="0.01" placeholder="e.g. 150.00" oninput="updatePtLiveCalculations()">
+                    <div class="pt-quick-chips">
+                        <span style="font-size: 0.7rem; color: var(--text-muted); margin-right: 2px;">Presets:</span>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtTpPreset(6)">+6%</button>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtTpPreset(10)">+10%</button>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtTpPreset(12)">+12%</button>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtTpPreset(18)">+18%</button>
+                        <button type="button" class="pt-chip-btn" onclick="applyPtTpPreset(25)">+25%</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Live Asymmetric Risk / Reward Analytics Dashboard -->
+            <div class="pt-summary-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                    <div>
+                        <div style="font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-purple); font-weight: 700; margin-bottom: 2px;">
+                            Asymmetric Risk / Reward Profile
+                        </div>
+                        <div id="ptLiveRiskReward" class="mono" style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary);">
+                            2.4 : 1
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
+                        <div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Capital at Risk</div>
+                            <div class="mono" style="font-size: 1rem; font-weight: 700; color: var(--accent-red);">
+                                <span id="ptLiveRiskAmt">-$250.00</span>
+                                <span id="ptLiveRiskPct" style="font-size: 0.78rem; font-weight: 500;">(-5.0%)</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Potential Reward</div>
+                            <div class="mono" style="font-size: 1rem; font-weight: 700; color: var(--accent-green);">
+                                <span id="ptLiveRewardAmt">+$600.00</span>
+                                <span id="ptLiveRewardPct" style="font-size: 0.78rem; font-weight: 500;">(+12.0%)</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Position Size</div>
+                            <div class="mono" style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">
+                                <span id="ptLiveShares">0.00</span> <span style="font-size: 0.78rem; font-weight: 500; color: var(--text-secondary);">Shares</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Strategy / Execution Tag (Optional) -->
+            <div style="margin-top: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label class="form-label" style="margin-bottom: 0; font-size: 0.78rem; color: var(--text-muted);">
+                        Strategy / Execution Tag (Optional)
+                    </label>
+                    <div class="pt-quick-chips">
+                        <button type="button" class="pt-chip-btn" onclick="setPtReason('AI Quantitative Setup')">AI Quantitative</button>
+                        <button type="button" class="pt-chip-btn" onclick="setPtReason('SuperTrend Flip Rebound')">SuperTrend</button>
+                        <button type="button" class="pt-chip-btn" onclick="setPtReason('Omni-Consensus Breakout')">Breakout</button>
+                        <button type="button" class="pt-chip-btn" onclick="setPtReason('Trend Following Swing')">Trend Swing</button>
+                    </div>
+                </div>
+                <input type="text" id="ptModalReason" class="form-input" placeholder="e.g. AI Quantitative Rebound, Breakout from Channel" value="AI Quantitative Trade Setup">
+            </div>
+
+            <!-- Footer Actions -->
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle); position: sticky; bottom: 0; background: var(--bg-modal-card, #111827); z-index: 5;">
+                <button type="button" class="btn-secondary" onclick="closePaperTradeModal()">
+                    <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                    <span>Cancel</span>
+                </button>
+                <button type="submit" class="btn-primary" style="display: flex; align-items: center; gap: 6px; padding: 10px 20px; font-weight: 700;">
+                    <i data-lucide="play" style="width: 15px; height: 15px;"></i>
+                    <span>Execute Forward Paper Trade</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

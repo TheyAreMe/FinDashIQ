@@ -147,15 +147,17 @@
                 <div id="helpTabOverview" class="help-doc-section active">
                     <div class="help-doc-title">⚡ Getting Started with FinDashIQ</div>
                     <p class="help-doc-lead">
-                        FinDashIQ is an institutional-grade financial analytics terminal combining multi-factor
+                        FinDashIQ is an financial analytics terminal combining multi-factor
                         quantitative indicators, persistent watchlist intelligence, dynamic strategy backtesting,
-                        automated AI investment synthesis, real-time multi-currency conversion, and multi-channel signal notification rules.
+                        automated AI investment synthesis, real-time multi-currency conversion, and multi-channel signal
+                        notification rules.
                     </p>
 
                     <div class="help-callout">
                         <strong>💡 Key Architecture:</strong> FinDashIQ operates with <strong>zero external
                             setup</strong> using its built-in offline quantitative heuristics engine, while supporting
-                        Google Gemini AI integration for natural language investment synthesis and live forex rate caching.
+                        Google Gemini AI integration for natural language investment synthesis and live forex rate
+                        caching.
                     </div>
 
                     <div class="help-section-sub">Navigation &amp; Views</div>
@@ -163,22 +165,31 @@
                         <div class="help-feature-card">
                             <div class="help-card-head"><i data-lucide="layout-grid"
                                     style="color: var(--accent-blue);"></i> Top Tab 1: Watchlist Hub</div>
-                            <div>Command center for monitoring portfolio securities, drag-and-drop ordering, dual Card/Table views, dynamic currency display, sparklines, and news syntheses.</div>
+                            <div>Command center for monitoring portfolio securities, drag-and-drop ordering, dual
+                                Card/Table views, dynamic currency display, sparklines, and news syntheses.</div>
                         </div>
                         <div class="help-feature-card">
                             <div class="help-card-head"><i data-lucide="line-chart"
-                                    style="color: var(--accent-cyan);"></i> Top Tab 2: Terminal</div>
-                            <div>4 specialized sub-tabs: AI Thesis &amp; Copilot, Technical Candlestick Charts &amp;
-                                Oscillators, Strategy Backtesting, and Multi-Factor Consensus.</div>
+                                    style="color: var(--accent-cyan);"></i> Top Tab 2: Stock Deep-Dive</div>
+                            <div>3 specialized sub-tabs: AI Thesis &amp; Copilot, Technical Candlestick Charts &amp;
+                                Oscillators, and Multi-Factor Consensus &amp; Fundamentals.</div>
                         </div>
                         <div class="help-feature-card">
-                            <div class="help-card-head"><i data-lucide="radar"
-                                    style="color: var(--accent-green);"></i> Top Tab 3: AI Scanner</div>
-                            <div>Thematic market radar discovering ESG, Clean Energy, AI Silicon, and high-conviction opportunities outside your watchlist.</div>
+                            <div class="help-card-head"><i data-lucide="flask-conical"
+                                    style="color: var(--accent-purple);"></i> Top Tab 3: Backtesting Studio</div>
+                            <div>Dedicated algorithmic simulation workspace: 8 quantitative strategies + Omni-Consensus
+                                ensemble, Long/Short modes, equity &amp; drawdown curves, comparative matrix, CSV
+                                export, and forward paper trading.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="radar" style="color: var(--accent-green);"></i>
+                                Top Tab 4: AI Scanner</div>
+                            <div>Thematic market radar discovering ESG, Clean Energy, AI Silicon, and high-conviction
+                                opportunities outside your watchlist.</div>
                         </div>
                         <div class="help-feature-card">
                             <div class="help-card-head"><i data-lucide="bell" style="color: var(--accent-amber);"></i>
-                                Top Tab 4: Alerts Hub</div>
+                                Top Tab 5: Alerts Hub</div>
                             <div>Configure quantitative trigger conditions and dispatch real-time alerts to Telegram,
                                 Discord, Email, or custom REST Webhooks.</div>
                         </div>
@@ -190,20 +201,36 @@
                     <div class="help-doc-title">📊 Watchlist &amp; Market Intelligence Hub</div>
                     <p class="help-doc-lead">
                         Track live market quotes, institutional flows, and AI conviction scores with persistent
-                        server-side storage, drag-and-drop reordering, dual viewing modes, and live base currency conversion.
+                        server-side storage, drag-and-drop reordering, dual viewing modes, and live base currency
+                        conversion.
                     </p>
 
                     <div class="help-section-sub">Card &amp; Table View Features</div>
                     <ul class="help-list">
-                        <li><strong>Dual View Modes (Cards vs. Table):</strong> Toggle seamlessly between the visual <em>Grid Card View</em> and compact <em>Data Table View</em> with sticky columns and mobile horizontal swipe support. Persisted in user preferences.</li>
-                        <li><strong>Drag-and-Drop Reordering:</strong> Easily rearrange the order of stocks by dragging cards or table drag handles (<i data-lucide="grip-vertical" style="width:12px; vertical-align:middle;"></i>). New positions are immediately saved to the server.</li>
-                        <li><strong>Dynamic Multi-Currency Display:</strong> All prices, quotes, and ranges convert in real-time to your chosen base currency (USD, EUR, GBP, CHF, JPY, etc.).</li>
-                        <li><strong>Live Price, Sparklines &amp; Timeframe Axis:</strong> Real-time pricing with 1D change, smooth SVG gradient trajectory curves, start/end date markers, and multi-week period return badges (e.g. <code>30D Trend: +12.85%</code>).</li>
-                        <li><strong>AI Conviction Gauge:</strong> Multi-factor momentum rating (0–100%) and directional stance (<em>Strong Bullish</em>, <em>Bullish</em>, <em>Neutral</em>, <em>Bearish</em>) calibrated with market downturn damping.</li>
-                        <li><strong>RSI (14), SuperTrend, CMF (20), VWAP:</strong> Multi-factor quantitative health indicators displayed in high-contrast badges.</li>
-                        <li><strong>AI News Catalyst Synthesis:</strong> Real-time summary of corporate developments, macro events, and sentiment with breaking news weighting.</li>
-                        <li><strong>Company Search Modal:</strong> Click <strong>"+ Add Stock"</strong> to open the search modal with real-time company name and symbol lookups across international exchanges.</li>
-                        <li><strong>Inline Removal:</strong> Click the <strong>✕</strong> button directly on any card or table row to remove an asset.</li>
+                        <li><strong>Dual View Modes (Cards vs. Table):</strong> Toggle seamlessly between the visual
+                            <em>Grid Card View</em> and compact <em>Data Table View</em> with sticky columns and mobile
+                            horizontal swipe support. Persisted in user preferences.</li>
+                        <li><strong>Drag-and-Drop Reordering:</strong> Easily rearrange the order of stocks by dragging
+                            cards or table drag handles (<i data-lucide="grip-vertical"
+                                style="width:12px; vertical-align:middle;"></i>). New positions are immediately saved to
+                            the server.</li>
+                        <li><strong>Dynamic Multi-Currency Display:</strong> All prices, quotes, and ranges convert in
+                            real-time to your chosen base currency (USD, EUR, GBP, CHF, JPY, etc.).</li>
+                        <li><strong>Live Price, Sparklines &amp; Timeframe Axis:</strong> Real-time pricing with 1D
+                            change, smooth SVG gradient trajectory curves, start/end date markers, and multi-week period
+                            return badges (e.g. <code>30D Trend: +12.85%</code>).</li>
+                        <li><strong>AI Conviction Gauge:</strong> Multi-factor momentum rating (0–100%) and directional
+                            stance (<em>Strong Bullish</em>, <em>Bullish</em>, <em>Neutral</em>, <em>Bearish</em>)
+                            calibrated with market downturn damping.</li>
+                        <li><strong>RSI (14), SuperTrend, CMF (20), VWAP:</strong> Multi-factor quantitative health
+                            indicators displayed in high-contrast badges.</li>
+                        <li><strong>AI News Catalyst Synthesis:</strong> Real-time summary of corporate developments,
+                            macro events, and sentiment with breaking news weighting.</li>
+                        <li><strong>Company Search Modal:</strong> Click <strong>"+ Add Stock"</strong> to open the
+                            search modal with real-time company name and symbol lookups across international exchanges.
+                        </li>
+                        <li><strong>Inline Removal:</strong> Click the <strong>✕</strong> button directly on any card or
+                            table row to remove an asset.</li>
                     </ul>
 
                     <div class="help-callout">
@@ -216,7 +243,7 @@
                 <div id="helpTabTerminal" class="help-doc-section">
                     <div class="help-doc-title">🔍 Stock Deep-Dive Terminal</div>
                     <p class="help-doc-lead">
-                        4 dedicated sub-tabs for complete institutional analysis on any global stock or ETF basket:
+                        3 dedicated sub-tabs for complete institutional analysis on any global stock or ETF basket:
                     </p>
 
                     <div class="help-section-sub">Sub-Tab Breakdown</div>
@@ -232,23 +259,25 @@
                             <tbody>
                                 <tr>
                                     <td><strong>1. AI Intelligence &amp; Copilot</strong></td>
-                                    <td>AI Conviction Engine, Executive Thesis, 30-Day Bull/Base/Bear Scenarios, Execution Matrix (Entry, Volatility SL, TP1, R:R), Dynamic AI Catalyst Synthesis, Interactive AI Copilot chat.</td>
-                                    <td>Actionable trade setups, scenario modeling, and conversational market queries.</td>
+                                    <td>AI Conviction Engine, Executive Thesis, 30-Day Bull/Base/Bear Scenarios,
+                                        Execution Matrix (Entry, Volatility SL, TP1, R:R), Dynamic AI Catalyst
+                                        Synthesis, Interactive AI Copilot chat.</td>
+                                    <td>Actionable trade setups, scenario modeling, and conversational market queries.
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><strong>2. Charts &amp; Oscillators</strong></td>
-                                    <td>Interactive Candlestick/Area charts, SuperTrend (10,3), VWAP, SMA/EMA 20/50/200, Bollinger Bands (20,2), Keltner Channels (20,1.5,10), Stochastic (14,3,3), RSI (14), MACD (12,26,9), CMF (20), Volume.</td>
+                                    <td>Interactive Candlestick/Area charts, SuperTrend (10,3), VWAP, SMA/EMA 20/50/200,
+                                        Bollinger Bands (20,2), Keltner Channels (20,1.5,10), Stochastic (14,3,3), RSI
+                                        (14), MACD (12,26,9), CMF (20), Volume.</td>
                                     <td>Institutional technical charting across 1M to MAX timeframes.</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>3. Strategy Backtesting</strong></td>
-                                    <td>Multi-Factor Quant, SuperTrend Breakout, MACD+RSI strategies, Alpha (vs. $10k Benchmark), Win Rate, Profit Factor, Max Drawdown, Dynamic Equity Curve, Order Execution Ledger.</td>
-                                    <td>Historical validation against Buy &amp; Hold with customizable timeframes.</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>4. Fundamentals &amp; Consensus</strong></td>
-                                    <td>Composite Consensus Verdict (Strong Buy to Strong Sell), Consensus Signal Meter, Market Cap, P/E, Forward P/E, Beta, Dividend Yield, 52-Week Range Slider.</td>
-                                    <td>Fundamental health, valuation multiples, and multi-factor indicator consensus.</td>
+                                    <td><strong>3. Fundamentals &amp; Consensus</strong></td>
+                                    <td>Composite Consensus Verdict (Strong Buy to Strong Sell), Consensus Signal Meter,
+                                        Market Cap, P/E, Forward P/E, Beta, Dividend Yield, 52-Week Range Slider.</td>
+                                    <td>Fundamental health, valuation multiples, and multi-factor indicator consensus.
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -259,7 +288,9 @@
                 <div id="helpTabScanner" class="help-doc-section">
                     <div class="help-doc-title">🛰️ AI Quantitative Stock Scanner &amp; Opportunity Discovery</div>
                     <p class="help-doc-lead">
-                        Autonomous multi-factor market radar precalculating asymmetric setups, breaking positive news catalysts, and benchmark basket leaders across global equity markets for stocks <strong>not currently on your watchlist</strong>.
+                        Autonomous multi-factor market radar precalculating asymmetric setups, breaking positive news
+                        catalysts, and benchmark basket leaders across global equity markets for stocks <strong>not
+                            currently on your watchlist</strong>.
                     </p>
 
                     <div class="help-grid-cards">
@@ -268,77 +299,250 @@
                                 <i data-lucide="globe" style="width: 14px; color: var(--accent-blue);"></i>
                                 <span>Global Multi-Market Universe</span>
                             </div>
-                            <div>Evaluates 300+ equities across US, European Blue Chips, Asia-Pacific, Clean Energy, and Benchmark ETFs, expandable with custom tickers.</div>
+                            <div>Evaluates 300+ equities across US, European Blue Chips, Asia-Pacific, Clean Energy, and
+                                Benchmark ETFs, expandable with custom tickers.</div>
                         </div>
                         <div class="help-feature-card">
                             <div class="help-card-head">
                                 <i data-lucide="flame" style="width: 14px; color: var(--accent-amber);"></i>
                                 <span>Breaking News &amp; Viral Catalysts</span>
                             </div>
-                            <div>Real-time NLP engine detects positive news catalysts, earnings surprises, and volume surges (1.2x–3.0x+ 20D SMA) with interactive 1-click modal deep dives.</div>
+                            <div>Real-time NLP engine detects positive news catalysts, earnings surprises, and volume
+                                surges (1.2x–3.0x+ 20D SMA) with interactive 1-click modal deep dives.</div>
                         </div>
                         <div class="help-feature-card">
                             <div class="help-card-head">
                                 <i data-lucide="boxes" style="width: 14px; color: var(--accent-purple);"></i>
                                 <span>Top 5 ETF &amp; Index Baskets</span>
                             </div>
-                            <div>Instant access to top institutional holdings across SPY, QQQ, SMH (Semiconductors), ICLN (Clean Energy), and DAX 40.</div>
+                            <div>Instant access to top institutional holdings across SPY, QQQ, SMH (Semiconductors),
+                                ICLN (Clean Energy), and DAX 40.</div>
                         </div>
                     </div>
 
                     <div class="help-section-sub">Autonomous Background Engine &amp; Live Timing</div>
                     <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 6px 0 0 0;">
-                        The scanner operates continuously in the background (default: every 30 minutes, configurable from 15 min to 2 hours by administrators). The <strong>Last Scan / Next Due</strong> stat box displays exact timestamps alongside a ticking <strong>Live Countdown Timer</strong>. Changing the scan interval immediately recalculates and updates the schedule in real time.
+                        The scanner operates continuously in the background (default: every 30 minutes, configurable
+                        from 15 min to 2 hours by administrators). The <strong>Last Scan / Next Due</strong> stat box
+                        displays exact timestamps alongside a ticking <strong>Live Countdown Timer</strong>. Changing
+                        the scan interval immediately recalculates and updates the schedule in real time.
                     </p>
 
                     <div class="help-section-sub">Algorithmic Screener Strategies &amp; Elite Conviction</div>
                     <ul class="help-list">
-                        <li><strong>⚡ Elite Institutional Alpha (&ge; 85% Conviction):</strong> Filter threshold defaults to the highest-probability quantitative setups (≥ 85%), with adjustable options down to 50%.</li>
-                        <li><strong>🔥 Breaking Positive News &amp; Parabolic Catalysts:</strong> Flags viral news headlines, major deal awards, FDA clearances, and explosive volume expansions.</li>
-                        <li><strong>🚀 High Momentum Breakouts:</strong> Requires active SuperTrend Bullish state, positive 30-day slope, and relative volume confirmation.</li>
-                        <li><strong>💎 Deep Value &amp; Mean-Reversion:</strong> Identifies oversold quality dip-buying candidates (RSI &lt; 55) trading at a fundamental discount.</li>
-                        <li><strong>👑 Dividend Aristocrats &amp; Defensive Cash Flow:</strong> Screens durable yield leaders with robust multi-year cash flow.</li>
-                        <li><strong>⚡ TTM Squeeze Volatility Breakouts:</strong> Detects Bollinger Band compression inside Keltner Channels anticipating major directional moves.</li>
+                        <li><strong>⚡ Elite Institutional Alpha (&ge; 85% Conviction):</strong> Filter threshold
+                            defaults to the highest-probability quantitative setups (≥ 85%), with adjustable options
+                            down to 50%.</li>
+                        <li><strong>🔥 Breaking Positive News &amp; Parabolic Catalysts:</strong> Flags viral news
+                            headlines, major deal awards, FDA clearances, and explosive volume expansions.</li>
+                        <li><strong>🚀 High Momentum Breakouts:</strong> Requires active SuperTrend Bullish state,
+                            positive 30-day slope, and relative volume confirmation.</li>
+                        <li><strong>💎 Deep Value &amp; Mean-Reversion:</strong> Identifies oversold quality dip-buying
+                            candidates (RSI &lt; 55) trading at a fundamental discount.</li>
+                        <li><strong>👑 Dividend Aristocrats &amp; Defensive Cash Flow:</strong> Screens durable yield
+                            leaders with robust multi-year cash flow.</li>
+                        <li><strong>⚡ TTM Squeeze Volatility Breakouts:</strong> Detects Bollinger Band compression
+                            inside Keltner Channels anticipating major directional moves.</li>
                     </ul>
 
                     <div class="help-section-sub">Real-Time Search &amp; Dynamic Tab Badge</div>
                     <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 6px 0 0 0;">
-                        The Top Tab 3 badge updates dynamically to match the exact number of found opportunities. Use the recommendations search bar to filter instantly by ticker, company, or sector without resetting your query when toggling between <strong>Grid Cards</strong> and <strong>Table</strong> view modes.
+                        The Top Tab 4 badge updates dynamically to match the exact number of found opportunities. Use
+                        the recommendations search bar to filter instantly by ticker, company, or sector without
+                        resetting your query when toggling between <strong>Grid Cards</strong> and
+                        <strong>Table</strong> view modes.
                     </p>
 
                     <div class="help-section-sub">Interactive Catalyst Indicator Dot &amp; Popover</div>
                     <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 6px 0 0 0;">
-                        Scanner cards with active market catalysts display a glowing amber <strong>Pulsing Catalyst Dot</strong> next to their directional bias badge (e.g. Strong Buy). Hovering over the dot reveals a rich <strong>Catalyst Popover</strong> with real-time volume surge statistics, breaking wire headlines, and story summaries. Clicking the dot or popover immediately opens the <strong>Global News Modal</strong> for full coverage.
+                        Scanner cards with active market catalysts display a glowing amber <strong>Pulsing Catalyst
+                            Dot</strong> next to their directional bias badge (e.g. Strong Buy). Hovering over the dot
+                        reveals a rich <strong>Catalyst Popover</strong> with real-time volume surge statistics,
+                        breaking wire headlines, and story summaries. Clicking the dot or popover immediately opens the
+                        <strong>Global News Modal</strong> for full coverage.
                     </p>
                 </div>
 
-                <!-- TAB: Strategy Backtesting -->
+                <!-- TAB: Strategy Backtesting & Simulation Studio -->
                 <div id="helpTabBacktest" class="help-doc-section">
-                    <div class="help-doc-title">🧪 Quantitative Strategy Backtesting</div>
+                    <div class="help-doc-title">🧪 Strategy Backtesting &amp; Simulation Studio (Top Tab 3)</div>
                     <p class="help-doc-lead">
-                        Simulate algorithmic execution strategies on historical market data and benchmark performance
-                        against a $10,000 Buy &amp; Hold investment across multiple selectable timeframes (1M, 3M, 6M, 1Y, 2Y, 5Y, MAX).
+                        FinDashIQ provides a dedicated backtesting workspace to rigorously test quantitative models,
+                        benchmark against Buy &amp; Hold, inspect dual equity &amp; drawdown curves, analyze
+                        side-by-side strategy matrices, audit full trade ledgers, and execute forward paper trades.
                     </p>
 
-                    <div class="help-section-sub">Strategy Types</div>
+                    <div class="help-section-sub">Studio Header &amp; Asset Management</div>
                     <ul class="help-list">
-                        <li><strong>Multi-Factor Quant:</strong> Combines SuperTrend trend confirmation, Chaikin Money
-                            Flow accumulation, and RSI momentum filters.</li>
-                        <li><strong>SuperTrend Breakout:</strong> Follows trailing volatility breakout bands to capture
-                            major trend expansions while cutting downside risk.</li>
-                        <li><strong>MACD + RSI Momentum:</strong> Mean-reversion strategy triggering on MACD signal line
-                            crosses exiting oversold RSI zones.</li>
+                        <li><strong>Backtest Asset Selector Tabs:</strong> Switch instantly between portfolio stocks
+                            using dedicated asset tabs. Click any ticker tab to run the backtest for that security with
+                            zero page reload.</li>
+                        <li><strong>Sync to Watchlist Button:</strong> Click the <i data-lucide="refresh-cw"
+                                style="width: 12px; vertical-align: middle;"></i> <strong>"Sync to Watchlist"</strong>
+                            button in the asset selector header to instantly align your backtesting asset list with your
+                            active watchlist. The sync runs asynchronously and displays a confirmation badge.</li>
+                        <li><strong>Search Asset:</strong> Click <strong>"Search Asset"</strong> to look up any global
+                            equity or ETF across US, European, and Asian exchanges and add it directly to your
+                            backtesting workspace.</li>
+                        <li><strong>Inline Removal:</strong> Click the <strong>✕</strong> badge on any asset pill to
+                            remove it from the backtesting bar without modifying your primary watchlist.</li>
                     </ul>
 
-                    <div class="help-section-sub">Scorecard Metrics</div>
+                    <div class="help-section-sub">Control Toolbar &amp; Simulation Parameters</div>
+                    <div class="help-grid-cards">
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="clock" style="color: var(--accent-purple);"></i>
+                                Historical Timeframes</div>
+                            <div>Evaluate models across 8 horizons: <strong>1M, 3M, 6M, 1Y (default), 2Y, 3Y, 5Y,
+                                    MAX</strong>. Adjusting the timeframe automatically fetches complete historical
+                                OHLCV data.</div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="repeat" style="color: var(--accent-green);"></i>
+                                Execution Modes</div>
+                            <div>
+                                <strong>Long-Only:</strong> Traditional spot equity investing. Positions are closed to
+                                cash during bearish market regimes.<br>
+                                <strong>Long &amp; Short:</strong> Bidirectional derivative/futures trading.
+                                Automatically takes short positions on bearish indicator reversals.
+                            </div>
+                        </div>
+                        <div class="help-feature-card">
+                            <div class="help-card-head"><i data-lucide="sliders"
+                                    style="color: var(--accent-amber);"></i> Risk &amp; Friction Inputs</div>
+                            <div>
+                                <strong>Initial Capital:</strong> Starting portfolio balance (default $10,000).<br>
+                                <strong>Stop-Loss:</strong> Hard protective stop percentage (default 5.0%).<br>
+                                <strong>Take-Profit:</strong> Target profit exit threshold (default 12.0%).<br>
+                                <strong>Slippage &amp; Fee:</strong> Realistic per-trade execution friction (default
+                                0.10%).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="help-section-sub">8 Quantitative Algorithmic Strategies + Master Ensemble</div>
                     <ul class="help-list">
-                        <li><strong>Alpha (Excess Return):</strong> Total Strategy Return (%) minus Buy &amp; Hold
-                            Benchmark (%).</li>
-                        <li><strong>Win Rate:</strong> Percentage of profitable completed round-trip trades.</li>
-                        <li><strong>Profit Factor:</strong> Ratio of gross profits to gross losses.</li>
-                        <li><strong>Maximum Drawdown:</strong> Peak-to-trough capital drawdown during the backtest
-                            period.</li>
-                        <li><strong>Order Execution Ledger:</strong> Comprehensive trade-by-trade log with date, type, price, volume, realized PnL, and trigger reason.</li>
+                        <li><strong>👑 Omni-Consensus Master Ensemble:</strong> Combines all 9 quantitative indicators
+                            (SuperTrend, CMF, RSI, MACD, Stochastic, Bollinger Bands, EMA 9/21, SMA 50/200, Volume) into
+                            an institutional confluence engine with weighted voting.</li>
+                        <li><strong>🤖 AI Conviction Model:</strong> Dynamic conviction thresholding that initiates
+                            trades when quantitative momentum scores cross institutional certainty levels (≥ 70% bull, ≤
+                            30% bear).</li>
+                        <li><strong>📈 SuperTrend (ATR Trend Following):</strong> Follows ATR volatility trailing bands
+                            (10, 3) to ride macro trend expansions while strictly limiting downside whipsaws.</li>
+                        <li><strong>⚡ EMA Golden / Death Cross:</strong> High-speed trend-following model triggering on
+                            EMA 9 crossing above or below EMA 21.</li>
+                        <li><strong>🎯 Bollinger Bands Mean Reversion:</strong> Capitalizes on statistical extremes
+                            (20-period, 2.0σ) by entering when price tags the outer band and reverting to the 20-SMA
+                            baseline.</li>
+                        <li><strong>🌊 MACD + RSI Dual Momentum:</strong> Crossover momentum model entering when the
+                            MACD signal line crosses exiting oversold RSI zones.</li>
+                        <li><strong>⚡ Stochastic Oscillator Cross:</strong> Swing trading system trading %K and %D line
+                            crossovers (14, 3, 3) in oversold (&lt; 20) and overbought (&gt; 80) territory.</li>
+                        <li><strong>💧 Chaikin Money Flow (CMF) Volume Breakout:</strong> Institutional accumulation
+                            model identifying sustained institutional buying pressure when CMF crosses +0.05.</li>
+                    </ul>
+
+                    <div class="help-section-sub">Institutional Performance Scorecards</div>
+                    <div class="help-table-wrapper">
+                        <table class="help-table">
+                            <thead>
+                                <tr>
+                                    <th>Scorecard</th>
+                                    <th>Key Metrics Displayed</th>
+                                    <th>Institutional Significance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Strategy Return vs Benchmark</strong></td>
+                                    <td>Strategy Total Return (%), Buy &amp; Hold Return (%), Alpha (%)</td>
+                                    <td>Measures excess return (Alpha) generated above passive holding.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Portfolio Growth</strong></td>
+                                    <td>Ending Capital Balance ($), Current Holding State (In Cash / In Position)</td>
+                                    <td>Visualizes net asset growth from the initial $10,000 baseline.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Win Rate &amp; Trades</strong></td>
+                                    <td>Win Rate (%), Total Closed Trades, Wins vs Losses count</td>
+                                    <td>Indicates statistical edge and trade sample size validity.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Risk &amp; Profit Factor</strong></td>
+                                    <td>Profit Factor (Gross Profit / Gross Loss), Max Drawdown (%)</td>
+                                    <td>Quantifies risk efficiency (target &gt; 1.50) and capital protection.</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sharpe &amp; Sortino Ratios</strong></td>
+                                    <td>Annualized Sharpe Ratio, Downside-calibrated Sortino Ratio</td>
+                                    <td>Evaluates risk-adjusted returns by isolating harmful downside volatility.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="help-section-sub">Dual-Pane Interactive Visualizations</div>
+                    <ul class="help-list">
+                        <li><strong>Primary Compounding Equity Curve:</strong> Plots the cumulative growth of the
+                            strategy portfolio (green line) versus the Buy &amp; Hold benchmark (dashed gray line)
+                            across every market day, with interactive tooltip inspection.</li>
+                        <li><strong>Performance Relative to Initial Investment Chart:</strong> Interactive area chart
+                            visualizing cumulative percentage gain or loss relative to starting investment capital ($0.0\% baseline).
+                            Enables direct visual comparison between algorithmic alpha and passive Buy &amp; Hold returns over time.</li>
+                    </ul>
+
+                    <div class="help-section-sub">Multi-Strategy Comparative Benchmark Matrix</div>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 6px 0 0 0;">
+                        Located directly below the charts, the comparative matrix runs all 8 strategies simultaneously
+                        against the active asset. It presents a side-by-side table comparing Return, Alpha, Win Rate,
+                        Profit Factor, Sharpe, Sortino, Max Drawdown, and Closed Trades. Clicking
+                        <strong>"Select"</strong> on any row instantly activates that strategy in the main chart and
+                        trade ledger.
+                    </p>
+
+                    <div class="help-section-sub">Simulated Order Execution Ledger &amp; CSV Export</div>
+                    <ul class="help-list">
+                        <li><strong>Zero-Lookahead Trade Log:</strong> Complete chronological log of every executed
+                            simulated order with Order #, Action (BUY/SELL/SHORT/COVER), Entry Date, Exit Date,
+                            Execution Price, Realized PnL ($ and %), and Final Portfolio Capital.</li>
+                        <li><strong>Indicator Trigger / Exit Reason:</strong> Explains the exact mathematical condition
+                            that triggered entry or exit (e.g. <em>"SuperTrend Bullish Flip (CMF: +0.18)"</em>,
+                            <em>"Stop-Loss Breached (-5.0%)"</em>, or <em>"Take-Profit Target Hit (+12.0%)"</em>).</li>
+                        <li><strong>Trade Filtering:</strong> Toggle between <strong>All Trades</strong>, <strong>Wins
+                                Only</strong>, or <strong>Losses Only</strong>.</li>
+                        <li><strong>CSV Export:</strong> Click <i data-lucide="download"
+                                style="width: 12px; vertical-align: middle;"></i> <strong>"Export CSV"</strong> to
+                            download the complete order ledger for external analysis in Excel, Python, or institutional
+                            risk engines.</li>
+                    </ul>
+
+                    <div class="help-section-sub">Centralized Forward Paper Trading Hub &amp; Modal</div>
+                    <ul class="help-list">
+                        <li><strong>Active Virtual Positions Tracker:</strong> Monitor ongoing simulated positions with
+                            live mark-to-market valuations, unrealized PnL ($ and %), allocated capital, stop-loss,
+                            take-profit, and active status. Click <strong>"Close Position"</strong> to manually exit any
+                            trade.</li>
+                        <li><strong>Modern Configurator Modal:</strong> Click <strong>"+ New Paper Trade"</strong> to
+                            launch the enhanced wide execution modal:
+                            <ul style="margin-top: 4px;">
+                                <li><strong>Quick Asset Pills:</strong> Instantly switch between watchlist tickers with
+                                    0ms latency.</li>
+                                <li><strong>Order Side Toggle:</strong> Segmented 2-button selector for <em>Buy /
+                                        Long</em> vs <em>Sell / Short</em>.</li>
+                                <li><strong>Quick Capital Chips:</strong> 1-click allocation buttons ($1k, $2.5k, $5k,
+                                    $10k, $25k) with automated share count calculation.</li>
+                                <li><strong>Live Price Synchronization:</strong> Synchronize with the live market
+                                    bid/ask or customize entry price.</li>
+                                <li><strong>Dynamic SL &amp; TP Presets:</strong> Rapid preset chips (-3%, -5%, -8%,
+                                    -10%, -15% for Stop-Loss; +6%, +10%, +12%, +18%, +25% for Take-Profit) with
+                                    real-time price distance badges.</li>
+                                <li><strong>Live Asymmetric Risk / Reward Card:</strong> Instant calculation of R:R
+                                    ratio (e.g. 2.4 : 1), exact Dollar Capital at Risk ($), Potential Reward ($), and
+                                    total position size.</li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
 
@@ -346,25 +550,35 @@
                 <div id="helpTabNews" class="help-doc-section">
                     <div class="help-doc-title">📰 Global Breaking News &amp; Market Catalysts</div>
                     <p class="help-doc-lead">
-                        Real-time financial intelligence feed streaming headlines, regulatory filings, earnings reports, viral sentiment anomalies, and macroeconomic updates from premier worldwide wire services.
+                        Real-time financial intelligence feed streaming headlines, regulatory filings, earnings reports,
+                        viral sentiment anomalies, and macroeconomic updates from premier worldwide wire services.
                     </p>
 
                     <div class="help-grid-cards">
                         <div class="help-feature-card">
-                            <div class="help-card-head"><i data-lucide="globe" style="color: var(--accent-cyan);"></i> Multi-Language Wires</div>
-                            <div>Aggregates international feeds from Reuters, Bloomberg, CNBC, Handelsblatt, Tagesschau, Nikkei, and financial wires, automatically translated to English.</div>
+                            <div class="help-card-head"><i data-lucide="globe" style="color: var(--accent-cyan);"></i>
+                                Multi-Language Wires</div>
+                            <div>Aggregates international feeds from Reuters, Bloomberg, CNBC, Handelsblatt, Tagesschau,
+                                Nikkei, and financial wires, automatically translated to English.</div>
                         </div>
                         <div class="help-feature-card">
-                            <div class="help-card-head"><i data-lucide="flame" style="color: var(--accent-amber);"></i> Viral Catalyst &amp; Volume Scoring</div>
-                            <div>NLP keyword extraction detects high-impact earnings surprises, M&amp;A deals, FDA clearances, and abnormal volume surges (1.2x–3.0x+ 20D SMA).</div>
+                            <div class="help-card-head"><i data-lucide="flame" style="color: var(--accent-amber);"></i>
+                                Viral Catalyst &amp; Volume Scoring</div>
+                            <div>NLP keyword extraction detects high-impact earnings surprises, M&amp;A deals, FDA
+                                clearances, and abnormal volume surges (1.2x–3.0x+ 20D SMA).</div>
                         </div>
                     </div>
 
                     <div class="help-section-sub">News Modal Features &amp; Filters</div>
                     <ul class="help-list">
-                        <li><strong>Search &amp; Filter:</strong> Filter headlines in real time by keyword, company name, or publisher. Toggle between <em>All Wires</em>, <em>🚀 High Impact Catalysts</em>, and <em>🏛️ Tier 1 Sources</em>.</li>
-                        <li><strong>Stock Attribution:</strong> View company-specific news streams directly from any stock's deep-dive terminal or watchlist card.</li>
-                        <li><strong>1-Click Catalyst Deep-Dive:</strong> Clicking any catalyst box from the AI Stock Scanner immediately focuses the news wire on the exact article with direct links to read original source reporting.</li>
+                        <li><strong>Search &amp; Filter:</strong> Filter headlines in real time by keyword, company
+                            name, or publisher. Toggle between <em>All Wires</em>, <em>🚀 High Impact Catalysts</em>,
+                            and <em>🏛️ Tier 1 Sources</em>.</li>
+                        <li><strong>Stock Attribution:</strong> View company-specific news streams directly from any
+                            stock's deep-dive terminal or watchlist card.</li>
+                        <li><strong>1-Click Catalyst Deep-Dive:</strong> Clicking any catalyst box from the AI Stock
+                            Scanner immediately focuses the news wire on the exact article with direct links to read
+                            original source reporting.</li>
                     </ul>
                 </div>
 
@@ -389,8 +603,11 @@
 
                     <div class="help-section-sub">How Forex Conversion Works</div>
                     <ul class="help-list">
-                        <li><strong>Real-Time Conversion:</strong> When you change your base currency in the Profile Modal, all stock prices, sparkline ranges, entry zones, stop-losses, and portfolio totals recalculate instantaneously.</li>
-                        <li><strong>Exchange Rate Caching:</strong> Live forex rates are fetched and cached locally with automatic background refresh to maintain sub-10ms response times.</li>
+                        <li><strong>Real-Time Conversion:</strong> When you change your base currency in the Profile
+                            Modal, all stock prices, sparkline ranges, entry zones, stop-losses, and portfolio totals
+                            recalculate instantaneously.</li>
+                        <li><strong>Exchange Rate Caching:</strong> Live forex rates are fetched and cached locally with
+                            automatic background refresh to maintain sub-10ms response times.</li>
                     </ul>
                 </div>
 
@@ -404,29 +621,47 @@
 
                     <div class="help-section-sub">🌐 Global Watchlist Alerts vs. Individual Stocks</div>
                     <ul class="help-list">
-                        <li><strong>🌐 ALL WATCHLIST ASSETS (Global Monitor):</strong> Selecting this target monitors your entire active watchlist simultaneously. When any holding triggers the signal (e.g. adverse news, oversold RSI dip), an alert is dispatched specifically for that asset.</li>
-                        <li><strong>Individual Stocks / ETFs:</strong> Monitor a specific stock or search international companies via the <strong>Search Stock</strong> modal.</li>
+                        <li><strong>🌐 ALL WATCHLIST ASSETS (Global Monitor):</strong> Selecting this target monitors
+                            your entire active watchlist simultaneously. When any holding triggers the signal (e.g.
+                            adverse news, oversold RSI dip), an alert is dispatched specifically for that asset.</li>
+                        <li><strong>Individual Stocks / ETFs:</strong> Monitor a specific stock or search international
+                            companies via the <strong>Search Stock</strong> modal.</li>
                     </ul>
 
                     <div class="help-section-sub">Supported Trigger Indicator Categories</div>
                     <ul class="help-list">
-                        <li><strong>Trend &amp; Volatility:</strong> SuperTrend Direction Flips (Bullish/Bearish), SMA 50/200 Golden &amp; Death Crosses, Bollinger Band Upper Breakouts &amp; Lower Reversal Zones.</li>
-                        <li><strong>Momentum Oscillators:</strong> RSI Deep Oversold (&lt;30) &amp; Overbought Exhaustion (&gt;70), MACD Signal Line Crosses, Stochastic Oscillator Crosses (&lt;20).</li>
-                        <li><strong>Institutional Flow:</strong> Chaikin Money Flow Heavy Inflows (&gt;+0.15) &amp; Outflows (&lt;-0.15), Daily VWAP Breakouts and Breakdowns.</li>
-                        <li><strong>📰 Breaking News Catalysts:</strong> 🚨 High-Impact Breaking News, 📈 Bullish Catalysts (Earnings/Upgrades), 📉 Adverse Events (Downgrades/Headwinds), 🏛️ Tier-1 Publisher Breaking Headlines.</li>
-                        <li><strong>AI &amp; Risk Levels:</strong> AI Conviction Upgrades (&ge;80%) &amp; Drops (&lt;45%), Dynamic ATR TP1 Reached, Volatility Stop-Loss Breaches, Intraday Volatility Spikes/Drops (&plusmn;3.5%).</li>
+                        <li><strong>Trend &amp; Volatility:</strong> SuperTrend Direction Flips (Bullish/Bearish), SMA
+                            50/200 Golden &amp; Death Crosses, Bollinger Band Upper Breakouts &amp; Lower Reversal
+                            Zones.</li>
+                        <li><strong>Momentum Oscillators:</strong> RSI Deep Oversold (&lt;30) &amp; Overbought
+                            Exhaustion (&gt;70), MACD Signal Line Crosses, Stochastic Oscillator Crosses (&lt;20).</li>
+                        <li><strong>Institutional Flow:</strong> Chaikin Money Flow Heavy Inflows (&gt;+0.15) &amp;
+                            Outflows (&lt;-0.15), Daily VWAP Breakouts and Breakdowns.</li>
+                        <li><strong>📰 Breaking News Catalysts:</strong> 🚨 High-Impact Breaking News, 📈 Bullish
+                            Catalysts (Earnings/Upgrades), 📉 Adverse Events (Downgrades/Headwinds), 🏛️ Tier-1
+                            Publisher Breaking Headlines.</li>
+                        <li><strong>AI &amp; Risk Levels:</strong> AI Conviction Upgrades (&ge;80%) &amp; Drops
+                            (&lt;45%), Dynamic ATR TP1 Reached, Volatility Stop-Loss Breaches, Intraday Volatility
+                            Spikes/Drops (&plusmn;3.5%).</li>
                     </ul>
 
                     <div class="help-section-sub">🔄 Autonomous Background Monitoring Engine</div>
                     <ul class="help-list">
-                        <li><strong>Configurable Slider (1m to 24h):</strong> Set your desired automated polling interval directly with the slider bar (defaults to 15 minutes). Persisted automatically.</li>
-                        <li><strong>Live Heartbeat &amp; Countdown:</strong> Real-time timer counts down to the next scan with live active status indicator.</li>
-                        <li><strong>Check Signals Now:</strong> Execute an instant background calculation and news scan across your rules without waiting for the timer.</li>
-                        <li><strong>Pause / Resume:</strong> Temporarily suspend background polling at any time with a single click.</li>
+                        <li><strong>Configurable Slider (1m to 24h):</strong> Set your desired automated polling
+                            interval directly with the slider bar (defaults to 15 minutes). Persisted automatically.
+                        </li>
+                        <li><strong>Live Heartbeat &amp; Countdown:</strong> Real-time timer counts down to the next
+                            scan with live active status indicator.</li>
+                        <li><strong>Check Signals Now:</strong> Execute an instant background calculation and news scan
+                            across your rules without waiting for the timer.</li>
+                        <li><strong>Pause / Resume:</strong> Temporarily suspend background polling at any time with a
+                            single click.</li>
                     </ul>
 
                     <div class="help-callout">
-                        <strong>⚡ Live Testing &amp; Status Feedback:</strong> Click <strong>"Trigger Test Message"</strong> on the form or <strong>"Test"</strong> on any active rule card to execute live dispatch across your configured channel and receive instant delivery confirmation.
+                        <strong>⚡ Live Testing &amp; Status Feedback:</strong> Click <strong>"Trigger Test
+                            Message"</strong> on the form or <strong>"Test"</strong> on any active rule card to execute
+                        live dispatch across your configured channel and receive instant delivery confirmation.
                     </div>
                 </div>
 
@@ -434,40 +669,58 @@
                 <div id="helpTabTelegram" class="help-doc-section">
                     <div class="help-doc-title">📱 Telegram Bot Setup &amp; Delivery Methods</div>
                     <p class="help-doc-lead">
-                        Receive instant markdown-formatted market catalyst signals, price breakout alerts, and direct news links right in your Telegram chats, public channels, or private trading groups.
+                        Receive instant markdown-formatted market catalyst signals, price breakout alerts, and direct
+                        news links right in your Telegram chats, public channels, or private trading groups.
                     </p>
 
                     <div class="help-callout" style="border-left-color: var(--accent-cyan);">
                         <strong>🔑 Step 1: Create Bot &amp; Set Token in <code>.env</code></strong>
                         <ol class="help-list" style="margin-top: 6px;">
-                            <li>Open Telegram, search for <strong>@BotFather</strong>, send <code>/newbot</code>, and follow prompts.</li>
-                            <li>Copy the <strong>Bot API Token</strong> and add to your <code>.env</code> file: <code>TELEGRAM_BOT_TOKEN=...</code></li>
+                            <li>Open Telegram, search for <strong>@BotFather</strong>, send <code>/newbot</code>, and
+                                follow prompts.</li>
+                            <li>Copy the <strong>Bot API Token</strong> and add to your <code>.env</code> file:
+                                <code>TELEGRAM_BOT_TOKEN=...</code></li>
                         </ol>
                     </div>
 
                     <div class="help-section-sub">👤 Method A: Direct Private Messages (DMs to You)</div>
                     <ul class="help-list">
-                        <li><strong>Step 1:</strong> In Telegram, search for your bot (e.g. <code>@FinDashIQ_bot</code>) and tap <strong>"Start"</strong> (or send <code>hello</code>).</li>
-                        <li><strong>Step 2:</strong> In FinDashIQ Destination, type <code>auto</code> (or your numeric Chat ID from <code>@raw_data_bot</code>).</li>
-                        <li><strong>Step 3:</strong> Click <strong>Trigger Test Message</strong> — the alert will arrive directly in your private chat.</li>
+                        <li><strong>Step 1:</strong> In Telegram, search for your bot (e.g. <code>@FinDashIQ_bot</code>)
+                            and tap <strong>"Start"</strong> (or send <code>hello</code>).</li>
+                        <li><strong>Step 2:</strong> In FinDashIQ Destination, type <code>auto</code> (or your numeric
+                            Chat ID from <code>@raw_data_bot</code>).</li>
+                        <li><strong>Step 3:</strong> Click <strong>Trigger Test Message</strong> — the alert will arrive
+                            directly in your private chat.</li>
                     </ul>
 
-                    <div class="help-section-sub">📢 Method B: Public Channels &amp; Public Groups (e.g. <code>@FinDashIQ</code>)</div>
+                    <div class="help-section-sub">📢 Method B: Public Channels &amp; Public Groups (e.g.
+                        <code>@FinDashIQ</code>)</div>
                     <ul class="help-list">
-                        <li><strong>Step 1 (Make Public):</strong> In Telegram group settings ➔ Edit ➔ <strong>Group Type</strong> ➔ Set to <strong>Public</strong> ➔ Assign handle (e.g. <code>FinDashIQ</code>).</li>
-                        <li><strong>Step 2 (Admin Rights):</strong> In Group Administrators, add your bot (e.g. <code>@FinDashIQ_bot</code>) as an <strong>Admin</strong> with <em>Post Messages</em> rights.</li>
-                        <li><strong>Step 3:</strong> In FinDashIQ Destination, enter <code>@FinDashIQ</code> and click <strong>Trigger Test Message</strong>.</li>
+                        <li><strong>Step 1 (Make Public):</strong> In Telegram group settings ➔ Edit ➔ <strong>Group
+                                Type</strong> ➔ Set to <strong>Public</strong> ➔ Assign handle (e.g.
+                            <code>FinDashIQ</code>).</li>
+                        <li><strong>Step 2 (Admin Rights):</strong> In Group Administrators, add your bot (e.g.
+                            <code>@FinDashIQ_bot</code>) as an <strong>Admin</strong> with <em>Post Messages</em>
+                            rights.</li>
+                        <li><strong>Step 3:</strong> In FinDashIQ Destination, enter <code>@FinDashIQ</code> and click
+                            <strong>Trigger Test Message</strong>.</li>
                     </ul>
 
                     <div class="help-section-sub">🔒 Method C: Private Groups (No public handle)</div>
                     <ul class="help-list">
-                        <li><strong>Step 1:</strong> Add your bot to the private group as an <strong>Administrator</strong>.</li>
+                        <li><strong>Step 1:</strong> Add your bot to the private group as an
+                            <strong>Administrator</strong>.</li>
                         <li><strong>Step 2:</strong> In the group chat, send <code>/test @FinDashIQ_bot</code>.</li>
-                        <li><strong>Step 3:</strong> In FinDashIQ Destination, enter <code>auto</code> (or the numeric group ID starting with <code>-100...</code>) and click <strong>Trigger Test Message</strong>.</li>
+                        <li><strong>Step 3:</strong> In FinDashIQ Destination, enter <code>auto</code> (or the numeric
+                            group ID starting with <code>-100...</code>) and click <strong>Trigger Test
+                                Message</strong>.</li>
                     </ul>
 
                     <div class="help-callout" style="border-left-color: var(--accent-amber); margin-top: 14px;">
-                        <strong>⚠️ Note on <code>chat not found</code> (HTTP 400):</strong> Telegram only allows <code>@handle</code> addressing for <strong>Public</strong> groups/channels. If your group is Private, either set it to Public (Method B) or use <code>auto</code> with Admin rights (Method C).
+                        <strong>⚠️ Note on <code>chat not found</code> (HTTP 400):</strong> Telegram only allows
+                        <code>@handle</code> addressing for <strong>Public</strong> groups/channels. If your group is
+                        Private, either set it to Public (Method B) or use <code>auto</code> with Admin rights (Method
+                        C).
                     </div>
                 </div>
 
@@ -475,15 +728,18 @@
                 <div id="helpTabDiscord" class="help-doc-section">
                     <div class="help-doc-title">💬 Discord Webhook Integration</div>
                     <p class="help-doc-lead">
-                        Push real-time quantitative indicator breakouts and corporate catalyst wires directly into your Discord trading channels with rich formatted embeds.
+                        Push real-time quantitative indicator breakouts and corporate catalyst wires directly into your
+                        Discord trading channels with rich formatted embeds.
                     </p>
 
                     <div class="help-section-sub">1. Generate Discord Webhook URL</div>
                     <ol class="help-list">
-                        <li>Open your Discord server and navigate to your trading channel (e.g. <code>#quant-signals</code>).</li>
+                        <li>Open your Discord server and navigate to your trading channel (e.g.
+                            <code>#quant-signals</code>).</li>
                         <li>Click the gear icon next to the channel name to open <strong>Channel Settings</strong>.</li>
                         <li>Go to <strong>Integrations ➔ Webhooks ➔ New Webhook</strong>.</li>
-                        <li>Name the webhook (e.g. <code>FinDashIQ AI Desk</code>) and click <strong>Copy Webhook URL</strong>.</li>
+                        <li>Name the webhook (e.g. <code>FinDashIQ AI Desk</code>) and click <strong>Copy Webhook
+                                URL</strong>.</li>
                     </ol>
 
                     <div class="help-section-sub">2. Embed Color Coding</div>
@@ -494,7 +750,8 @@
                         </div>
                         <div class="help-feature-card">
                             <div class="help-card-head" style="color: var(--accent-red);">🔴 Bearish Triggers</div>
-                            <div>SuperTrend Bearish Breakdowns, Death Crosses, Overbought Exhaustion, and SL Breaches.</div>
+                            <div>SuperTrend Bearish Breakdowns, Death Crosses, Overbought Exhaustion, and SL Breaches.
+                            </div>
                         </div>
                         <div class="help-feature-card">
                             <div class="help-card-head" style="color: var(--accent-purple);">🟣 Breaking Catalysts</div>
@@ -507,7 +764,8 @@
                 <div id="helpTabEmail" class="help-doc-section">
                     <div class="help-doc-title">📧 Email &amp; SMTP Server Configuration</div>
                     <p class="help-doc-lead">
-                        Dispatches structured HTML executive notification memos directly to your inbox or email automation webhook endpoints.
+                        Dispatches structured HTML executive notification memos directly to your inbox or email
+                        automation webhook endpoints.
                     </p>
 
                     <div class="help-section-sub">1. SMTP Server Environment Setup (.env)</div>
@@ -523,7 +781,8 @@ SMTP_FROM=alerts@findashiq.com</code></pre>
                     <div class="help-section-sub">2. Executive Memo Contents</div>
                     <ul class="help-list">
                         <li><strong>Asset Symbol &amp; Company:</strong> Ticker and profile summary.</li>
-                        <li><strong>Algorithmic Context:</strong> Multi-factor momentum, volume, and volatility status.</li>
+                        <li><strong>Algorithmic Context:</strong> Multi-factor momentum, volume, and volatility status.
+                        </li>
                         <li><strong>Breaking News Links:</strong> Direct hyperlinks to full catalyst articles.</li>
                     </ul>
                 </div>
@@ -532,19 +791,24 @@ SMTP_FROM=alerts@findashiq.com</code></pre>
                 <div id="helpTabBrowser" class="help-doc-section">
                     <div class="help-doc-title">🔔 Browser Push &amp; Audio Synthesizer Chimes</div>
                     <p class="help-doc-lead">
-                        Instant in-browser and operating system desktop push alerts with zero latency, powered by the HTML5 Notification API and Web Audio synthesizer.
+                        Instant in-browser and operating system desktop push alerts with zero latency, powered by the
+                        HTML5 Notification API and Web Audio synthesizer.
                     </p>
 
                     <div class="help-section-sub">1. How Desktop Push Works</div>
                     <ul class="help-list">
-                        <li><strong>HTML5 Desktop Notifications:</strong> Fires operating system notification popups even when your browser is minimized or running in a background tab.</li>
-                        <li><strong>Web Audio Synthesizer Chime:</strong> Produces a high-priority dual-tone acoustic chime (587Hz ➔ 880Hz) with zero external media files.</li>
-                        <li><strong>100% Offline Capable:</strong> Runs entirely client-side without external notification servers.</li>
+                        <li><strong>HTML5 Desktop Notifications:</strong> Fires operating system notification popups
+                            even when your browser is minimized or running in a background tab.</li>
+                        <li><strong>Web Audio Synthesizer Chime:</strong> Produces a high-priority dual-tone acoustic
+                            chime (587Hz ➔ 880Hz) with zero external media files.</li>
+                        <li><strong>100% Offline Capable:</strong> Runs entirely client-side without external
+                            notification servers.</li>
                     </ul>
 
                     <div class="help-section-sub">2. Enabling Desktop Alerts</div>
                     <ol class="help-list">
-                        <li>Select <strong>🔔 In-App &amp; Desktop Sound Alert</strong> in the Dispatch Channel dropdown.</li>
+                        <li>Select <strong>🔔 In-App &amp; Desktop Sound Alert</strong> in the Dispatch Channel
+                            dropdown.</li>
                         <li>Click the <strong>Enable Desktop Alerts</strong> button next to the destination label.</li>
                         <li>Click <strong>Allow / Grant</strong> on your browser's permission prompt.</li>
                     </ol>
@@ -554,7 +818,8 @@ SMTP_FROM=alerts@findashiq.com</code></pre>
                 <div id="helpTabApi" class="help-doc-section">
                     <div class="help-doc-title">🌐 Custom Webhooks &amp; REST API</div>
                     <p class="help-doc-lead">
-                        Connect FinDashIQ signal alerts to custom trading execution bots (Python, Node.js, Go), FastAPI listeners, or automation hubs (Zapier, n8n, Make).
+                        Connect FinDashIQ signal alerts to custom trading execution bots (Python, Node.js, Go), FastAPI
+                        listeners, or automation hubs (Zapier, n8n, Make).
                     </p>
 
                     <div class="help-section-sub">Standard JSON Webhook POST Payload</div>
@@ -587,7 +852,8 @@ SMTP_FROM=alerts@findashiq.com</code></pre>
                 <div id="helpTabAuth" class="help-doc-section">
                     <div class="help-doc-title">👤 Authentication, Roles &amp; Data Isolation</div>
                     <p class="help-doc-lead">
-                        Role-based access control keeps watchlists, notification rules, currency choices, and visual theme preferences
+                        Role-based access control keeps watchlists, notification rules, currency choices, and visual
+                        theme preferences
                         completely isolated per user account.
                     </p>
 
@@ -615,7 +881,8 @@ SMTP_FROM=alerts@findashiq.com</code></pre>
                         <li><strong>Delta Downloads:</strong> On reload, the engine downloads only missing recent bars
                             (1–2 days) rather than full multi-year histories, reducing network bandwidth by &gt;98%.
                         </li>
-                        <li><strong>Security Headers:</strong> Enforces HSTS, restrictive CSP, X-Frame-Options: SAMEORIGIN, X-Content-Type-Options: nosniff, and ProxyFix headers for reverse proxies.</li>
+                        <li><strong>Security Headers:</strong> Enforces HSTS, restrictive CSP, X-Frame-Options:
+                            SAMEORIGIN, X-Content-Type-Options: nosniff, and ProxyFix headers for reverse proxies.</li>
                         <li><strong>Force Refresh:</strong> Click <strong>"Force Refresh"</strong> in any tab to bypass
                             cached data and perform a live query.</li>
                     </ul>
@@ -629,14 +896,20 @@ SMTP_FROM=alerts@findashiq.com</code></pre>
                     </p>
 
                     <div class="help-callout" style="border-left-color: var(--accent-amber);">
-                        <strong>⚠️ Educational &amp; Research Purpose:</strong> FinDashIQ is provided exclusively for educational, technical demonstration, and quantitative research purposes. Nothing on this platform constitutes financial, investment, legal, or tax advice.
+                        <strong>⚠️ Educational &amp; Research Purpose:</strong> FinDashIQ is provided exclusively for
+                        educational, technical demonstration, and quantitative research purposes. Nothing on this
+                        platform constitutes financial, investment, legal, or tax advice.
                     </div>
 
                     <div class="help-section-sub">Legal Summary</div>
                     <ul class="help-list">
-                        <li><strong>No Financial Liability:</strong> The creator and contributors assume no liability for any trading losses or financial decisions made based on platform metrics or AI synthesis.</li>
-                        <li><strong>Data Privacy &amp; GDPR:</strong> User accounts and preferences are stored securely on your server instance with zero tracking cookies and no third-party telemetry.</li>
-                        <li><strong>Full Impressum:</strong> Click <strong>"Impressum &amp; Legal"</strong> in the footer or auth screen to review complete provider details and privacy disclaimers.</li>
+                        <li><strong>No Financial Liability:</strong> The creator and contributors assume no liability
+                            for any trading losses or financial decisions made based on platform metrics or AI
+                            synthesis.</li>
+                        <li><strong>Data Privacy &amp; GDPR:</strong> User accounts and preferences are stored securely
+                            on your server instance with zero tracking cookies and no third-party telemetry.</li>
+                        <li><strong>Full Impressum:</strong> Click <strong>"Impressum &amp; Legal"</strong> in the
+                            footer or auth screen to review complete provider details and privacy disclaimers.</li>
                     </ul>
                 </div>
             </div>

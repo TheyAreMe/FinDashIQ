@@ -1,0 +1,39 @@
+{
+  "success": true,
+  "current_version": "0.1.4",
+  "update_available": false,
+  "latest_version": "0.1.3",
+  "latest_release_name": "v0.1.3",
+  "latest_release_url": "https://github.com/TheyAreMe/FinDashIQ/releases/tag/betav2",
+  "latest_release_date": "2026-09-05T14:47:02Z",
+  "latest_release_notes": "# \u26a1 FinDashIQ v0.1.3 \u2014 Stock Scanner Enhancements & UX Polish (This update incl. unpublished v0.1.2)\r\n\r\nFinDashIQ **v0.1.3** delivers key enhancements to the automated Stock Scanner, including autonomous background engine execution, admin interval controls, timezone-aware live countdowns, elevated default conviction screening, and a unified split hero layout.\r\n\r\n---\r\n\r\n### \ud83d\ude80 Highlights in v0.1.3 (Brief Summary)\r\n\r\n* \u26a1 **Default Conviction (\u2265 85%)**: Elevated initial screening threshold to focus on high-conviction setups (\u2265 85%).\r\n* \ud83d\udd04 **Autonomous Background Scanner**: Decoupled scanning from the frontend to run entirely in the background, with configurable scan intervals adjustable by admins directly from the scanner tab.\r\n* \u23f1\ufe0f **Live Timing & Local Timezone Sync**: \"Last Scan / Next Due\" timestamps automatically render in the user's local browser timezone with an active countdown timer.\r\n* \u2600\ufe0f **Bright Mode & UX Polish**: Fixed contrast across the admin controls, universe cards, and ticker addition modals.\r\n\r\n---\r\n\r\n## \u26a1 Previous Releases\r\n\r\n### FinDashIQ v0.1.2 \u2014 Global Stock Scanner & Expanded Universe\r\n\r\nWe are pleased to release **FinDashIQ (v0.1.2)**, introducing an expanded global screening universe of 276+ liquid institutional assets, high-speed vectorized data ingestion, interactive catalyst indicators with hover popovers, and streamlined market selection filters.\r\n\r\n---",
+  "is_prerelease": false,
+  "recent_releases": [
+    {
+      "version": "0.1.3",
+      "name": "v0.1.3",
+      "tag": "betav2",
+      "html_url": "https://github.com/TheyAreMe/FinDashIQ/releases/tag/betav2",
+      "published_at": "2026-09-05T14:47:02Z",
+      "prerelease": false
+    },
+    {
+      "version": "0.1.1",
+      "name": "v0.1.1",
+      "tag": "betav1",
+      "html_url": "https://github.com/TheyAreMe/FinDashIQ/releases/tag/betav1",
+      "published_at": "2026-08-30T10:20:42Z",
+      "prerelease": false
+    },
+    {
+      "version": "0.1.0",
+      "name": "v0.1.0",
+      "tag": "beta",
+      "html_url": "https://github.com/TheyAreMe/FinDashIQ/releases/tag/beta",
+      "published_at": "2026-08-30T08:01:19Z",
+      "prerelease": false
+    }
+  ],
+  "timestamp_epoch": 1788717848.517216,
+  "cached": false
+}

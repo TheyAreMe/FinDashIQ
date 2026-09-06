@@ -58,5 +58,20 @@
     "ecoBadge": "\ud83d\udcc8 Community Opportunity",
     "addedAt": "2026-09-05T15:28:21.034454",
     "addedBy": "admin"
+  },
+  {
+    "ticker": "CLNE",
+    "name": "Clean Energy Fuels Corp.",
+    "market": "us",
+    "sector": "Equities",
+    "themes": [
+      "momentum"
+    ],
+    "parentETF": "",
+    "marketCapClass": "large",
+    "esgRating": "Standard (80/100)",
+    "ecoBadge": "\ud83d\udcc8 Community Opportunity",
+    "addedAt": "2026-09-05T16:32:45.337215",
+    "addedBy": "admin"
   }
 ]

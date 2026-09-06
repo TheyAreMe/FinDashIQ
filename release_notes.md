@@ -1,10 +1,24 @@
-# ⚡ FinDashIQ v0.1.3 — Stock Scanner Enhancements & UX Polish
+# ⚡ FinDashIQ v0.1.4 — Strategy Backtesting Studio, System Updates & Historical AI Conviction Graph
 
-FinDashIQ **v0.1.3** delivers key enhancements to the automated Stock Scanner, including autonomous background engine execution, admin interval controls, timezone-aware live countdowns, elevated default conviction screening, and a unified split hero layout.
+FinDashIQ **v0.1.4** introduces the **Strategy Backtesting & Simulation Studio** for institutional multi-factor strategy simulation and forward paper trading, alongside the Historical AI Conviction Score chart in the Charts subtab, automated GitHub Releases update verification, and an administrator update management panel.
 
 ---
 
-### 🚀 Highlights in v0.1.3 (Brief Summary)
+### 🚀 Highlights in v0.1.4 (Brief Summary)
+
+* 🎮 **Strategy Backtesting & Simulation Studio**:
+  * **Institutional Backtesting Suite**: Test strategies over custom time horizons (1M, 3M, 6M, 1Y, 2Y, 3Y, 5Y, MAX) in Long-Only or Long & Short modes with configurable capital allocation, stop-loss %, take-profit %, and slippage/fees.
+* 🔄 **GitHub Releases Update Checker**: Automated version comparison against official releases on GitHub (`TheyAreMe/FinDashIQ/releases`).
+* 🛡️ **Administrator Updates Tab**: Dedicated System Updates management tab in the profile modal displaying release notes, upgrade commands, and recent release history.
+* 📈 **Historical AI Conviction Graph (0–100%)**: Added backwards-calculated AI Conviction Score chart as the second graph in the Charts & Technicals subtab to see stability of conviction over time.
+
+---
+
+## ⚡ Previous Releases
+
+### FinDashIQ v0.1.3 — Stock Scanner Enhancements & UX Polish
+
+FinDashIQ **v0.1.3** delivers key enhancements to the automated Stock Scanner, including autonomous background engine execution, admin interval controls, timezone-aware live countdowns, elevated default conviction screening, and a unified split hero layout.
 
 * ⚡ **Default Conviction (≥ 85%)**: Elevated initial screening threshold to focus on high-conviction setups (≥ 85%).
 * 🔄 **Autonomous Background Scanner**: Decoupled scanning from the frontend to run entirely in the background, with configurable scan intervals adjustable by admins directly from the scanner tab.
@@ -12,8 +26,6 @@ FinDashIQ **v0.1.3** delivers key enhancements to the automated Stock Scanner, i
 * ☀️ **Bright Mode & UX Polish**: Fixed contrast across the admin controls, universe cards, and ticker addition modals.
 
 ---
-
-## ⚡ Previous Releases
 
 ### FinDashIQ v0.1.2 — Global Stock Scanner & Expanded Universe
 

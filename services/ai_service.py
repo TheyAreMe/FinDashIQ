@@ -7,6 +7,8 @@ import socket
 import time
 import urllib.error
 import urllib.request
+import numpy as np
+import pandas as pd
 
 
 class AIService:
@@ -817,6 +819,192 @@ class AIService:
         if return_breakdown:
             return conviction_score, bias, stance_color, badge_class, factor_breakdown
         return conviction_score, bias, stance_color, badge_class
+
+    @staticmethod
+    def compute_historic_conviction_series(df: pd.DataFrame) -> pd.Series:
+        """
+        Calculates backwards historical AI conviction score (10 to 98%, scale 0-100) for every bar in df.
+        Faithfully evaluates multi-factor scoring matching compute_conviction_score:
+        1. Trend & Moving Averages (SuperTrend, SMA 50, SMA 200, Golden/Death cross)
+        2. Momentum & Multi-Oscillator Confluence (Contextual RSI, MACD histogram/cross, Stochastic)
+        3. Institutional Flow & Volume (CMF, VWAP, Relative Volume)
+        4. Volatility & Breakout Squeeze (TTM Squeeze, 52-Week Range proximity)
+        5. Price Action Dynamics & Single-Day Shock Penalties
+        6. Downtrend & Capitulation Guard (Safety caps)
+        Returns a pd.Series of float conviction scores indexed identically to df.
+        """
+        if df is None or df.empty or len(df) == 0:
+            return pd.Series(dtype=float)
+
+        n = len(df)
+        close = df['Close'].values if 'Close' in df.columns else np.zeros(n)
+        prev_close = np.roll(close, 1)
+        prev_close[0] = close[0]
+        change_pct = np.where(prev_close > 0, ((close - prev_close) / prev_close) * 100.0, 0.0)
+
+        st_dir = df['SuperTrend_Dir'].values if 'SuperTrend_Dir' in df.columns else np.ones(n)
+        sma50 = df['SMA_50'].values if 'SMA_50' in df.columns else np.full(n, np.nan)
+        sma200 = df['SMA_200'].values if 'SMA_200' in df.columns else np.full(n, np.nan)
+        rsi = df['RSI'].values if 'RSI' in df.columns else np.full(n, 50.0)
+        macd_hist = df['MACD_Hist'].values if 'MACD_Hist' in df.columns else np.zeros(n)
+        macd = df['MACD'].values if 'MACD' in df.columns else np.zeros(n)
+        macd_sig = df['MACD_Signal'].values if 'MACD_Signal' in df.columns else np.zeros(n)
+        stoch_k = df['Stoch_K'].values if 'Stoch_K' in df.columns else np.full(n, 50.0)
+        stoch_d = df['Stoch_D'].values if 'Stoch_D' in df.columns else np.full(n, 50.0)
+        cmf = df['CMF'].values if 'CMF' in df.columns else np.zeros(n)
+        vwap = df['VWAP'].values if 'VWAP' in df.columns else close
+        vol = df['Volume'].values if 'Volume' in df.columns else np.zeros(n)
+        vol_sma = df['Volume_SMA20'].values if 'Volume_SMA20' in df.columns else np.ones(n)
+        squeeze = df['TTM_Squeeze'].values if 'TTM_Squeeze' in df.columns else np.zeros(n, dtype=bool)
+
+        high = df['High'].values if 'High' in df.columns else close
+        low = df['Low'].values if 'Low' in df.columns else close
+
+        high_s = pd.Series(high)
+        low_s = pd.Series(low)
+        roll_high = high_s.rolling(252, min_periods=20).max().fillna(high_s).values
+        roll_low = low_s.rolling(252, min_periods=20).min().fillna(low_s).values
+
+        scores = np.full(n, 50.0)
+
+        for i in range(n):
+            sc = 50.0
+            cp = close[i]
+            chg = change_pct[i]
+
+            # 1. Multi-Timeframe Trend & Moving Average Alignment
+            t_pts = 0.0
+            if st_dir[i] == 1:
+                if chg <= -5.0:
+                    t_pts += 0.0
+                elif chg <= -2.5:
+                    t_pts += 3.0
+                else:
+                    t_pts += 10.0
+            elif st_dir[i] == -1:
+                t_pts -= 12.0
+                if chg < -2.0:
+                    t_pts -= 4.0
+
+            s200 = sma200[i]
+            if not np.isnan(s200) and s200 > 0:
+                t_pts += 5.0 if cp > s200 else -7.0
+
+            s50 = sma50[i]
+            if not np.isnan(s50) and s50 > 0:
+                t_pts += 4.0 if cp > s50 else -5.0
+                if not np.isnan(s200) and s200 > 0:
+                    t_pts += 3.0 if s50 > s200 else -4.0
+            sc += t_pts
+
+            # 2. Momentum & Multi-Oscillator Confluence
+            m_pts = 0.0
+            r_val = rsi[i] if not np.isnan(rsi[i]) else 50.0
+            c_val = cmf[i] if not np.isnan(cmf[i]) else 0.0
+            v_val = vwap[i] if not np.isnan(vwap[i]) else cp
+
+            if r_val < 35.0:
+                if chg <= -2.5 or st_dir[i] == -1 or (v_val and cp < v_val * 0.99 and c_val < 0):
+                    m_pts -= 12.0
+                elif chg >= 0 and c_val > 0.05 and macd_hist[i] > 0:
+                    m_pts += 8.0
+                else:
+                    m_pts -= 4.0
+            elif 55.0 < r_val <= 68.0:
+                m_pts += 7.0
+            elif 35.0 <= r_val < 45.0:
+                m_pts -= 4.0
+            elif r_val > 75.0:
+                m_pts -= 8.0
+            elif r_val > 68.0:
+                m_pts += 3.0
+
+            m_hist = macd_hist[i]
+            if i > 0 and macd[i] > macd_sig[i] and macd[i-1] <= macd_sig[i-1]:
+                m_pts += 6.0
+            elif m_hist > 0.05:
+                m_pts += 5.0
+            elif i > 0 and macd[i] < macd_sig[i] and macd[i-1] >= macd_sig[i-1]:
+                m_pts -= 6.0
+            elif m_hist < -0.05:
+                m_pts -= 6.0
+
+            if stoch_k[i] > stoch_d[i]:
+                m_pts += 3.0
+            elif stoch_k[i] < stoch_d[i]:
+                m_pts -= 3.0
+            sc += m_pts
+
+            # 3. Flow & Volume
+            f_pts = 0.0
+            if c_val > 0.10:
+                f_pts += (3.0 if chg <= -4.0 else 9.0)
+            elif c_val > 0.03:
+                f_pts += (1.0 if chg <= -4.0 else 5.0)
+            elif c_val < -0.08:
+                f_pts -= 11.0
+            elif c_val < -0.02:
+                f_pts -= 5.0
+
+            if v_val and cp > v_val * 1.003:
+                f_pts += 5.0
+            elif v_val and cp < v_val * 0.997:
+                f_pts -= 6.0
+
+            vsma = vol_sma[i]
+            if vsma and vsma > 0 and vol[i] > 0:
+                rvol = vol[i] / vsma
+                if rvol >= 1.5 and chg > 0.5:
+                    f_pts += 4.0
+                elif rvol >= 1.5 and chg < -1.5:
+                    f_pts -= 6.0
+            sc += f_pts
+
+            # 4. Volatility, Breakout Squeeze & 52-Week Proximity
+            v_pts = 0.0
+            if squeeze[i]:
+                if m_pts > 0 and f_pts > 0:
+                    v_pts += 5.0
+                elif m_pts < 0 or f_pts < 0:
+                    v_pts -= 5.0
+
+            h52 = roll_high[i]
+            l52 = roll_low[i]
+            if h52 > l52:
+                rpos = (cp - l52) / (h52 - l52)
+                if rpos >= 0.85 and chg > -2.0:
+                    v_pts += 4.0
+                elif rpos <= 0.15 and chg <= -2.0:
+                    v_pts -= 5.0
+            sc += v_pts
+
+            # 5. Price Action Momentum & Severe Adverse Drop Penalties
+            p_pts = 0.0
+            if chg <= -10.0:
+                p_pts -= 26.0
+            elif chg <= -5.0:
+                p_pts -= 16.0
+            elif chg <= -2.5:
+                p_pts -= 9.0
+            elif chg < -0.5:
+                p_pts -= 3.0
+            elif chg >= 4.0:
+                p_pts += 7.0
+            elif chg > 0.5:
+                p_pts += 4.0
+            sc += p_pts
+
+            # 6. Safety Caps
+            if chg <= -8.0:
+                sc = min(sc, 28.0)
+            elif chg <= -4.0:
+                sc = min(sc, 44.0)
+            elif st_dir[i] == -1 and cp < v_val and m_hist < 0 and (np.isnan(s50) or cp < s50):
+                sc = min(sc, 36.0)
+
+            scores[i] = round(float(min(98.0, max(10.0, sc))), 1)
+
+        return pd.Series(scores, index=df.index)
 
     def generate_ai_analysis(
         self,

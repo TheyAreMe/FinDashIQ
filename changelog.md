@@ -1,5 +1,18 @@
 # 📋 Changelog
 
+## v0.1.3 ➔ v0.1.4 Delta
+
+### 🎮 Strategy Backtesting & Simulation Studio
+- **Dedicated Backtesting Studio Top Tab**: Introduced a multi-factor backtesting suite with selectable historical timeframes (1M, 3M, 6M, 1Y, 2Y, 3Y, 5Y, MAX), Long-Only / Long & Short simulation modes, and custom risk parameters (Stop-Loss %, Take-Profit %, Slippage & Fees %).
+
+### 🔄 In-App System Updates & Release Tracking
+- **GitHub Releases Update Checker**: Automated version comparison against official GitHub releases (`TheyAreMe/FinDashIQ/releases`).
+- **Administrator Updates Tab**: Added dedicated System Updates management tab in the profile modal displaying release notes, upgrade commands, and release history.
+
+### 📈 Historical AI Conviction Graph
+- **Historical Conviction Over Time (0–100%)**: Added backwards-calculated AI Conviction Score chart as the second graph in the Charts & Technicals subtab to see stability of conviction over time.
+
+---------------------------------------------------------------
 ## v0.1.2 ➔ v0.1.3 Delta
 
 ### 🔍 Stock Scanner Improvements

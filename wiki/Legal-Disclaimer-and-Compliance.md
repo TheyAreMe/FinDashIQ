@@ -10,6 +10,7 @@ This document outlines the operational, regulatory, educational, and privacy pro
 3. [Limitation of Liability](#3-limitation-of-liability)
 4. [Impressum & Provider Information](#4-impressum--provider-information)
 5. [Data Privacy & GDPR Compliance](#5-data-privacy--gdpr-compliance)
+6. [Open Source License & Attributions](#6-open-source-license--attributions)
 
 ---
 
@@ -49,3 +50,15 @@ FinDashIQ is built on a privacy-first, self-hosted architecture:
 - **Local Data Storage**: All user account credentials, watchlists, preferences, and alert rules are stored exclusively on your server instance in the `data/` directory.
 - **Zero Tracking Cookies**: The platform does not use third-party analytics trackers, advertising pixels, or telemetry beacons.
 - **Session Security**: Session tokens are protected via standard HTTP cookie security flags and hardened headers (`HSTS`, `CSP`, `X-Content-Type-Options: nosniff`).
+
+---
+
+## 6. Open Source License & Attributions
+
+FinDashIQ is released under the **[MIT License](https://github.com/TheyAreMe/FinDashIQ/blob/main/LICENSE)**. It builds upon permissive open-source libraries and external APIs:
+
+- **Core Python**: Flask (BSD-3), Pandas (BSD-3), NumPy (BSD-3), yfinance (Apache-2.0), google-genai (Apache-2.0), Requests (Apache-2.0), Gunicorn (MIT), Werkzeug (BSD-3), python-dotenv (BSD-3), packaging (Apache-2.0 / BSD-2).
+- **Frontend & Visualizations**: ApexCharts.js (MIT), Lucide Icons (ISC), Inter Font (OFL 1.1), JetBrains Mono (OFL 1.1).
+- **External Feeds & APIs**: Yahoo! Finance (Market Data), Google Gemini API (Multimodal AI), Frankfurter / ECB (Forex), GitHub REST API (Release Updates), Telegram Bot API & Discord Webhooks (Alert Dispatch).
+
+Full attribution details and licenses are accessible in-app via the **Impressum & Legal** modal in the application footer.

@@ -1,6 +1,7 @@
 import gzip
 import os
 import json
+import threading
 import concurrent.futures
 from datetime import datetime, timedelta
 
@@ -14,11 +15,12 @@ except ImportError:
 from flask import Flask, render_template, jsonify, request, session, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.middleware.proxy_fix import ProxyFix
-from services.stock_service import StockService
+from services.stock_service import stock_service, normalize_ticker, sanitize_for_json
 from services.ai_service import AIService
 from services.scanner_service import ScannerService
 from services.currency_service import CurrencyService
 from services.news_service import news_service
+from services.update_service import update_service, APP_VERSION
 
 
 def _load_dotenv_if_present():
@@ -55,8 +57,18 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_
 
 @app.context_processor
 def inject_asset_version():
-    """Injects static asset version string for automatic client cache busting."""
-    return {'asset_version': '4.69.13'}
+    """Injects static asset version and app version strings for automatic client cache busting."""
+    js_mtime = APP_VERSION
+    try:
+        js_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'js', 'app.js')
+        if os.path.exists(js_path):
+            js_mtime = f"{APP_VERSION}-{int(os.path.getmtime(js_path))}"
+    except Exception:
+        pass
+    return {
+        'asset_version': js_mtime,
+        'app_version': APP_VERSION
+    }
 
 
 @app.after_request
@@ -131,7 +143,6 @@ def favicon():
     """Serves the institutional SVG favicon."""
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.svg', mimetype='image/svg+xml')
 
-stock_service = StockService()
 ai_service = AIService()
 scanner_service = ScannerService(stock_service, ai_service)
 currency_service = CurrencyService()
@@ -139,6 +150,7 @@ currency_service = CurrencyService()
 USERS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'users.json')
 WATCHLIST_FILE = os.path.join(os.path.dirname(__file__), 'data', 'watchlist.json')
 ALERTS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'alerts.json')
+
 
 DEFAULT_WATCHLIST = ["NVDA", "MSFT", "IFX.DE", "TSM", "SPCX", "EXXT.DE", "XDWT.DE", "NEL.OL"]
 
@@ -169,6 +181,7 @@ def load_users() -> dict:
             "watchlist": list(DEFAULT_WATCHLIST),
             "watchlistViewMode": "cards",
             "alerts": [],
+            "paperTrades": [],
             "theme": "dark",
             "aiSettings": {
                 "apiKey": "",
@@ -379,6 +392,53 @@ def api_resolve_stocks():
     }), 200
 
 
+@app.route('/api/stocks/<path:ticker>', methods=['GET'])
+def api_get_single_stock(ticker):
+    """
+    Returns single stock dataset with full timeseries and indicators for backtesting and deep analysis.
+    Query parameters:
+      period: '1mo' | '3mo' | '6mo' | '1y' | '2y' | '5y' | 'max' (default: 'max')
+      interval: '1d' (default: '1d')
+      forceRefresh: bool (default: False)
+    """
+    clean_ticker = (ticker or '').strip().upper()
+    if not clean_ticker:
+        return jsonify({'error': 'Ticker required'}), 400
+
+    period = request.args.get('period', 'max')
+    interval = request.args.get('interval', '1d')
+    force_refresh = request.args.get('forceRefresh', '').lower() in ('true', '1', 'yes')
+
+    valid_periods = {'1mo', '3mo', '6mo', '1y', '2y', '5y', 'ytd', 'max'}
+    if period not in valid_periods:
+        period = 'max'
+
+    include_backtests = request.args.get('includeBacktests', 'false').lower() in ('true', '1')
+
+    try:
+        results = stock_service.fetch_full_stock_analysis([clean_ticker], period=period, interval=interval, force_refresh=force_refresh, phase='full', include_backtests=include_backtests)
+        stocks = results.get('stocks', {})
+        stock_data = stocks.get(clean_ticker) or stocks.get(normalize_ticker(clean_ticker))
+        if not stock_data:
+            return jsonify({'error': f'Could not retrieve market data for {clean_ticker}'}), 404
+        if 'error' in stock_data and not stock_data.get('timeseries'):
+            return jsonify({'error': stock_data['error']}), 404
+
+        return jsonify(sanitize_for_json({
+            'success': True,
+            'ticker': clean_ticker,
+            'period': period,
+            'interval': interval,
+            'profile': stock_data.get('profile', {}),
+            'currentPrice': stock_data.get('currentPrice') or (stock_data.get('profile', {}).get('currentPrice', 0)),
+            'timeseries': stock_data.get('timeseries', []),
+            'signals': stock_data.get('signals', {}),
+            'backtests': stock_data.get('backtests', {})
+        })), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/analyze', methods=['POST'])
 def api_analyze():
     """
@@ -579,7 +639,7 @@ def api_analyze():
             'timestamp': results.get('timestamp', datetime.now().isoformat())
         }
 
-        return jsonify(response), 200
+        return jsonify(sanitize_for_json(response)), 200
 
     except Exception as e:
         return jsonify({"error": f"Internal analysis error: {str(e)}"}), 500
@@ -679,6 +739,26 @@ def test_gemini():
 
     report = ai_service.test_model_cascade(api_key, preferred_model=model)
     return jsonify(report), 200
+
+
+@app.route('/api/stock/warmup-status', methods=['GET'])
+def api_stock_warmup_status():
+    """Returns live metrics about server startup pre-hydration and RAM cache warming."""
+    return jsonify(stock_service.get_warmup_status()), 200
+
+
+@app.route('/api/stock/warmup', methods=['POST'])
+def api_stock_warmup_trigger():
+    """Admin-only: Asynchronously triggers a full pre-hydration warmup cycle for all assets."""
+    user, _ = get_current_user_data()
+    if not user or user.get('role') != 'admin':
+        return jsonify({"success": False, "message": "Administrator privileges required."}), 403
+
+    def _async_warmup():
+        stock_service.prehydrate_universe(force_refresh=True)
+
+    threading.Thread(target=_async_warmup, daemon=True, name="ManualStockWarmup").start()
+    return jsonify({"success": True, "message": "Background universe pre-hydration initiated."}), 200
 
 
 # =============================================================
@@ -1253,6 +1333,69 @@ def api_alert_item(alert_id):
         return jsonify({"error": str(e)}), 500
 
 
+# =============================================================
+# PERSISTENT PAPER TRADING & VIRTUAL PORTFOLIO ENDPOINTS
+# =============================================================
+
+@app.route('/api/paper-trades', methods=['GET', 'POST'])
+def api_paper_trades():
+    """Permanent paper trades storage with user account isolation."""
+    user, username = get_current_user_data()
+    users = load_users()
+
+    if not user or username not in users:
+        return jsonify({"success": True, "trades": []}), 200
+
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        trade_id = data.get('id') or f"pt_{int(datetime.now().timestamp())}_{os.urandom(3).hex()}"
+        data['id'] = trade_id
+        if 'entryDate' not in data:
+            data['entryDate'] = datetime.now().isoformat()
+        if 'status' not in data:
+            data['status'] = 'OPEN'
+
+        if 'paperTrades' not in users[username]:
+            users[username]['paperTrades'] = []
+        existing_idx = next((i for i, t in enumerate(users[username]['paperTrades']) if t.get('id') == trade_id), None)
+        if existing_idx is not None:
+            users[username]['paperTrades'][existing_idx] = data
+        else:
+            users[username]['paperTrades'].append(data)
+        save_users(users)
+        return jsonify({"success": True, "trade": data, "trades": users[username]['paperTrades']}), 200
+
+    # GET
+    return jsonify({"success": True, "trades": users[username].get('paperTrades', [])}), 200
+
+
+@app.route('/api/paper-trades/<trade_id>', methods=['DELETE', 'PATCH'])
+def api_modify_paper_trade(trade_id):
+    """Closes, updates, or removes an active simulated paper trade."""
+    user, username = get_current_user_data()
+    users = load_users()
+
+    def _modify_list(trades_list):
+        if request.method == 'DELETE':
+            return [t for t in trades_list if t.get('id') != trade_id]
+        elif request.method == 'PATCH':
+            patch_data = request.get_json(silent=True) or {}
+            for t in trades_list:
+                if t.get('id') == trade_id:
+                    t.update(patch_data)
+                    break
+            return trades_list
+        return trades_list
+
+    if not user or username not in users:
+        return jsonify({"success": False, "error": "Authentication required"}), 401
+
+    trades = users[username].get('paperTrades', [])
+    users[username]['paperTrades'] = _modify_list(trades)
+    save_users(users)
+    return jsonify({"success": True, "trades": users[username]['paperTrades']}), 200
+
+
 @app.route('/api/alerts/test-trigger', methods=['POST'])
 def api_test_trigger_alert():
     """Executes live or simulated notification dispatch across configured channels."""
@@ -1318,6 +1461,26 @@ def api_test_trigger_alert():
     })
 
     return jsonify({"success": True, "notification": dispatch_report}), 200
+
+
+# =============================================================
+# APPLICATION UPDATE & GITHUB RELEASES ENDPOINTS
+# =============================================================
+
+@app.route('/api/admin/check-updates', methods=['GET', 'POST'])
+def api_check_updates():
+    """Queries GitHub Releases for FinDashIQ updates with rate-limited caching."""
+    user, _ = get_current_user_data()
+    is_admin = bool(user and user.get('role') == 'admin')
+
+    force = request.args.get('force', 'false').lower() in ('true', '1', 'yes')
+    if request.method == 'POST':
+        force = True
+
+    result = update_service.check_for_updates(force_refresh=force)
+    result['isAdmin'] = is_admin
+    status_code = 200 if result.get('success', True) else 500
+    return jsonify(result), status_code
 
 
 if __name__ == '__main__':

@@ -1,43 +1,179 @@
 <!-- ========================================================= -->
-<!-- TAB 3: STRATEGY BACKTESTING & SIMULATION -->
+<!-- TOP VIEW 3: STRATEGY BACKTESTING & SIMULATION STUDIO -->
 <!-- ========================================================= -->
-<div id="tabPane-backtest" class="tab-pane">
-    <div class="glass-card backtest-section">
-        <div class="backtest-header">
-            <div>
+<div class="backtest-studio-container">
+    <!-- Studio Header & Backtest Asset Selector (Combined in Single Box) -->
+    <div class="glass-card backtest-studio-header-card">
+        <div class="backtest-studio-header">
+            <div class="studio-title-group">
                 <div class="card-header-title">
-                    <i data-lucide="play-circle" style="color: var(--accent-cyan); width: 22px; height: 22px;"></i>
+                    <i data-lucide="play-circle" style="color: var(--accent-cyan); width: 26px; height: 26px;"></i>
                     <div>
-                        <span>Indicator Strategy Backtesting & Order Execution Simulation</span>
-                        <div id="backtestSubtitle" style="font-size: 0.76rem; color: var(--text-secondary); font-weight: 500; margin-top: 1px;"></div>
+                        <h2 class="studio-heading">Strategy Backtesting &amp; Forward Testing</h2>
                     </div>
-                </div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
-                    Simulation of following indicator-generated <strong>BUY</strong>, <strong>SELL</strong>, and <strong>HOLD</strong> orders over the selected historical period.
                 </div>
             </div>
 
-            <!-- Strategy & Capital Controls -->
-            <div class="control-group">
-                <span class="control-label">Strategy:</span>
-                <button type="button" id="stratQuantBtn" class="btn-toggle active" onclick="setBacktestStrategy('quant')">
-                    <i data-lucide="sparkles" style="width: 13px;"></i> Multi-Factor Quant
-                </button>
-                <button type="button" id="stratSuperBtn" class="btn-toggle" onclick="setBacktestStrategy('supertrend')">
-                    <i data-lucide="trending-up" style="width: 13px;"></i> SuperTrend
-                </button>
-                <button type="button" id="stratMomBtn" class="btn-toggle" onclick="setBacktestStrategy('momentum')">
-                    <i data-lucide="zap" style="width: 13px;"></i> MACD + RSI
+            <!-- Action Controls -->
+            <div class="bt-header-actions" style="display: flex; align-items: center; gap: 10px;">
+                <div id="btHeaderLoadingBadge" class="bt-loading-badge" style="display: none;">
+                    <div class="bt-spinner-ring"></div>
+                    <span id="btHeaderLoadingText">Fetching Market Data...</span>
+                </div>
+                <button type="button" class="btn-watchlist-add" onclick="openAddStockModal('backtest')"
+                    title="Search any stock or ETF across international exchanges to backtest"
+                    style="font-size: 0.8rem; padding: 7px 14px;">
+                    <i data-lucide="search" style="width: 14px; height: 14px;"></i>
+                    <span>Search Asset</span>
                 </button>
             </div>
         </div>
 
-        <!-- Performance Scorecards Ribbon -->
+        <div class="bt-header-divider"></div>
+
+        <!-- Backtest Asset Selector Bar -->
+        <div class="bt-stock-selector-row">
+            <div class="selector-header-title">
+                <i data-lucide="layers" style="width: 15px; color: var(--accent-cyan);"></i>
+                <span>Backtest Asset:</span>
+                <button type="button" id="btnSyncBacktestWatchlist" class="btn-sync-watchlist"
+                    onclick="syncBacktestWithWatchlist()" title="Sync backtest assets with your active Watchlist"
+                    aria-label="Sync Backtest Assets with Watchlist">
+                    <svg class="sync-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 2v6h-6"></path>
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                        <path d="M3 22v-6h6"></path>
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                    </svg>
+                    <span class="sync-label">Sync to Watchlist</span>
+                </button>
+            </div>
+            <div id="btWatchlistTabsList" class="ticker-tabs-list">
+                <!-- Dynamically populated from active Watchlist in exact same style as general page -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Toolbar: Timeframes, Mode Toggle, Strategy, Risk Controls -->
+    <div class="glass-card backtest-controls-toolbar">
+        <div class="controls-row-top">
+            <!-- Timeframe Range Selector (Matches Chart Period Controls) -->
+            <div class="control-group">
+                <span class="control-label" style="display: flex; align-items: center; gap: 5px;">
+                    <i data-lucide="clock" style="width: 13px; color: var(--accent-purple);"></i>
+                    Range:
+                </span>
+                <div class="control-group" id="btTimeframeGroup">
+                    <button type="button" class="btn-toggle" data-tf="1mo"
+                        onclick="setBacktestTimeframe('1mo')">1M</button>
+                    <button type="button" class="btn-toggle" data-tf="3mo"
+                        onclick="setBacktestTimeframe('3mo')">3M</button>
+                    <button type="button" class="btn-toggle" data-tf="6mo"
+                        onclick="setBacktestTimeframe('6mo')">6M</button>
+                    <button type="button" class="btn-toggle active" data-tf="1y"
+                        onclick="setBacktestTimeframe('1y')">1Y</button>
+                    <button type="button" class="btn-toggle" data-tf="2y"
+                        onclick="setBacktestTimeframe('2y')">2Y</button>
+                    <button type="button" class="btn-toggle" data-tf="3y"
+                        onclick="setBacktestTimeframe('3y')">3Y</button>
+                    <button type="button" class="btn-toggle" data-tf="5y"
+                        onclick="setBacktestTimeframe('5y')">5Y</button>
+                    <button type="button" class="btn-toggle" data-tf="max"
+                        onclick="setBacktestTimeframe('max')">MAX</button>
+                </div>
+            </div>
+
+            <!-- Execution Mode Toggle (Long-Only vs Long & Short) -->
+            <div class="control-cluster">
+                <span class="control-cluster-label">
+                    <i data-lucide="repeat" style="width: 13px; color: var(--accent-green);"></i>
+                    Mode:
+                </span>
+                <div class="mode-switch-group">
+                    <button type="button" id="btModeLongOnly" class="mode-btn active"
+                        onclick="setBacktestMode('long_only')"
+                        title="Long-Only spot investing (Cash during bear regimes)">
+                        Long-Only
+                    </button>
+                    <button type="button" id="btModeLongShort" class="mode-btn" onclick="setBacktestMode('long_short')"
+                        title="Bidirectional long and short derivatives/futures trading">
+                        Long &amp; Short
+                    </button>
+                </div>
+            </div>
+
+            <!-- Strategy Dropdown Selector (8 Strategies) -->
+            <div class="control-cluster strategy-cluster">
+                <span class="control-cluster-label">
+                    <i data-lucide="sparkles" style="width: 13px; color: var(--accent-cyan);"></i>
+                    Strategy:
+                </span>
+                <select id="btStrategySelect" class="bt-strategy-dropdown"
+                    onchange="onBacktestStrategySelectChange(this.value)">
+                    <option value="omni_consensus" selected>👑 Omni-Consensus Master Ensemble (All 9 Indicators Unified)
+                    </option>
+                    <option value="ai_conviction">🤖 AI Conviction Model (Dynamic Thresholding)</option>
+                    <option value="supertrend">📈 SuperTrend (ATR Trend Following)</option>
+                    <option value="ema_cross">⚡ EMA Golden / Death Cross (EMA 9 / 21)</option>
+                    <option value="bollinger">🎯 Bollinger Bands Mean Reversion (20, 2σ)</option>
+                    <option value="momentum">🌊 MACD + RSI Dual Momentum</option>
+                    <option value="stochastic">⚡ Stochastic Oscillator Cross (14, 3, 3)</option>
+                    <option value="cmf_breakout">💧 Chaikin Money Flow (CMF) Volume Breakout</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Risk & Friction Settings Row -->
+        <div class="controls-row-bottom">
+            <div class="risk-input-group">
+                <span class="risk-input-label">Initial Capital:</span>
+                <div class="input-with-affix">
+                    <span class="affix">$</span>
+                    <input type="number" id="btCapitalInput" class="risk-num-input mono" value="10000" min="500"
+                        step="500" oninput="debouncedRecalculateBacktest()" onchange="debouncedRecalculateBacktest()">
+                </div>
+            </div>
+
+            <div class="risk-input-group">
+                <span class="risk-input-label">Stop-Loss:</span>
+                <div class="input-with-affix">
+                    <input type="number" id="btStopLossInput" class="risk-num-input mono" value="5.0" min="0.5"
+                        max="30.0" step="0.5" oninput="debouncedRecalculateBacktest()"
+                        onchange="debouncedRecalculateBacktest()">
+                    <span class="affix">%</span>
+                </div>
+            </div>
+
+            <div class="risk-input-group">
+                <span class="risk-input-label">Take-Profit:</span>
+                <div class="input-with-affix">
+                    <input type="number" id="btTakeProfitInput" class="risk-num-input mono" value="12.0" min="1.0"
+                        max="100.0" step="1.0" oninput="debouncedRecalculateBacktest()"
+                        onchange="debouncedRecalculateBacktest()">
+                    <span class="affix">%</span>
+                </div>
+            </div>
+
+            <div class="risk-input-group">
+                <span class="risk-input-label">Slippage &amp; Fee:</span>
+                <div class="input-with-affix">
+                    <input type="number" id="btSlippageInput" class="risk-num-input mono" value="0.10" min="0.0"
+                        max="2.0" step="0.05" oninput="debouncedRecalculateBacktest()"
+                        onchange="debouncedRecalculateBacktest()">
+                    <span class="affix">%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Scorecards Ribbon -->
+    <div class="glass-card backtest-scorecards-card">
         <div class="backtest-score-grid">
             <div class="score-card">
                 <span class="score-label">Strategy Return vs Benchmark</span>
                 <span id="btReturnVal" class="score-value mono" style="color: var(--accent-green);">+0.00%</span>
-                <span id="btBenchVal" class="score-sub mono">Buy & Hold: +0.00% (Alpha: +0.00%)</span>
+                <span id="btBenchVal" class="score-sub mono">Buy &amp; Hold: +0.00% (Alpha: +0.00%)</span>
             </div>
 
             <div class="score-card">
@@ -47,57 +183,184 @@
             </div>
 
             <div class="score-card">
-                <span class="score-label">Win Rate & Trades</span>
+                <span class="score-label">Win Rate &amp; Trades</span>
                 <span id="btWinRateVal" class="score-value mono">0.0%</span>
                 <span id="btTradesCount" class="score-sub">0 Closed Trades (0 Wins / 0 Losses)</span>
             </div>
 
             <div class="score-card">
-                <span class="score-label">Risk & Profit Factor</span>
+                <span class="score-label">Risk &amp; Profit Factor</span>
                 <span id="btProfitFactor" class="score-value mono">0.0x</span>
                 <span id="btMaxDrawdown" class="score-sub mono">Max Drawdown: 0.00%</span>
             </div>
+
+            <div class="score-card">
+                <span class="score-label">Sharpe &amp; Sortino Ratios</span>
+                <span id="btSharpeVal" class="score-value mono" style="color: var(--accent-cyan);">0.00</span>
+                <span id="btSortinoVal" class="score-sub mono">Sortino Ratio: 0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stacked Dual-Pane Charts: Equity Growth + Underwater Drawdown -->
+    <div class="glass-card backtest-charts-card" style="position: relative;">
+        <!-- Loading Indicator Overlay -->
+        <div id="btChartsLoadingOverlay" class="chart-loading-overlay" style="display: none;">
+            <div class="chart-loading-spinner-box">
+                <div class="chart-spinner-ring"></div>
+                <div class="chart-loading-text">
+                    <span id="btChartsLoadingTitle" class="chart-loading-title">Loading Market History...</span>
+                    <span id="btChartsLoadingSubtext" class="chart-loading-subtext">Fetching daily historical candles
+                        &amp; computing multi-factor indicators</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Equity Curve Comparison Chart -->
-        <div style="padding: 20px 24px 10px 24px;">
+        <!-- Upper Chart: Strategy vs Buy & Hold Equity Curve -->
+        <div class="chart-pane-box">
             <div class="chart-box-header">
                 <div class="chart-title">
-                    <i data-lucide="trending-up" style="color: var(--accent-green);"></i>
-                    <span>Equity Curve: Strategy Portfolio Growth vs Buy & Hold Benchmark</span>
+                    <i id="btEquityTitleIcon" data-lucide="trending-up" style="color: var(--accent-green);"></i>
+                    <span>Primary Equity Curve: Portfolio Value vs Buy &amp; Hold Benchmark</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div class="chart-legend-custom">
+                        <span class="legend-item"><span id="btStratLegendDot" class="indicator-dot"
+                                style="background: #10b981;"></span>
+                            Strategy Portfolio ($)</span>
+                        <span class="legend-item"><span class="indicator-dot" style="background: #64748b;"></span> Buy
+                            &amp; Hold Benchmark ($)</span>
+                    </div>
+                    <button type="button" id="btnToggleTradeMarkers" class="btn-toggle active"
+                        onclick="toggleBacktestTradeMarkers()"
+                        style="padding: 4px 10px; font-size: 0.72rem; display: flex; align-items: center; gap: 5px;"
+                        title="Toggle Trade Execution Markers on/off for a clean curve view">
+                        <i data-lucide="tag" style="width: 12px; height: 12px;"></i>
+                        <span id="btnToggleTradeMarkersText">Markers: On</span>
+                    </button>
+                    <button type="button" class="btn-toggle" onclick="exportBacktestTradesCSV()"
+                        style="padding: 4px 10px; font-size: 0.72rem; display: flex; align-items: center; gap: 5px;"
+                        title="Export All Simulated Trades to CSV">
+                        <i data-lucide="download" style="width: 12px; height: 12px;"></i>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+            <div id="equityChartContainer" class="chart-canvas-box" style="min-height: 290px; position: relative;">
+                <!-- Loading or Chart rendered here -->
+            </div>
+        </div>
+
+        <div class="chart-pane-divider"></div>
+
+        <!-- Lower Chart: Return Profile Relative to Initial Investment -->
+        <div class="chart-pane-box">
+            <div class="chart-box-header">
+                <div class="chart-title">
+                    <i id="btReturnTitleIcon" data-lucide="trending-up"
+                        style="color: var(--accent-green, #10b981);"></i>
+                    <span>Performance Relative to Initial Investment (% Net Return)</span>
                 </div>
                 <div class="chart-legend-custom">
-                    <span class="legend-item"><span class="indicator-dot" style="background: #10b981;"></span> Strategy Equity</span>
-                    <span class="legend-item"><span class="indicator-dot" style="background: #64748b;"></span> Buy & Hold Benchmark</span>
+                    <span class="legend-item"><span id="btReturnLegendDot" class="indicator-dot"
+                            style="background: #10b981;"></span> Strategy (% vs Initial)</span>
+                    <span class="legend-item"><span class="indicator-dot" style="background: #64748b;"></span> Buy &amp;
+                        Hold (% vs Initial)</span>
+                    <span class="legend-item"><span class="indicator-dot"
+                            style="background: #94a3b8; border: 1px dashed #64748b;"></span> Initial Capital (0%)</span>
                 </div>
             </div>
-            <div id="equityChartContainer"></div>
-        </div>
-
-        <!-- Executed Orders History Table -->
-        <div class="card-header-styled" style="border-top: 1px solid var(--border-subtle);">
-            <div class="card-header-title" style="font-size: 0.95rem;">
-                <i data-lucide="list" style="color: var(--accent-blue);"></i>
-                <span>Simulated Order Execution & Trade Log</span>
+            <div id="drawdownChartContainer" class="chart-canvas-box" style="min-height: 200px; position: relative;">
+                <!-- Loading or Chart rendered here -->
             </div>
-            <span id="totalOrdersBadge" class="badge-pill badge-neutral">0 Orders</span>
+        </div>
+    </div>
+
+    <!-- Multi-Strategy Comparative Benchmark Grid -->
+    <div class="glass-card backtest-section-card">
+        <div class="card-header-styled"
+            style="padding: 0 0 14px 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 14px;">
+            <div class="card-header-title" style="font-size: 0.95rem;">
+                <i data-lucide="award" style="color: var(--accent-amber);"></i>
+                <span>Multi-Strategy Benchmark Matrix</span>
+            </div>
+            <span class="badge-pill badge-neutral" style="font-size: 0.72rem;">Side-by-Side Analytics</span>
         </div>
 
-        <div class="trades-table-container">
+        <div class="table-responsive">
+            <table class="benchmark-matrix-table">
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Mode</th>
+                        <th>Total Return</th>
+                        <th>Alpha vs B&amp;H</th>
+                        <th>Win Rate</th>
+                        <th>Profit Factor</th>
+                        <th>Sharpe</th>
+                        <th>Sortino</th>
+                        <th>Max Drawdown</th>
+                        <th>Closed Trades</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="btBenchmarkMatrixBody">
+                    <!-- Injected dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Centralized Forward Paper Trading Portfolio Tracker -->
+    <div class="glass-card backtest-section-card">
+        <div class="card-header-styled"
+            style="padding: 0 0 14px 0; border-bottom: 1px solid var(--border-subtle); margin-bottom: 14px;">
+            <div class="card-header-title" style="font-size: 0.95rem;">
+                <i data-lucide="briefcase" style="color: var(--accent-green);"></i>
+                <span>Active Virtual Positions &amp; Forward Paper Trades</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" id="btnRefreshPaperTrades" class="btn-sync-watchlist"
+                    onclick="refreshPaperTradesLive()"
+                    title="Fetch live quotes and update mark-to-market valuations for all active positions"
+                    aria-label="Update Positions">
+                    <svg class="sync-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 2v6h-6"></path>
+                        <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                        <path d="M3 22v-6h6"></path>
+                        <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                    </svg>
+                    <span class="refresh-label">Update Positions</span>
+                </button>
+                <button type="button" class="btn-primary" onclick="openNewPaperTradeModal()"
+                    title="Open Forward Paper Trade configurator to simulate position">
+                    <i data-lucide="plus" style="width: 14px; height: 14px;"></i>
+                    <span>New Paper Trade</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
             <table class="trades-table">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Action</th>
-                        <th>Date</th>
-                        <th>Execution Price</th>
-                        <th>Trade PnL ($)</th>
-                        <th>Trade Return (%)</th>
-                        <th>Portfolio Capital</th>
-                        <th>Indicator Trigger Reason</th>
+                        <th style="width: 36px;">#</th>
+                        <th>Asset</th>
+                        <th>Side</th>
+                        <th>Shares</th>
+                        <th>Entry</th>
+                        <th>Current</th>
+                        <th>Capital</th>
+                        <th>Stop-Loss</th>
+                        <th>Take-Profit</th>
+                        <th>Unrealized P&amp;L</th>
+                        <th>Return</th>
+                        <th>Status</th>
+                        <th style="text-align: center; width: 90px;">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="tradesTableBody">
+                <tbody id="paperTradesTableBody">
                     <!-- Injected dynamically -->
                 </tbody>
             </table>

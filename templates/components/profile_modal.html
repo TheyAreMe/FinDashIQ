@@ -35,6 +35,10 @@
                 onclick="switchProfileModalTab('users')" style="display: none;">
                 <i data-lucide="users" style="width: 14px;"></i> User Management
             </button>
+            <button type="button" id="tabBtnProfileUpdates" class="profile-tab-btn admin-only-tab"
+                onclick="switchProfileModalTab('updates')" style="display: none;">
+                <i data-lucide="refresh-cw" style="width: 14px;"></i> System Updates
+            </button>
         </div>
 
         <!-- Status Message Banner -->
@@ -238,6 +242,72 @@
                                 <!-- Populated dynamically -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: System Updates & GitHub Releases -->
+        <div id="profileTabPaneUpdates" class="profile-tab-pane">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Current Status Hero Banner -->
+                <div class="glass-card" style="padding: 16px; border-radius: var(--radius-md); background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div id="updateStatusIconContainer" style="width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(59, 130, 246, 0.1); color: var(--accent-blue);">
+                                <i data-lucide="git-branch" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <h3 style="font-size: 1rem; font-weight: 700; margin: 0; color: var(--text-primary);">FinDashIQ Core</h3>
+                                    <span id="updateCurrentVersionBadge" class="badge-pill badge-neutral" style="font-size: 0.72rem;">v{{ app_version }}</span>
+                                    <span id="updateStatusStateBadge" class="badge-pill badge-bullish" style="font-size: 0.72rem;">Up to Date</span>
+                                </div>
+                                <div id="updateStatusSubtext" style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">
+                                    Checking official GitHub releases...
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="btnCheckUpdatesNow" class="btn-watchlist-add" onclick="handleManualCheckUpdates()" style="padding: 8px 16px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="refresh-cw" id="btnCheckUpdatesIcon" style="width: 14px; height: 14px;"></i>
+                            <span id="btnCheckUpdatesText">Check for Updates</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Update Available Details Card (Hidden when up to date) -->
+                <div id="updateDetailsCard" class="glass-card" style="display: none; padding: 16px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.95rem; color: var(--accent-green); display: flex; align-items: center; gap: 6px;">
+                                <i data-lucide="sparkles" style="width: 16px;"></i>
+                                <span id="updateReleaseTitle">New Release Available</span>
+                            </div>
+                            <div id="updateReleaseMeta" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Published on GitHub</div>
+                        </div>
+                        <a id="updateReleaseGithubLink" href="https://github.com/TheyAreMe/FinDashIQ/releases" target="_blank" rel="noopener noreferrer" class="btn-watchlist-refresh" style="padding: 6px 12px; font-size: 0.75rem; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="external-link" style="width: 13px;"></i> View on GitHub
+                        </a>
+                    </div>
+
+                    <!-- Release Notes Body -->
+                    <div style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; max-height: 160px; overflow-y: auto; background: var(--bg-surface); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-bottom: 12px;" id="updateReleaseBody">
+                    </div>
+
+                    <!-- How to Upgrade Snippet -->
+                    <div style="padding: 10px 12px; background: rgba(0,0,0,0.25); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                        <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em;">How to update your local installation:</div>
+                        <code style="font-family: monospace; font-size: 0.78rem; color: var(--accent-cyan); display: block; user-select: all;">git pull origin main &amp;&amp; pip install -r requirements.txt</code>
+                    </div>
+                </div>
+
+                <!-- Recent Releases History List -->
+                <div>
+                    <div style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="history" style="width: 15px; color: var(--accent-blue);"></i> Release History
+                    </div>
+                    <div id="updateRecentReleasesList" style="display: flex; flex-direction: column; gap: 6px;">
+                        <!-- Dynamically filled -->
                     </div>
                 </div>
             </div>

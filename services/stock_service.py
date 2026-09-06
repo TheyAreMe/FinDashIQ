@@ -4,6 +4,8 @@ import time
 import re
 import math
 import concurrent.futures
+import threading
+import logging
 from datetime import datetime, timedelta
 import numpy as np
 import pandas as pd
@@ -11,6 +13,10 @@ import urllib.request
 import urllib.parse
 import yfinance as yf
 from services.news_service import news_service
+
+logger = logging.getLogger(__name__)
+logging.getLogger('yfinance').setLevel(logging.CRITICAL)
+logging.getLogger('urllib3').setLevel(logging.CRITICAL)
 
 
 GLOBAL_TICKER_NAME_MAP = {
@@ -68,7 +74,7 @@ GLOBAL_TICKER_NAME_MAP = {
     'VRTX': 'Vertex Pharmaceuticals Inc.',
     'CRSP': 'CRISPR Therapeutics AG',
     'ILMN': 'Illumina Inc.',
-    'SQ': 'Block Inc.',
+    'XYZ': 'Block Inc.',
     'SHOP': 'Shopify Inc.',
     'MELI': 'MercadoLibre Inc.',
     'SE': 'Sea Limited',
@@ -84,6 +90,64 @@ GLOBAL_TICKER_NAME_MAP = {
 
 _NAME_LOOKUP_CACHE = {}
 
+TICKER_ALIASES = {}
+
+
+def normalize_ticker(ticker: str) -> str:
+    """Normalizes ticker symbol."""
+    if not ticker or not isinstance(ticker, str):
+        return ticker
+    clean = ticker.strip().upper()
+    return TICKER_ALIASES.get(clean, clean)
+
+
+def _safe_float(val, default=None, decimals=2):
+    """Safely converts a value to float or None without producing NaN or Infinity."""
+    if val is None or pd.isna(val):
+        return default
+    try:
+        f = float(val)
+        if math.isnan(f) or math.isinf(f) or np.isnan(f) or np.isinf(f):
+            return default
+        return round(f, decimals) if decimals is not None else f
+    except (ValueError, TypeError):
+        return default
+
+
+def _safe_int(val, default=0):
+    """Safely converts a value to integer or default without producing NaN/overflow."""
+    if val is None or pd.isna(val):
+        return default
+    try:
+        f = float(val)
+        if math.isnan(f) or math.isinf(f) or np.isnan(f) or np.isinf(f):
+            return default
+        return int(f)
+    except (ValueError, TypeError):
+        return default
+
+
+def sanitize_for_json(obj):
+    """Recursively replaces all NaN, Infinity, -Infinity, and numpy float/int with compliant JSON primitives."""
+    if obj is None:
+        return None
+    if isinstance(obj, float):
+        if math.isnan(obj) or math.isinf(obj) or np.isnan(obj) or np.isinf(obj):
+            return None
+        return obj
+    if isinstance(obj, (np.floating, np.integer)):
+        val = float(obj) if isinstance(obj, np.floating) else int(obj)
+        if isinstance(val, float) and (math.isnan(val) or math.isinf(val)):
+            return None
+        return val
+    if isinstance(obj, dict):
+        return {k: sanitize_for_json(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [sanitize_for_json(v) for v in obj]
+    if pd.isna(obj):
+        return None
+    return obj
+
 
 class StockService:
     """
@@ -98,11 +162,22 @@ class StockService:
         self._analysis_cache = {}
         self._profile_cache = {}
         self._news_cache = {}
+        self._lock = threading.RLock()
+        self._warmup_thread = None
+        self._stop_warmup = threading.Event()
+        self._is_warming_up = False
+        self._last_warmup_time = None
+        self._last_warmup_duration = 0.0
+        self._warmed_tickers = []
+
+        # Start continuous background warmup & delta sync daemon
+        if os.environ.get('WERKZEUG_RUN_MAIN') != 'false':
+            self.start_background_warmup()
 
     @staticmethod
     def _resolve_company_name(ticker_symbol: str, info: dict) -> str:
         """Resolves the real company name with zero-latency dictionary, cache, and fast search fallbacks."""
-        clean_t = ticker_symbol.strip().upper()
+        clean_t = normalize_ticker(ticker_symbol.strip().upper())
         
         # 1. Info dictionary from yfinance
         if info:
@@ -157,8 +232,8 @@ class StockService:
             fast_info = getattr(ticker_obj, 'fast_info', None)
             info = {}
 
-            # Only fallback to heavy quoteSummary endpoint if fast_info is unavailable and info scrape is requested
-            if not skip_info_scrape and fast_info is None:
+            # Query quoteSummary endpoint if fundamental info scrape is requested
+            if not skip_info_scrape:
                 try:
                     info = ticker_obj.info or {}
                 except Exception:
@@ -232,32 +307,36 @@ class StockService:
 
             currency = getattr(fast_info, 'currency', None) or info.get('currency', 'USD') or 'USD'
 
-            return {
-                'ticker': ticker_symbol,
+            canonical_ticker = normalize_ticker(ticker_symbol)
+            return sanitize_for_json({
+                'ticker': canonical_ticker,
+                'originalTicker': ticker_symbol,
                 'name': resolved_name,
                 'currency': currency,
-                'sector': info.get('sector', 'Equities'),
-                'industry': info.get('industry', 'N/A'),
-                'currentPrice': round(current_price, 2) if current_price is not None else None,
-                'previousClose': round(prev_close, 2) if prev_close is not None else None,
-                'change': change,
-                'changePercent': change_percent,
-                'dayHigh': day_high,
-                'dayLow': day_low,
-                'dayOpen': day_open,
-                'fiftyTwoWeekHigh': high_52,
-                'fiftyTwoWeekLow': low_52,
-                'marketCap': market_cap,
-                'volume': int(info.get('volume') or info.get('regularMarketVolume') or 0),
-                'avgVolume': int(info.get('averageVolume') or 0),
-                'peRatio': round(float(info.get('trailingPE')), 2) if info.get('trailingPE') else None,
-                'forwardPE': round(float(info.get('forwardPE')), 2) if info.get('forwardPE') else None,
-                'dividendYield': round(float(info.get('dividendYield')) * 100, 2) if info.get('dividendYield') else None,
-                'beta': round(float(info.get('beta')), 2) if info.get('beta') else None
-            }
+                'sector': info.get('sector', 'Equities') or 'Equities',
+                'industry': info.get('industry', 'N/A') or 'N/A',
+                'currentPrice': _safe_float(current_price),
+                'previousClose': _safe_float(prev_close),
+                'change': _safe_float(change),
+                'changePercent': _safe_float(change_percent),
+                'dayHigh': _safe_float(day_high),
+                'dayLow': _safe_float(day_low),
+                'dayOpen': _safe_float(day_open),
+                'fiftyTwoWeekHigh': _safe_float(high_52),
+                'fiftyTwoWeekLow': _safe_float(low_52),
+                'marketCap': _safe_int(market_cap, None),
+                'volume': _safe_int(info.get('volume') or info.get('regularMarketVolume')),
+                'avgVolume': _safe_int(info.get('averageVolume')),
+                'peRatio': _safe_float(info.get('trailingPE')),
+                'forwardPE': _safe_float(info.get('forwardPE')),
+                'dividendYield': _safe_float(float(info.get('dividendYield')) * 100 if float(info.get('dividendYield')) < 0.1 else float(info.get('dividendYield'))) if info.get('dividendYield') is not None else None,
+                'beta': _safe_float(info.get('beta'))
+            })
         except Exception as e:
+            canonical_ticker = normalize_ticker(ticker_symbol)
             return {
-                'ticker': ticker_symbol,
+                'ticker': canonical_ticker,
+                'originalTicker': ticker_symbol,
                 'name': StockService._resolve_company_name(ticker_symbol, {}),
                 'currency': 'USD',
                 'currentPrice': None,
@@ -291,8 +370,10 @@ class StockService:
         df['SMA_20'] = df['Close'].rolling(window=20, min_periods=5).mean()
         df['SMA_50'] = df['Close'].rolling(window=50, min_periods=10).mean()
         df['SMA_200'] = df['Close'].rolling(window=200, min_periods=20).mean()
+        df['EMA_9'] = df['Close'].ewm(span=9, adjust=False).mean()
         df['EMA_12'] = df['Close'].ewm(span=12, adjust=False).mean()
         df['EMA_20'] = df['Close'].ewm(span=20, adjust=False).mean()
+        df['EMA_21'] = df['Close'].ewm(span=21, adjust=False).mean()
         df['EMA_26'] = df['Close'].ewm(span=26, adjust=False).mean()
         df['EMA_50'] = df['Close'].ewm(span=50, adjust=False).mean()
         df['EMA_200'] = df['Close'].ewm(span=200, adjust=False).mean()
@@ -408,6 +489,15 @@ class StockService:
             df['CMF'] = 0
             df['OBV'] = 0
             df['Volume_SMA20'] = 0
+
+        # 14. Historical AI Conviction Score (0-100%) & 5-Day EMA Trend
+        try:
+            from services.ai_service import AIService
+            df['AI_Conviction'] = AIService.compute_historic_conviction_series(df)
+            df['AI_Conviction_EMA'] = df['AI_Conviction'].ewm(span=5, adjust=False).mean().round(1)
+        except Exception:
+            df['AI_Conviction'] = 50.0
+            df['AI_Conviction_EMA'] = 50.0
 
         return df
 
@@ -885,7 +975,8 @@ class StockService:
         Retrieves historical market data using persistent server-side disk caching
         and lightweight delta downloads for fast reloading.
         """
-        safe_ticker = ticker.replace('/', '_').replace('^', '_')
+        actual_ticker = normalize_ticker(ticker)
+        safe_ticker = actual_ticker.replace('/', '_').replace('^', '_')
         cache_file = os.path.join(self.cache_dir, f"{safe_ticker}_{interval}.csv")
         now = time.time()
 
@@ -907,15 +998,13 @@ class StockService:
                 if isinstance(cached_df.columns, pd.MultiIndex):
                     cached_df.columns = [col[0] for col in cached_df.columns]
                 file_age = now - os.path.getmtime(cache_file)
-                # If cache is fresh (< 1800 seconds / 30 mins), not forced, and has sufficient historical depth
-                if not force_refresh and file_age < 1800 and not cached_df.empty and len(cached_df) >= required_rows:
+                # If cache is fresh (< 1800 seconds / 30 mins), not forced, and non-empty
+                if not force_refresh and file_age < 1800 and not cached_df.empty:
                     return cached_df
-                elif len(cached_df) < required_rows:
-                    cached_df = None  # Force full download to satisfy larger period requested
             except Exception:
                 cached_df = None
 
-        # If we have existing cached data with sufficient depth, perform a lightweight DELTA download
+        # If we have existing cached data, perform a lightweight DELTA download
         if cached_df is not None and not cached_df.empty and 'Close' in cached_df.columns:
             try:
                 last_dt = cached_df.index[-1]
@@ -924,17 +1013,17 @@ class StockService:
 
                 # Fetch only from 3 days prior to last cached bar to today
                 delta_start = (last_dt - timedelta(days=3)).strftime('%Y-%m-%d')
-                delta_df = yf.download(ticker, start=delta_start, interval=interval, progress=False)
+                delta_df = yf.download(actual_ticker, start=delta_start, interval=interval, progress=False)
 
                 if isinstance(delta_df.columns, pd.MultiIndex):
                     delta_df.columns = [col[0] for col in delta_df.columns]
 
                 if not delta_df.empty and 'Close' in delta_df.columns:
-                    delta_df = self._patch_latest_bar_if_nan(ticker, delta_df)
+                    delta_df = self._patch_latest_bar_if_nan(actual_ticker, delta_df)
                     # Combine cached and delta, removing duplicate timestamps keeping the latest
                     combined_df = pd.concat([cached_df, delta_df])
                     combined_df = combined_df.loc[~combined_df.index.duplicated(keep='last')]
-                    combined_df = self._patch_latest_bar_if_nan(ticker, combined_df)
+                    combined_df = self._patch_latest_bar_if_nan(actual_ticker, combined_df)
                     combined_df = combined_df.dropna(subset=['Close'])
                     combined_df.to_csv(cache_file)
                     return combined_df
@@ -945,35 +1034,40 @@ class StockService:
             except Exception:
                 return cached_df
 
-        # If no cache exists or existing cache was too shallow for requested period, download full history
+        # If no cache exists, download full history
         try:
             download_period = period if period in ('2y', '5y', 'max') else '2y'
-            full_df = yf.download(ticker, period=download_period, interval=interval, progress=False)
+            full_df = yf.download(actual_ticker, period=download_period, interval=interval, progress=False)
             if isinstance(full_df.columns, pd.MultiIndex):
                 full_df.columns = [col[0] for col in full_df.columns]
 
             if not full_df.empty and 'Close' in full_df.columns:
-                full_df = self._patch_latest_bar_if_nan(ticker, full_df)
+                full_df = self._patch_latest_bar_if_nan(actual_ticker, full_df)
                 full_df = full_df.dropna(subset=['Close'])
                 full_df.to_csv(cache_file)
                 return full_df
         except Exception:
             pass
 
+        if cached_df is not None and not cached_df.empty and 'Close' in cached_df.columns:
+            return cached_df
+
         return pd.DataFrame()
 
-    def _process_single_ticker(self, ticker: str, period: str = '6mo', interval: str = '1d', force_refresh: bool = False) -> tuple[str, dict]:
+    def _process_single_ticker(self, ticker: str, period: str = '6mo', interval: str = '1d', force_refresh: bool = False, include_backtests: bool = True) -> tuple[str, dict]:
         """Processes an individual ticker: downloads data, computes indicators, profile, backtests, and news."""
+        actual_ticker = normalize_ticker(ticker)
         now = time.time()
-        cache_key = f"{ticker}_{period}_{interval}"
-        cached_entry = self._analysis_cache.get(cache_key)
-
-        # Check if in-memory cache is valid (< 600s) and not force_refresh
-        if not force_refresh and cached_entry and (now - cached_entry['timestamp'] < 600):
-            return ticker, cached_entry['data']
+        cache_key = f"{actual_ticker}_{period}_{interval}"
+        
+        with self._lock:
+            cached_entry = self._analysis_cache.get(cache_key)
+            # Check if in-memory cache is valid (< 1800s / 30m) and not force_refresh
+            if not force_refresh and cached_entry and (now - cached_entry['timestamp'] < 1800):
+                return ticker, cached_entry['data']
 
         try:
-            ticker_df = self.get_historical_dataframe(ticker, period=period, interval=interval, force_refresh=force_refresh)
+            ticker_df = self.get_historical_dataframe(actual_ticker, period=period, interval=interval, force_refresh=force_refresh)
 
             if ticker_df.empty or 'Close' not in ticker_df.columns:
                 return ticker, {'error': f'No historical data found for {ticker}.'}
@@ -983,24 +1077,49 @@ class StockService:
             last_row = enriched_df.iloc[-1]
             prev_row = enriched_df.iloc[-2] if len(enriched_df) > 1 else last_row
 
-            curr_price = round(float(last_row.get('Close', 0.0)), 2)
-            prev_close = round(float(prev_row.get('Close', curr_price)), 2)
-            change = round(curr_price - prev_close, 2)
-            change_pct = round((change / prev_close * 100) if prev_close > 0 else 0.0, 2)
+            curr_price = _safe_float(last_row.get('Close'), 0.0)
+            prev_close = _safe_float(prev_row.get('Close'), curr_price)
+            change = _safe_float(curr_price - prev_close, 0.0) if (curr_price is not None and prev_close is not None) else 0.0
+            change_pct = _safe_float((change / prev_close * 100) if (prev_close and prev_close > 0) else 0.0, 0.0)
 
-            high_52 = round(float(enriched_df['High'].tail(252).max()), 2) if 'High' in enriched_df.columns else curr_price
-            low_52 = round(float(enriched_df['Low'].tail(252).min()), 2) if 'Low' in enriched_df.columns else curr_price
-            day_high = round(float(last_row.get('High', curr_price)), 2)
-            day_low = round(float(last_row.get('Low', curr_price)), 2)
-            day_open = round(float(last_row.get('Open', curr_price)), 2)
-            volume = int(last_row.get('Volume', 0)) if not pd.isna(last_row.get('Volume', 0)) else 0
+            high_52 = _safe_float(enriched_df['High'].tail(252).max() if 'High' in enriched_df.columns else curr_price, curr_price)
+            low_52 = _safe_float(enriched_df['Low'].tail(252).min() if 'Low' in enriched_df.columns else curr_price, curr_price)
+            day_high = _safe_float(last_row.get('High'), curr_price)
+            day_low = _safe_float(last_row.get('Low'), curr_price)
+            day_open = _safe_float(last_row.get('Open'), curr_price)
+            volume = _safe_int(last_row.get('Volume'))
 
-            comp_name = self._resolve_company_name(ticker, {})
-            currency = 'EUR' if ('.DE' in ticker or '.PA' in ticker or '.AS' in ticker) else ('NOK' if '.OL' in ticker else ('SEK' if '.ST' in ticker else ('JPY' if '.T' in ticker else 'USD')))
+            comp_name = self._resolve_company_name(actual_ticker, {})
+            currency = 'EUR' if ('.DE' in actual_ticker or '.PA' in actual_ticker or '.AS' in actual_ticker) else ('NOK' if '.OL' in actual_ticker else ('SEK' if '.ST' in actual_ticker else ('JPY' if '.T' in actual_ticker else 'USD')))
+
+            avg_volume = _safe_int(enriched_df['Volume'].tail(30).mean() if 'Volume' in enriched_df.columns and not enriched_df['Volume'].empty else volume)
+            market_cap = None
+            pe_ratio = None
+            forward_pe = None
+            dividend_yield = None
+            beta = None
+            sector = 'Equities'
+
+            try:
+                t_obj = yf.Ticker(actual_ticker)
+                fund_profile = StockService.get_stock_profile(t_obj, actual_ticker, skip_info_scrape=True)
+                if fund_profile:
+                    market_cap = _safe_int(fund_profile.get('marketCap'), None)
+                    pe_ratio = _safe_float(fund_profile.get('peRatio'))
+                    forward_pe = _safe_float(fund_profile.get('forwardPE'))
+                    dividend_yield = _safe_float(fund_profile.get('dividendYield'))
+                    beta = _safe_float(fund_profile.get('beta'))
+                    if fund_profile.get('avgVolume'):
+                        avg_volume = _safe_int(fund_profile.get('avgVolume'))
+                    if fund_profile.get('sector') and fund_profile.get('sector') != 'Equities':
+                        sector = fund_profile.get('sector')
+            except Exception:
+                pass
 
             profile = {
                 'ticker': ticker,
                 'name': comp_name,
+                'sector': sector,
                 'currentPrice': curr_price,
                 'previousClose': prev_close,
                 'change': change,
@@ -1012,10 +1131,16 @@ class StockService:
                 'fiftyTwoWeekHigh': high_52,
                 'fiftyTwoWeekLow': low_52,
                 'volume': volume,
-                'atr': round(float(last_row.get('ATR', 0)), 2) if not pd.isna(last_row.get('ATR')) else None,
-                'vwap': round(float(last_row.get('VWAP', 0)), 2) if not pd.isna(last_row.get('VWAP')) else None,
-                'superTrend': round(float(last_row.get('SuperTrend', 0)), 2) if not pd.isna(last_row.get('SuperTrend')) else None,
-                'cmf': round(float(last_row.get('CMF', 0)), 2) if not pd.isna(last_row.get('CMF')) else None
+                'avgVolume': avg_volume,
+                'marketCap': market_cap,
+                'peRatio': pe_ratio,
+                'forwardPE': forward_pe,
+                'dividendYield': dividend_yield,
+                'beta': beta,
+                'atr': _safe_float(last_row.get('ATR')),
+                'vwap': _safe_float(last_row.get('VWAP')),
+                'superTrend': _safe_float(last_row.get('SuperTrend')),
+                'cmf': _safe_float(last_row.get('CMF'))
             }
 
             signals = self.generate_technical_summary(enriched_df)
@@ -1047,7 +1172,9 @@ class StockService:
                     'sma20': safe_val(row.get('SMA_20')),
                     'sma50': safe_val(row.get('SMA_50')),
                     'sma200': safe_val(row.get('SMA_200')),
+                    'ema9': safe_val(row.get('EMA_9')),
                     'ema20': safe_val(row.get('EMA_20')),
+                    'ema21': safe_val(row.get('EMA_21')),
                     'ema50': safe_val(row.get('EMA_50')),
                     'ema200': safe_val(row.get('EMA_200')),
                     'bbUpper': safe_val(row.get('BB_Upper')),
@@ -1071,17 +1198,8 @@ class StockService:
                     'williamsR': safe_val(row.get('Williams_R')),
                     'atr': safe_val(row.get('ATR')),
                     'volumeSma': safe_val(row.get('Volume_SMA20'), 0),
-                    # Uppercase alias keys
-                    'SMA_20': safe_val(row.get('SMA_20')),
-                    'SMA_50': safe_val(row.get('SMA_50')),
-                    'SMA_200': safe_val(row.get('SMA_200')),
-                    'RSI': safe_val(row.get('RSI'), 1),
-                    'MACD': safe_val(row.get('MACD')),
-                    'Signal': safe_val(row.get('MACD_Signal') or row.get('Signal')),
-                    'Hist': safe_val(row.get('MACD_Hist') or row.get('Hist')),
-                    'SuperTrend': safe_val(row.get('SuperTrend')),
-                    'VWAP': safe_val(row.get('VWAP')),
-                    'CMF': safe_val(row.get('CMF'), 3)
+                    'aiConviction': safe_val(row.get('AI_Conviction'), 1),
+                    'aiConvictionEma': safe_val(row.get('AI_Conviction_EMA'), 1)
                 }
                 timeseries.append(point)
 
@@ -1098,28 +1216,83 @@ class StockService:
             slice_limit = PERIOD_DAYS_MAP.get(period)
             display_timeseries = timeseries[-slice_limit:] if (slice_limit and len(timeseries) > slice_limit) else timeseries
 
-            backtests = {
-                'quant': self.simulate_backtest(display_timeseries, strategy='quant'),
-                'supertrend': self.simulate_backtest(display_timeseries, strategy='supertrend'),
-                'momentum': self.simulate_backtest(display_timeseries, strategy='momentum'),
-                'rsi_oversold': self.simulate_backtest(display_timeseries, strategy='rsi_oversold'),
-                'macd_crossover': self.simulate_backtest(display_timeseries, strategy='macd_crossover')
-            }
+            # Calculate Historical AI Conviction Stats across display slice
+            conv_scores = [p['aiConviction'] for p in display_timeseries if p.get('aiConviction') is not None]
+            if conv_scores:
+                pct_above_50 = round(sum(1 for s in conv_scores if s >= 50.0) / len(conv_scores) * 100, 1)
+                avg_conv = round(sum(conv_scores) / len(conv_scores), 1)
+                diffs = [conv_scores[i] - conv_scores[i-1] for i in range(1, len(conv_scores))]
+                jitter_val = round(float(np.std(diffs)), 1) if len(diffs) > 1 else 0.0
 
-            news = self.fetch_stock_news(ticker, company_name=profile.get('name', ''), limit=35, force_refresh=force_refresh)
+                if pct_above_50 >= 75.0:
+                    regime = 'High Stability Bullish'
+                    regime_badge = 'badge-bullish'
+                elif pct_above_50 >= 55.0:
+                    regime = 'Moderate Bullish Bias'
+                    regime_badge = 'badge-bullish'
+                elif pct_above_50 >= 40.0:
+                    regime = 'Neutral / Transition'
+                    regime_badge = 'badge-neutral'
+                else:
+                    regime = 'Bearish Bias'
+                    regime_badge = 'badge-bearish'
 
-            stock_entry = {
+                if jitter_val <= 4.0:
+                    jitter_desc = 'Low Jitter (Stable)'
+                elif jitter_val <= 8.0:
+                    jitter_desc = 'Moderate Jitter'
+                else:
+                    jitter_desc = 'High Jitter (Volatile)'
+
+                conviction_history_stats = {
+                    'pctAbove50': pct_above_50,
+                    'avgConviction': avg_conv,
+                    'jitter': jitter_val,
+                    'jitterDesc': jitter_desc,
+                    'regime': regime,
+                    'regimeBadge': regime_badge,
+                    'currentConviction': conv_scores[-1]
+                }
+            else:
+                conviction_history_stats = {
+                    'pctAbove50': 50.0,
+                    'avgConviction': 50.0,
+                    'jitter': 0.0,
+                    'jitterDesc': 'N/A',
+                    'regime': 'Neutral',
+                    'regimeBadge': 'badge-neutral',
+                    'currentConviction': 50.0
+                }
+
+            if include_backtests:
+                backtests = {
+                    'quant': self.simulate_backtest(display_timeseries, strategy='quant'),
+                    'supertrend': self.simulate_backtest(display_timeseries, strategy='supertrend'),
+                    'momentum': self.simulate_backtest(display_timeseries, strategy='momentum'),
+                    'rsi_oversold': self.simulate_backtest(display_timeseries, strategy='rsi_oversold'),
+                    'macd_crossover': self.simulate_backtest(display_timeseries, strategy='macd_crossover')
+                }
+            else:
+                backtests = {}
+
+            news = self.fetch_stock_news(actual_ticker, company_name=profile.get('name', ''), limit=35, force_refresh=force_refresh)
+
+            stock_entry = sanitize_for_json({
                 'profile': profile,
                 'signals': signals,
                 'timeseries': display_timeseries,
-                'fullTimeseries': timeseries,
+                'fullTimeseries': timeseries if period == 'max' else (timeseries[-1260:] if len(timeseries) > 1260 else timeseries),
                 'period': period,
+                'convictionHistoryStats': conviction_history_stats,
                 'backtests': backtests,
                 'news': news,
                 'dataPointsCount': len(display_timeseries)
-            }
+            })
 
-            self._analysis_cache[cache_key] = {'timestamp': now, 'data': stock_entry}
+            with self._lock:
+                self._analysis_cache[cache_key] = {'timestamp': now, 'data': stock_entry}
+                if actual_ticker != ticker:
+                    self._analysis_cache[f"{ticker}_{period}_{interval}"] = {'timestamp': now, 'data': stock_entry}
             return ticker, stock_entry
 
         except Exception as e:
@@ -1127,15 +1300,17 @@ class StockService:
 
     def _process_single_ticker_fast(self, ticker: str, force_refresh: bool = False) -> tuple[str, dict]:
         """Rapidly processes an individual ticker for Stage 1 Fast Hydration (quotes, sparklines, core signals) in <5ms."""
+        actual_ticker = normalize_ticker(ticker)
         now = time.time()
-        fast_cache_key = f"{ticker}_fast"
-        cached_entry = self._analysis_cache.get(fast_cache_key)
-
-        if not force_refresh and cached_entry and (now - cached_entry['timestamp'] < 300):
-            return ticker, cached_entry['data']
+        fast_cache_key = f"{actual_ticker}_fast"
+        
+        with self._lock:
+            cached_entry = self._analysis_cache.get(fast_cache_key)
+            if not force_refresh and cached_entry and (now - cached_entry['timestamp'] < 900):
+                return ticker, cached_entry['data']
 
         try:
-            safe_ticker = ticker.replace('/', '_').replace('^', '_')
+            safe_ticker = actual_ticker.replace('/', '_').replace('^', '_')
             cache_file = os.path.join(self.cache_dir, f"{safe_ticker}_1d.csv")
             
             ticker_df = None
@@ -1144,17 +1319,17 @@ class StockService:
                     ticker_df = pd.read_csv(cache_file, index_col=0, parse_dates=True)
                     if isinstance(ticker_df.columns, pd.MultiIndex):
                         ticker_df.columns = [col[0] for col in ticker_df.columns]
-                    ticker_df = self._patch_latest_bar_if_nan(ticker, ticker_df)
+                    ticker_df = self._patch_latest_bar_if_nan(actual_ticker, ticker_df)
                 except Exception:
                     ticker_df = None
 
             if ticker_df is None or ticker_df.empty or 'Close' not in ticker_df.columns:
-                ticker_df = self.get_historical_dataframe(ticker, period='1mo', interval='1d', force_refresh=force_refresh)
+                ticker_df = self.get_historical_dataframe(actual_ticker, period='1mo', interval='1d', force_refresh=force_refresh)
 
             if ticker_df.empty or 'Close' not in ticker_df.columns:
                 return ticker, {'error': f'No historical data found for {ticker}.'}
 
-            ticker_df = self._patch_latest_bar_if_nan(ticker, ticker_df)
+            ticker_df = self._patch_latest_bar_if_nan(actual_ticker, ticker_df)
             ticker_df = ticker_df.dropna(subset=['Close'])
 
             # Use last 60 bars for instantaneous local indicator computation
@@ -1164,26 +1339,27 @@ class StockService:
             last_row = enriched_df.iloc[-1]
             prev_row = enriched_df.iloc[-2] if len(enriched_df) > 1 else last_row
 
-            curr_price = round(float(last_row.get('Close', 0.0)), 2)
-            prev_price = round(float(prev_row.get('Close', curr_price)), 2)
-            change = round(curr_price - prev_price, 2)
-            change_percent = round((change / prev_price * 100) if prev_price > 0 else 0.0, 2)
+            curr_price = _safe_float(last_row.get('Close'), 0.0)
+            prev_price = _safe_float(prev_row.get('Close'), curr_price)
+            change = _safe_float(curr_price - prev_price, 0.0) if (curr_price is not None and prev_price is not None) else 0.0
+            change_percent = _safe_float((change / prev_price * 100) if (prev_price and prev_price > 0) else 0.0, 0.0)
 
-            comp_name = self._resolve_company_name(ticker, {})
-            currency = 'EUR' if ('.DE' in ticker or '.PA' in ticker or '.AS' in ticker) else ('NOK' if '.OL' in ticker else ('SEK' if '.ST' in ticker else ('JPY' if '.T' in ticker else 'USD')))
+            comp_name = self._resolve_company_name(actual_ticker, {})
+            currency = 'EUR' if ('.DE' in actual_ticker or '.PA' in actual_ticker or '.AS' in actual_ticker) else ('NOK' if '.OL' in actual_ticker else ('SEK' if '.ST' in actual_ticker else ('JPY' if '.T' in actual_ticker else 'USD')))
 
             profile = {
-                'ticker': ticker,
+                'ticker': actual_ticker,
+                'originalTicker': ticker,
                 'name': comp_name,
                 'currentPrice': curr_price,
                 'previousClose': prev_price,
                 'change': change,
                 'changePercent': change_percent,
                 'currency': currency,
-                'atr': round(float(last_row.get('ATR', 0)), 2) if not pd.isna(last_row.get('ATR')) else None,
-                'vwap': round(float(last_row.get('VWAP', 0)), 2) if not pd.isna(last_row.get('VWAP')) else None,
-                'superTrend': round(float(last_row.get('SuperTrend', 0)), 2) if not pd.isna(last_row.get('SuperTrend')) else None,
-                'cmf': round(float(last_row.get('CMF', 0)), 2) if not pd.isna(last_row.get('CMF')) else None
+                'atr': _safe_float(last_row.get('ATR')),
+                'vwap': _safe_float(last_row.get('VWAP')),
+                'superTrend': _safe_float(last_row.get('SuperTrend')),
+                'cmf': _safe_float(last_row.get('CMF'))
             }
 
             signals = self.generate_technical_summary(enriched_df, news_items=[])
@@ -1191,23 +1367,26 @@ class StockService:
             # Extract lightweight sparkline (last 30 closes)
             sparkline = []
             for idx, row in enriched_df.tail(30).iterrows():
-                close_val = row.get('Close')
-                if close_val is not None and not pd.isna(close_val):
+                close_val = _safe_float(row.get('Close'))
+                if close_val is not None:
                     time_str = idx.strftime('%Y-%m-%d') if isinstance(idx, (pd.Timestamp, datetime)) else str(idx)
                     sparkline.append({
                         'time': time_str,
-                        'close': round(float(close_val), 2)
+                        'close': close_val
                     })
 
-            fast_entry = {
+            fast_entry = sanitize_for_json({
                 'profile': profile,
                 'signals': signals,
                 'sparkline': sparkline,
                 'dataPointsCount': len(sparkline),
                 'isFastHydration': True
-            }
+            })
 
-            self._analysis_cache[fast_cache_key] = {'timestamp': now, 'data': fast_entry}
+            with self._lock:
+                self._analysis_cache[fast_cache_key] = {'timestamp': now, 'data': fast_entry}
+                if actual_ticker != ticker:
+                    self._analysis_cache[f"{ticker}_fast"] = {'timestamp': now, 'data': fast_entry}
             return ticker, fast_entry
 
         except Exception as e:
@@ -1235,15 +1414,18 @@ class StockService:
                 try:
                     t_symbol, sdata = future.result()
                     results[t_symbol] = sdata
+                    norm = normalize_ticker(t_symbol)
+                    if norm != t_symbol:
+                        results[norm] = sdata
                 except Exception as e:
                     results[ticker] = {'error': f'Fast worker error analyzing {ticker}: {str(e)}'}
 
-        return {
+        return sanitize_for_json({
             'stocks': results,
             'tickers': cleaned_tickers,
             'isFastHydration': True,
             'timestamp': datetime.now().isoformat()
-        }
+        })
 
     def calculate_indicators_from_df(self, df: pd.DataFrame, ticker: str, company_name: str = '') -> tuple[list[dict], dict, dict]:
         """
@@ -1323,11 +1505,11 @@ class StockService:
                 }
                 timeseries.append(point)
 
-            return timeseries, signals, profile
+            return sanitize_for_json(timeseries), sanitize_for_json(signals), sanitize_for_json(profile)
         except Exception:
             return [], {}, {}
 
-    def fetch_full_stock_analysis(self, tickers: list[str], period: str = '6mo', interval: str = '1d', force_refresh: bool = False, phase: str = 'full') -> dict:
+    def fetch_full_stock_analysis(self, tickers: list[str], period: str = '6mo', interval: str = '1d', force_refresh: bool = False, phase: str = 'full', include_backtests: bool = True) -> dict:
         """
         Downloads historical market data using parallel asynchronous worker threads,
         persistent disk caching & delta updates, generates full indicator time-series, and runs backtests.
@@ -1348,7 +1530,7 @@ class StockService:
         # Execute parallel downloads and technical indicator generation across concurrent worker threads
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_ticker = {
-                executor.submit(self._process_single_ticker, ticker, period, interval, force_refresh): ticker
+                executor.submit(self._process_single_ticker, ticker, period, interval, force_refresh, include_backtests): ticker
                 for ticker in cleaned_tickers
             }
             for future in concurrent.futures.as_completed(future_to_ticker):
@@ -1356,24 +1538,28 @@ class StockService:
                 try:
                     t_symbol, sdata = future.result()
                     results[t_symbol] = sdata
+                    norm = normalize_ticker(t_symbol)
+                    if norm != t_symbol:
+                        results[norm] = sdata
                 except Exception as e:
                     results[ticker] = {'error': f'Parallel worker error analyzing {ticker}: {str(e)}'}
 
-        return {
+        return sanitize_for_json({
             'stocks': results,
             'tickers': cleaned_tickers,
             'period': period,
             'interval': interval,
             'isFastHydration': False,
             'timestamp': datetime.now().isoformat()
-        }
+        })
 
     def fetch_stock_news(self, ticker_symbol: str, limit: int = 35, force_refresh: bool = False, company_name: str = '') -> list[dict]:
         """Fetches the latest real-time multi-source global news items for a given stock with caching."""
+        actual_ticker = normalize_ticker(ticker_symbol)
         # 1. Primary: High-speed multi-source global news aggregator
         try:
             global_news = news_service.fetch_global_news(
-                ticker=ticker_symbol,
+                ticker=actual_ticker,
                 company_name=company_name,
                 limit=limit,
                 force_refresh=force_refresh
@@ -1383,14 +1569,14 @@ class StockService:
         except Exception:
             pass
 
-        # 2. Fallback to Yahoo Finance news wire if external feeds fail
+        # 2. Fallback to cached news wire if external feeds fail
         now = time.time()
-        cached_entry = self._news_cache.get(ticker_symbol)
-        if not force_refresh and cached_entry and (now - cached_entry['timestamp'] < 600):
+        cached_entry = self._news_cache.get(actual_ticker)
+        if cached_entry and (now - cached_entry['timestamp'] < 1800):
             return cached_entry['news'][:limit]
 
         try:
-            t = yf.Ticker(ticker_symbol)
+            t = yf.Ticker(actual_ticker)
             raw_news = getattr(t, 'news', []) or []
             parsed = []
             for item in raw_news:
@@ -1429,7 +1615,9 @@ class StockService:
                 if len(parsed) >= limit:
                     break
 
-            self._news_cache[ticker_symbol] = {'timestamp': now, 'news': parsed}
+            self._news_cache[actual_ticker] = {'timestamp': now, 'news': parsed}
+            if actual_ticker != ticker_symbol:
+                self._news_cache[ticker_symbol] = {'timestamp': now, 'news': parsed}
             return parsed
         except Exception:
             return []
@@ -1447,6 +1635,20 @@ class StockService:
         results = []
         seen_tickers = set()
 
+        # Prioritize ticker XYZ if query matches Block Inc.
+        block_match = clean_query.upper() == 'XYZ' or clean_query.lower() in ('block', 'block inc', 'block, inc.', 'block inc.')
+        if block_match:
+            results.append({
+                'ticker': 'XYZ',
+                'name': 'Block, Inc.',
+                'exchange': 'NYSE',
+                'type': 'EQUITY',
+                'sector': 'Technology',
+                'industry': 'Financial Technology',
+                'score': 10000000.0
+            })
+            seen_tickers.add('XYZ')
+
         try:
             url = f"https://query2.finance.yahoo.com/v1/finance/search?q={urllib.parse.quote(clean_query)}&quotesCount={limit}&newsCount=0"
             req = urllib.request.Request(
@@ -1460,7 +1662,8 @@ class StockService:
                 data = json.loads(resp.read().decode('utf-8'))
                 quotes = data.get('quotes', [])
                 for q in quotes:
-                    symbol = (q.get('symbol') or '').strip().upper()
+                    raw_symbol = (q.get('symbol') or '').strip().upper()
+                    symbol = normalize_ticker(raw_symbol)
                     if not symbol or symbol in seen_tickers:
                         continue
                     
@@ -1509,6 +1712,200 @@ class StockService:
                 pass
 
         return results[:limit]
+
+    # =========================================================================
+    # STARTUP PRE-HYDRATION & BACKGROUND WARMING DAEMON
+    # =========================================================================
+
+    def get_universe_tickers_for_warmup(self) -> list[str]:
+        """Gathers all universe tickers from default watchlist, user watchlists, backtest presets, and paper trades."""
+        tickers_set = set()
+
+        # 1. Base default watchlist & Backtest Presets
+        default_base = [
+            "NVDA", "MSFT", "IFX.DE", "TSM", "SPCX", "EXXT.DE", "XDWT.DE", "NEL.OL",
+            "AAPL", "TSLA", "PLTR", "AMZN", "GOOGL", "META", "AMD", "ASML"
+        ]
+        for t in default_base:
+            clean = normalize_ticker(t)
+            if clean:
+                tickers_set.add(clean)
+
+        data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
+
+        # 2. Global watchlist file
+        wl_file = os.path.join(data_dir, 'watchlist.json')
+        if os.path.exists(wl_file):
+            try:
+                with open(wl_file, 'r', encoding='utf-8') as f:
+                    wl_data = json.load(f)
+                    if isinstance(wl_data, list):
+                        for t in wl_data:
+                            clean = normalize_ticker(t)
+                            if clean:
+                                tickers_set.add(clean)
+            except Exception:
+                pass
+
+        # 3. All user custom watchlists & paper trades
+        users_file = os.path.join(data_dir, 'users.json')
+        if os.path.exists(users_file):
+            try:
+                with open(users_file, 'r', encoding='utf-8') as f:
+                    users_data = json.load(f)
+                    if isinstance(users_data, dict):
+                        for u_info in users_data.values():
+                            if isinstance(u_info, dict):
+                                for t in u_info.get('watchlist', []):
+                                    clean = normalize_ticker(t)
+                                    if clean:
+                                        tickers_set.add(clean)
+                                for pt in u_info.get('paper_trades', []):
+                                    if isinstance(pt, dict) and pt.get('ticker'):
+                                        clean = normalize_ticker(pt['ticker'])
+                                        if clean:
+                                            tickers_set.add(clean)
+            except Exception:
+                pass
+
+        # 4. Global paper trades file
+        pt_file = os.path.join(data_dir, 'paper_trades.json')
+        if os.path.exists(pt_file):
+            try:
+                with open(pt_file, 'r', encoding='utf-8') as f:
+                    pt_data = json.load(f)
+                    if isinstance(pt_data, list):
+                        for pt in pt_data:
+                            if isinstance(pt, dict) and pt.get('ticker'):
+                                clean = normalize_ticker(pt['ticker'])
+                                if clean:
+                                    tickers_set.add(clean)
+            except Exception:
+                pass
+
+        # 5. Price alerts file
+        alerts_file = os.path.join(data_dir, 'alerts.json')
+        if os.path.exists(alerts_file):
+            try:
+                with open(alerts_file, 'r', encoding='utf-8') as f:
+                    alerts_data = json.load(f)
+                    if isinstance(alerts_data, list):
+                        for a in alerts_data:
+                            if isinstance(a, dict) and a.get('ticker'):
+                                clean = normalize_ticker(a['ticker'])
+                                if clean:
+                                    tickers_set.add(clean)
+            except Exception:
+                pass
+
+        # 6. Custom scanner universe additions
+        scanner_custom_file = os.path.join(data_dir, 'scanner_custom_universe.json')
+        if os.path.exists(scanner_custom_file):
+            try:
+                with open(scanner_custom_file, 'r', encoding='utf-8') as f:
+                    custom_items = json.load(f)
+                    if isinstance(custom_items, list):
+                        for item in custom_items:
+                            if isinstance(item, dict) and item.get('ticker'):
+                                clean = normalize_ticker(item['ticker'])
+                                if clean:
+                                    tickers_set.add(clean)
+            except Exception:
+                pass
+
+        return sorted(list(tickers_set))
+
+    def prehydrate_universe(self, tickers: list[str] = None, force_refresh: bool = False) -> dict:
+        """
+        Pre-downloads historical bars and pre-computes indicators in parallel,
+        fully populating in-memory RAM cache and disk CSVs for 0ms user experience.
+        """
+        if tickers is None:
+            tickers = self.get_universe_tickers_for_warmup()
+
+        if not tickers:
+            return {"warmed_count": 0, "duration": 0.0, "tickers": []}
+
+        start_time = time.time()
+        self._is_warming_up = True
+        logger.info(f"[StockService] Starting background pre-hydration for {len(tickers)} universe tickers...")
+
+        def _warm_single(t: str):
+            try:
+                # 1. Ensure 5y daily candle depth in CSV disk cache
+                self.get_historical_dataframe(t, period='5y', interval='1d', force_refresh=force_refresh)
+                # 2. Pre-calculate Fast Stage 1 Profile & Sparkline
+                self._process_single_ticker_fast(t, force_refresh=force_refresh)
+                # 3. Pre-calculate Standard 6mo Analysis with backtests (for Main Watchlist / Deep Dive)
+                self._process_single_ticker(t, period='6mo', interval='1d', force_refresh=force_refresh, include_backtests=True)
+                # 4. Pre-calculate 5y Backtest Analysis (for Backtest Studio)
+                self._process_single_ticker(t, period='5y', interval='1d', force_refresh=force_refresh, include_backtests=True)
+                # 5. Pre-calculate 1y Backtest Analysis
+                self._process_single_ticker(t, period='1y', interval='1d', force_refresh=force_refresh, include_backtests=True)
+            except Exception as e:
+                logger.debug(f"[StockService] Warmup warning for {t}: {e}")
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(8, len(tickers))) as executor:
+            list(executor.map(_warm_single, tickers))
+
+        duration = round(time.time() - start_time, 2)
+        self._is_warming_up = False
+        self._last_warmup_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self._last_warmup_duration = duration
+        self._warmed_tickers = tickers
+        logger.info(f"[StockService] Pre-hydration completed for {len(tickers)} tickers in {duration}s.")
+
+        return {
+            "warmed_count": len(tickers),
+            "duration": duration,
+            "last_warmup_time": self._last_warmup_time,
+            "tickers": tickers
+        }
+
+    def _background_warmup_loop(self):
+        """Continuous background daemon loop: hydrates on boot, then syncs deltas every 15 minutes."""
+        time.sleep(1.0)
+        logger.info("[StockService] Launching initial server boot pre-hydration...")
+        try:
+            self.prehydrate_universe(force_refresh=False)
+        except Exception as e:
+            logger.error(f"[StockService] Boot pre-hydration error: {e}")
+
+        while not self._stop_warmup.is_set():
+            for _ in range(180):
+                if self._stop_warmup.is_set():
+                    return
+                time.sleep(5)
+
+            try:
+                logger.info("[StockService] Running periodic delta pre-hydration cycle...")
+                self.prehydrate_universe(force_refresh=False)
+            except Exception as e:
+                logger.error(f"[StockService] Periodic warmup error: {e}")
+
+    def start_background_warmup(self):
+        """Starts the background pre-hydration daemon thread if not already running."""
+        with self._lock:
+            if self._warmup_thread is None or not self._warmup_thread.is_alive():
+                self._stop_warmup.clear()
+                self._warmup_thread = threading.Thread(
+                    target=self._background_warmup_loop,
+                    daemon=True,
+                    name="StockWarmupDaemon"
+                )
+                self._warmup_thread.start()
+
+    def get_warmup_status(self) -> dict:
+        """Returns the current pre-hydration metrics and status."""
+        return {
+            "is_warming_up": self._is_warming_up,
+            "last_warmup_time": self._last_warmup_time,
+            "last_warmup_duration_sec": self._last_warmup_duration,
+            "warmed_tickers_count": len(self._warmed_tickers),
+            "warmed_tickers": self._warmed_tickers,
+            "ram_cache_entries": len(self._analysis_cache)
+        }
+
 
 # Singleton instance
 stock_service = StockService()

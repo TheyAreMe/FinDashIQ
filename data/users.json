@@ -18,7 +18,8 @@
       "EXXT.DE",
       "XDWT.DE",
       "NEL.OL",
-      "PYPL"
+      "PYPL",
+      "5803.T"
     ],
     "alerts": [
       {
@@ -40,14 +41,81 @@
       "model": "gemini-3.7-flash"
     },
     "theme": "dark",
-    "watchlistViewMode": "cards"
+    "watchlistViewMode": "cards",
+    "paperTrades": [
+      {
+        "ticker": "MU",
+        "side": "LONG",
+        "capital": 2500,
+        "entryPrice": 1016.59,
+        "shares": 2.459201841450339,
+        "stopLoss": 965.76,
+        "takeProfit": 1138.58,
+        "reason": "AI Quantitative Setup",
+        "status": "OPEN",
+        "id": "pt_1788643034_c8a0f3",
+        "entryDate": "2026-09-05T23:17:14.618930"
+      },
+      {
+        "ticker": "SMCI",
+        "side": "LONG",
+        "capital": 1000,
+        "entryPrice": 39.59,
+        "shares": 25.258903763576658,
+        "stopLoss": 37.61,
+        "takeProfit": 44.34,
+        "reason": "Quantitative Bullish Setup",
+        "status": "OPEN",
+        "id": "pt_1788643722_e237e7",
+        "entryDate": "2026-09-05T23:28:42.431454"
+      },
+      {
+        "ticker": "ORCL",
+        "side": "LONG",
+        "capital": 1000,
+        "entryPrice": 158.78,
+        "shares": 6.298022420959819,
+        "stopLoss": 150.84,
+        "takeProfit": 177.83,
+        "reason": "Quantitative Bullish Setup",
+        "status": "OPEN",
+        "id": "pt_1788643761_85688b",
+        "entryDate": "2026-09-05T23:29:21.918018"
+      },
+      {
+        "ticker": "CHPT",
+        "side": "LONG",
+        "capital": 1000,
+        "entryPrice": 9.89,
+        "shares": 101.11223458038423,
+        "stopLoss": 9.4,
+        "takeProfit": 11.08,
+        "reason": "Quantitative Bullish Setup",
+        "status": "OPEN",
+        "id": "pt_1788643789_6f1251",
+        "entryDate": "2026-09-05T23:29:49.743386"
+      },
+      {
+        "ticker": "AMD",
+        "side": "LONG",
+        "capital": 1000,
+        "entryPrice": 477.57,
+        "shares": 2.0939338735682727,
+        "stopLoss": 453.69,
+        "takeProfit": 534.88,
+        "reason": "Quantitative Bullish Setup",
+        "status": "OPEN",
+        "id": "pt_1788715332_b22c7b",
+        "entryDate": "2026-09-06T19:22:12.674644"
+      }
+    ]
   },
   "user": {
     "username": "user",
     "passwordHash": "scrypt:32768:8:1$QfIRXe0G2iZa6RTz$2c8aa4120bf916656bb8aa810ee3d7ac0d4c95225dba708ef3524b4cba253445c334d6ea4a6f4cd50c3e40e35573ba025ffaae38d6637c43b34a5c850131013e",
     "role": "user",
     "displayName": "user",
-    "email": "user@findashiq.internal",
+    "email": "usermail@googlemail.com",
     "avatar": "user",
     "riskProfile": "Balanced",
     "baseCurrency": "USD",

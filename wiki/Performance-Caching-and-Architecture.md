@@ -11,6 +11,8 @@ FinDashIQ is engineered for institutional low latency, achieving **sub-10ms resp
 4. [Forex & News Feed Caching](#4-forex--news-feed-caching)
 5. [Reverse Proxy Integration & Security Headers](#5-reverse-proxy-integration--security-headers)
 6. [Data Persistence Layout](#6-data-persistence-layout)
+7. [Recommended Hardware & Server Sizing](#7-recommended-hardware--server-sizing)
+
 
 ---
 
@@ -85,3 +87,16 @@ All user and market state is safely persisted in the root `data/` directory:
 - `data/watchlist.json` — Active watchlist assets and order sequences.
 - `data/alerts.json` — Configured signal trigger rules and webhook destinations.
 - `data/cache/*.csv` — Historical price bars for delta synchronization.
+
+---
+
+## 7. Recommended Hardware & Server Sizing
+
+For reliable, self-hosted deployment of FinDashIQ:
+
+| Resource | Recommended Baseline | Notes |
+|---|---|---|
+| **CPU** | **2 Cores** | Handles concurrent multi-factor technical analysis, delta downloads, and background market scanner threads smoothly. |
+| **RAM** | **3 – 4 GB RAM** | Comfortably accommodates Python/Pandas in-memory dataframes, Gunicorn worker processes, and background AI synthesis jobs without swapping. |
+| **Storage** | **1 – 2 GB free disk space** | Accommodates Python virtual environment dependencies, logs, and persistent historical CSV market cache. |
+

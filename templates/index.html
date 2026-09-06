@@ -173,21 +173,25 @@
                 <!-- Sub-Tab 2: Charts & Technical Oscillators -->
                 {% include 'tabs/tab_charts.html' %}
 
-                <!-- Sub-Tab 3: Strategy Backtesting & Simulation -->
-                {% include 'tabs/tab_backtest.html' %}
-
-                <!-- Sub-Tab 4: Fundamentals & Multi-Factor Consensus -->
+                <!-- Sub-Tab 3: Fundamentals & Multi-Factor Consensus -->
                 {% include 'tabs/tab_fundamentals.html' %}
             </div>
         </div>
 
         <!-- ========================================================= -->
-        <!-- TOP VIEW 3: AI QUANTITATIVE STOCK SCANNER -->
+        <!-- TOP VIEW 3: STRATEGY BACKTESTING & SIMULATION STUDIO -->
+        <!-- ========================================================= -->
+        <div id="topView-backtest" class="top-view-pane">
+            {% include 'tabs/tab_backtest.html' %}
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- TOP VIEW 4: AI QUANTITATIVE STOCK SCANNER -->
         <!-- ========================================================= -->
         {% include 'tabs/tab_scanner.html' %}
 
         <!-- ========================================================= -->
-        <!-- TOP VIEW 4: SIGNAL ALERTS & NOTIFICATIONS HUB -->
+        <!-- TOP VIEW 5: SIGNAL ALERTS & NOTIFICATIONS HUB -->
         <!-- ========================================================= -->
         {% include 'tabs/tab_notifications.html' %}
 
@@ -202,6 +206,7 @@
     {% include 'components/help_modal.html' %}
     {% include 'components/impressum_modal.html' %}
     {% include 'components/global_news_modal.html' %}
+    {% include 'components/paper_trade_modal.html' %}
 
     <!-- Direct Official Ko-fi Widget Overlay (Pure Official Embed) -->
     <div id="kofiDirectOverlay" class="vendor-direct-overlay" style="display: none;">
@@ -237,6 +242,7 @@
     <script>
         window.__INITIAL_AUTH__ = {{ 'true' if is_authenticated else 'false' }};
         window.__INITIAL_USER__ = {{ user | tojson | safe if user else 'null' }};
+        window.__ASSET_VERSION__ = "{{ asset_version }}";
     </script>
 
     <!-- Lucide Icons -->

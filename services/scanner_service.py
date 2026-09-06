@@ -827,7 +827,7 @@ class ScannerService:
                     "riskRewardRatio": f"{rr_ratio}:1"
                 },
                 "aiThesis": ai_thesis,
-                "timeseries": timeseries[-30:] if timeseries else []
+                "sparkline": [round(float(p.get('close', 0)), 2) for p in timeseries[-30:] if p.get('close')] if timeseries else []
             }
         except Exception:
             return None
@@ -1082,8 +1082,9 @@ class ScannerService:
             if 'price_above_vwap' in required_indicators and (opp.get('vwap') and opp.get('currentPrice', 0) < opp.get('vwap')):
                 continue
 
-            # Add watchlist marker
+            # Add watchlist marker and ensure heavy timeseries is stripped
             opp_copy = dict(opp)
+            opp_copy.pop('timeseries', None)
             opp_copy['isInWatchlist'] = ticker in user_wl_set
             filtered.append(opp_copy)
 
