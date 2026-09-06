@@ -403,18 +403,33 @@ class ScannerService:
     def _background_scan_loop(self):
         """
         Autonomous daemon loop:
-        1. Immediately launches initial full scan on server startup (no waiting).
-        2. Periodically re-executes every N minutes (default 30m).
+        1. Checks if disk cache is already warm & fresh. Only scans on boot if cache is missing or stale.
+        2. Staggers initial scan by 15s to keep server boot snappy and low-load.
+        3. Periodically re-executes every N minutes (default 30m).
         """
         logger.info("[ScannerService] Background scanner daemon worker started.")
-        time.sleep(1.0)  # Brief pause to allow Flask/server initialization
+        time.sleep(2.0)  # Brief pause to allow Flask/server initialization
 
-        # Step 1: Immediately run full scan on boot!
-        try:
-            logger.info("[ScannerService] Launching initial startup scan across all assets...")
-            self.run_full_scan()
-        except Exception as e:
-            logger.error(f"[ScannerService] Initial startup scan failed: {e}")
+        # Step 1: Check if disk cache is already warm & fresh
+        now = time.time()
+        is_cache_fresh = False
+        with self._lock:
+            cached_count = len(self._universe_cache.get('stocks_data', {}))
+            cache_age = now - self._last_scan_epoch
+            if cached_count >= 100 and cache_age < self.scan_interval_seconds:
+                is_cache_fresh = True
+
+        if is_cache_fresh:
+            logger.info(f"[ScannerService] Disk cache is warm & valid ({cached_count} assets, scanned {int(cache_age)}s ago). Skipping heavy boot scan.")
+        else:
+            # Stagger startup scan by 15s to let StockWarmup and incoming user requests complete smoothly
+            time.sleep(15.0)
+            if not self._stop_event.is_set():
+                try:
+                    logger.info("[ScannerService] Launching initial startup scan across all assets...")
+                    self.run_full_scan()
+                except Exception as e:
+                    logger.error(f"[ScannerService] Initial startup scan failed: {e}")
 
         # Step 2: Continuous loop
         while not self._stop_event.is_set():
@@ -553,43 +568,53 @@ class ScannerService:
         except Exception:
             pass
 
-        try:
-            # 2. Download multi-ticker batch in 1 single vectorized streaming request (~3-4s)
-            df_batch = yf.download(
-                tickers=clean_tickers,
-                period="3mo",
-                interval="1d",
-                group_by="ticker",
-                threads=True,
-                progress=False
-            )
+        # 2. Download multi-ticker batches in controlled chunks with controlled thread concurrency
+        CHUNK_SIZE = 75
+        max_threads = min(4, os.cpu_count() or 2)
 
-            # 3. Parse and compute indicators in RAM (<0.3s for all assets)
-            for ticker in clean_tickers:
-                item = item_map.get(ticker)
-                if not item:
-                    continue
+        for i in range(0, len(clean_tickers), CHUNK_SIZE):
+            chunk = clean_tickers[i:i + CHUNK_SIZE]
+            try:
+                df_batch = yf.download(
+                    tickers=chunk,
+                    period="3mo",
+                    interval="1d",
+                    group_by="ticker",
+                    threads=max_threads,
+                    progress=False
+                )
 
-                try:
-                    df_ticker = None
-                    if isinstance(df_batch.columns, pd.MultiIndex):
-                        if ticker in df_batch.columns.levels[0]:
-                            df_ticker = df_batch[ticker].dropna(subset=['Close'])
-                    else:
-                        df_ticker = df_batch.dropna(subset=['Close'])
+                if df_batch is not None and not df_batch.empty:
+                    for ticker in chunk:
+                        item = item_map.get(ticker)
+                        if not item:
+                            continue
 
-                    if df_ticker is None or df_ticker.empty or len(df_ticker) < 5:
-                        continue
+                        try:
+                            df_ticker = None
+                            if isinstance(df_batch.columns, pd.MultiIndex):
+                                if ticker in df_batch.columns.levels[0]:
+                                    df_ticker = df_batch[ticker].dropna(subset=['Close'])
+                            else:
+                                df_ticker = df_batch.dropna(subset=['Close'])
 
-                    ticker_news = news_by_ticker.get(ticker, [])
-                    stock_data = self._build_stock_data_from_df(ticker, item, df_ticker, preloaded_news=ticker_news)
-                    if stock_data:
-                        results[ticker] = stock_data
-                except Exception:
-                    continue
+                            if df_ticker is None or df_ticker.empty or len(df_ticker) < 5:
+                                continue
 
-        except Exception as e:
-            logger.warning(f"[ScannerService] Bulk batch download failed: {e}. Fallback to existing cache.")
+                            ticker_news = news_by_ticker.get(ticker, [])
+                            stock_data = self._build_stock_data_from_df(ticker, item, df_ticker, preloaded_news=ticker_news)
+                            if stock_data:
+                                results[ticker] = stock_data
+                        except Exception:
+                            continue
+
+            except Exception as e:
+                logger.warning(f"[ScannerService] Batch chunk {i // CHUNK_SIZE + 1} download error: {e}")
+
+            # Gentle yield between batches to keep CPU cool and server responsive
+            time.sleep(0.05)
+
+        if not results:
             return self._universe_cache.get('stocks_data', {})
 
         return results

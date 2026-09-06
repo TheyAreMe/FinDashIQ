@@ -1478,30 +1478,54 @@ class StockService:
                     return None
                 return round(float(v), decimals)
 
-            for idx, row in enriched_df.tail(60).iterrows():
+            tail_df = enriched_df.tail(60)
+            idx_list = tail_df.index
+            n_rows = len(tail_df)
+
+            opens = tail_df.get('Open')
+            highs = tail_df.get('High')
+            lows = tail_df.get('Low')
+            closes = tail_df.get('Close')
+            vols = tail_df.get('Volume')
+            sma20s = tail_df.get('SMA_20')
+            sma50s = tail_df.get('SMA_50')
+            sma200s = tail_df.get('SMA_200')
+            sts = tail_df.get('SuperTrend')
+            st_dirs = tail_df.get('SuperTrend_Dir', tail_df.get('SuperTrend_Direction'))
+            vwaps = tail_df.get('VWAP')
+            squeezes = tail_df.get('TTM_Squeeze')
+            rsis = tail_df.get('RSI')
+            macds = tail_df.get('MACD')
+            macd_sigs = tail_df.get('MACD_Signal', tail_df.get('Signal'))
+            macd_hists = tail_df.get('MACD_Hist', tail_df.get('Hist'))
+            cmfs = tail_df.get('CMF')
+            atrs = tail_df.get('ATR')
+
+            for i in range(n_rows):
+                idx = idx_list[i]
                 time_str = idx.strftime('%Y-%m-%d') if isinstance(idx, (pd.Timestamp, datetime)) else str(idx)
                 ts_ms = int(idx.timestamp() * 1000) if isinstance(idx, (pd.Timestamp, datetime)) else 0
                 point = {
                     'time': time_str,
                     'timestamp': ts_ms,
-                    'open': safe_val(row.get('Open')),
-                    'high': safe_val(row.get('High')),
-                    'low': safe_val(row.get('Low')),
-                    'close': safe_val(row.get('Close')),
-                    'volume': int(row.get('Volume', 0)) if not pd.isna(row.get('Volume')) else 0,
-                    'sma20': safe_val(row.get('SMA_20')),
-                    'sma50': safe_val(row.get('SMA_50')),
-                    'sma200': safe_val(row.get('SMA_200')),
-                    'superTrend': safe_val(row.get('SuperTrend')),
-                    'superTrendDir': int(row.get('SuperTrend_Dir', row.get('SuperTrend_Direction', 1))),
-                    'vwap': safe_val(row.get('VWAP')),
-                    'ttmSqueeze': bool(row.get('TTM_Squeeze', False)),
-                    'rsi': safe_val(row.get('RSI'), 1),
-                    'macd': safe_val(row.get('MACD')),
-                    'macdSignal': safe_val(row.get('MACD_Signal') or row.get('Signal')),
-                    'macdHist': safe_val(row.get('MACD_Hist') or row.get('Hist')),
-                    'cmf': safe_val(row.get('CMF'), 3),
-                    'atr': safe_val(row.get('ATR'))
+                    'open': safe_val(opens.iloc[i]) if opens is not None else None,
+                    'high': safe_val(highs.iloc[i]) if highs is not None else None,
+                    'low': safe_val(lows.iloc[i]) if lows is not None else None,
+                    'close': safe_val(closes.iloc[i]) if closes is not None else None,
+                    'volume': int(vols.iloc[i]) if vols is not None and not pd.isna(vols.iloc[i]) else 0,
+                    'sma20': safe_val(sma20s.iloc[i]) if sma20s is not None else None,
+                    'sma50': safe_val(sma50s.iloc[i]) if sma50s is not None else None,
+                    'sma200': safe_val(sma200s.iloc[i]) if sma200s is not None else None,
+                    'superTrend': safe_val(sts.iloc[i]) if sts is not None else None,
+                    'superTrendDir': int(st_dirs.iloc[i]) if st_dirs is not None and not pd.isna(st_dirs.iloc[i]) else 1,
+                    'vwap': safe_val(vwaps.iloc[i]) if vwaps is not None else None,
+                    'ttmSqueeze': bool(squeezes.iloc[i]) if squeezes is not None and not pd.isna(squeezes.iloc[i]) else False,
+                    'rsi': safe_val(rsis.iloc[i], 1) if rsis is not None else None,
+                    'macd': safe_val(macds.iloc[i]) if macds is not None else None,
+                    'macdSignal': safe_val(macd_sigs.iloc[i]) if macd_sigs is not None else None,
+                    'macdHist': safe_val(macd_hists.iloc[i]) if macd_hists is not None else None,
+                    'cmf': safe_val(cmfs.iloc[i], 3) if cmfs is not None else None,
+                    'atr': safe_val(atrs.iloc[i]) if atrs is not None else None
                 }
                 timeseries.append(point)
 
@@ -1834,18 +1858,18 @@ class StockService:
             try:
                 # 1. Ensure 5y daily candle depth in CSV disk cache
                 self.get_historical_dataframe(t, period='5y', interval='1d', force_refresh=force_refresh)
-                # 2. Pre-calculate Fast Stage 1 Profile & Sparkline
+                # 2. Pre-calculate Fast Stage 1 Profile & Sparkline (<5ms from cached CSV)
                 self._process_single_ticker_fast(t, force_refresh=force_refresh)
-                # 3. Pre-calculate Standard 6mo Analysis with backtests (for Main Watchlist / Deep Dive)
-                self._process_single_ticker(t, period='6mo', interval='1d', force_refresh=force_refresh, include_backtests=True)
-                # 4. Pre-calculate 5y Backtest Analysis (for Backtest Studio)
-                self._process_single_ticker(t, period='5y', interval='1d', force_refresh=force_refresh, include_backtests=True)
-                # 5. Pre-calculate 1y Backtest Analysis
-                self._process_single_ticker(t, period='1y', interval='1d', force_refresh=force_refresh, include_backtests=True)
+                # 3. Pre-calculate Standard 6mo Analysis (for Main Watchlist / Deep Dive)
+                self._process_single_ticker(t, period='6mo', interval='1d', force_refresh=force_refresh, include_backtests=False)
+                # Gentle yield to keep CPU usage low and quiet
+                time.sleep(0.02)
             except Exception as e:
                 logger.debug(f"[StockService] Warmup warning for {t}: {e}")
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=min(8, len(tickers))) as executor:
+        # Bounded concurrency (max 2 workers) prevents 100% CPU spikes during server boot
+        max_warmup_workers = min(2, os.cpu_count() or 2)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_warmup_workers) as executor:
             list(executor.map(_warm_single, tickers))
 
         duration = round(time.time() - start_time, 2)
