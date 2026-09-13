@@ -73,5 +73,35 @@
     "ecoBadge": "\ud83d\udcc8 Community Opportunity",
     "addedAt": "2026-09-05T16:32:45.337215",
     "addedBy": "admin"
+  },
+  {
+    "ticker": "CCEC",
+    "name": "Capital Clean Energy Carriers C",
+    "market": "us",
+    "sector": "Equities",
+    "themes": [
+      "momentum"
+    ],
+    "parentETF": "",
+    "marketCapClass": "large",
+    "esgRating": "Standard (80/100)",
+    "ecoBadge": "\ud83d\udcc8 Community Opportunity",
+    "addedAt": "2026-09-07T16:02:11.944987",
+    "addedBy": "admin"
+  },
+  {
+    "ticker": "589390.SS",
+    "name": "CHINA MERCHANTS FUND MANAGEMENT",
+    "market": "asia",
+    "sector": "Equities",
+    "themes": [
+      "momentum"
+    ],
+    "parentETF": "",
+    "marketCapClass": "large",
+    "esgRating": "Standard (80/100)",
+    "ecoBadge": "\ud83d\udcc8 Community Opportunity",
+    "addedAt": "2026-09-07T16:02:44.664169",
+    "addedBy": "admin"
   }
 ]

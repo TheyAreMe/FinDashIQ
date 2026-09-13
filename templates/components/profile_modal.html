@@ -39,6 +39,10 @@
                 onclick="switchProfileModalTab('updates')" style="display: none;">
                 <i data-lucide="refresh-cw" style="width: 14px;"></i> System Updates
             </button>
+            <button type="button" id="tabBtnProfileMaintenance" class="profile-tab-btn admin-only-tab"
+                onclick="switchProfileModalTab('maintenance')" style="display: none;">
+                <i data-lucide="cpu" style="width: 14px;"></i> Maintenance
+            </button>
         </div>
 
         <!-- Status Message Banner -->
@@ -63,7 +67,7 @@
                         </div>
                     </div>
 
-                    <div class="form-grid-3">
+                    <div class="form-grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
                         <div>
                             <label class="form-label">Investment Risk Tolerance</label>
                             <select id="profileSelectRisk" class="form-select">
@@ -86,6 +90,97 @@
                                 <option value="SEK">SEK (kr) — Swedish Krona</option>
                                 <option value="DKK">DKK (kr) — Danish Krone</option>
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+                        <div>
+                            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Interface Language</span>
+                                <span id="profileLangCodeBadge" class="badge-pill badge-neutral" style="font-size: 0.68rem; font-weight: 700;">EN</span>
+                            </label>
+                            <div class="custom-lang-selector-wrapper" style="position: relative;">
+                                <button type="button" id="profileLangTriggerBtn" class="form-select custom-lang-trigger" onclick="toggleProfileLangDropdown(event)" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; text-align: left; width: 100%;">
+                                    <div id="profileLangSelectedDisplay" style="display: flex; align-items: center; gap: 8px;">
+                                        <span id="profileLangCurrentFlag" class="flag-icon-badge"></span>
+                                        <span id="profileLangCurrentLabel" style="font-weight: 600;">English (US)</span>
+                                    </div>
+                                    <i data-lucide="chevron-down" style="width: 14px; height: 14px; color: var(--text-muted);"></i>
+                                </button>
+                                <div id="profileLangDropdownMenu" class="custom-lang-dropdown-menu">
+                                    <button type="button" class="custom-lang-option" onclick="selectProfileLanguage('en')">
+                                        <div class="lang-opt-left">
+                                            <span class="flag-icon-badge"><svg class="flag-svg" viewBox="0 0 741 390" width="16" height="11" xmlns="http://www.w3.org/2000/svg"><rect width="741" height="390" fill="#b22234"/><path d="M0,30H741M0,90H741M0,150H741M0,210H741M0,270H741M0,330H741" stroke="#fff" stroke-width="30"/><rect width="296" height="210" fill="#3c3b6e"/><g fill="#fff"><circle cx="40" cy="35" r="8"/><circle cx="100" cy="35" r="8"/><circle cx="160" cy="35" r="8"/><circle cx="220" cy="35" r="8"/><circle cx="70" cy="70" r="8"/><circle cx="130" cy="70" r="8"/><circle cx="190" cy="70" r="8"/><circle cx="250" cy="70" r="8"/><circle cx="40" cy="105" r="8"/><circle cx="100" cy="105" r="8"/><circle cx="160" cy="105" r="8"/><circle cx="220" cy="105" r="8"/><circle cx="70" cy="140" r="8"/><circle cx="130" cy="140" r="8"/><circle cx="190" cy="140" r="8"/><circle cx="250" cy="140" r="8"/><circle cx="40" cy="175" r="8"/><circle cx="100" cy="175" r="8"/><circle cx="160" cy="175" r="8"/><circle cx="220" cy="175" r="8"/></g></svg></span>
+                                            <div class="lang-opt-names">
+                                                <span class="lang-opt-title">English (US)</span>
+                                                <span class="lang-opt-sub">English</span>
+                                            </div>
+                                        </div>
+                                        <span class="lang-opt-check" data-lang="en">✓</span>
+                                    </button>
+                                    <button type="button" class="custom-lang-option" onclick="selectProfileLanguage('de')">
+                                        <div class="lang-opt-left">
+                                            <span class="flag-icon-badge"><svg class="flag-svg" viewBox="0 0 5 3" width="16" height="11" xmlns="http://www.w3.org/2000/svg"><rect width="5" height="1" y="0" fill="#111"/><rect width="5" height="1" y="1" fill="#DD0000"/><rect width="5" height="1" y="2" fill="#FFCE00"/></svg></span>
+                                            <div class="lang-opt-names">
+                                                <span class="lang-opt-title">Deutsch (DE)</span>
+                                                <span class="lang-opt-sub">German</span>
+                                            </div>
+                                        </div>
+                                        <span class="lang-opt-check" data-lang="de">✓</span>
+                                    </button>
+                                    <button type="button" class="custom-lang-option" onclick="selectProfileLanguage('es')">
+                                        <div class="lang-opt-left">
+                                            <span class="flag-icon-badge"><svg class="flag-svg" viewBox="0 0 750 500" width="16" height="11" xmlns="http://www.w3.org/2000/svg"><rect width="750" height="500" fill="#AA151B"/><rect width="750" height="250" y="125" fill="#F1BF00"/></svg></span>
+                                            <div class="lang-opt-names">
+                                                <span class="lang-opt-title">Español (ES)</span>
+                                                <span class="lang-opt-sub">Spanish</span>
+                                            </div>
+                                        </div>
+                                        <span class="lang-opt-check" data-lang="es">✓</span>
+                                    </button>
+                                    <button type="button" class="custom-lang-option" onclick="selectProfileLanguage('fr')">
+                                        <div class="lang-opt-left">
+                                            <span class="flag-icon-badge"><svg class="flag-svg" viewBox="0 0 3 2" width="16" height="11" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" x="0" fill="#0055A4"/><rect width="1" height="2" x="1" fill="#FFFFFF"/><rect width="1" height="2" x="2" fill="#EF4135"/></svg></span>
+                                            <div class="lang-opt-names">
+                                                <span class="lang-opt-title">Français (FR)</span>
+                                                <span class="lang-opt-sub">French</span>
+                                            </div>
+                                        </div>
+                                        <span class="lang-opt-check" data-lang="fr">✓</span>
+                                    </button>
+                                    <button type="button" class="custom-lang-option" onclick="selectProfileLanguage('it')">
+                                        <div class="lang-opt-left">
+                                            <span class="flag-icon-badge"><svg class="flag-svg" viewBox="0 0 3 2" width="16" height="11" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="2" x="0" fill="#009246"/><rect width="1" height="2" x="1" fill="#FFFFFF"/><rect width="1" height="2" x="2" fill="#CE2B37"/></svg></span>
+                                            <div class="lang-opt-names">
+                                                <span class="lang-opt-title">Italiano (IT)</span>
+                                                <span class="lang-opt-sub">Italian</span>
+                                            </div>
+                                        </div>
+                                        <span class="lang-opt-check" data-lang="it">✓</span>
+                                    </button>
+                                    <button type="button" class="custom-lang-option" onclick="selectProfileLanguage('pt')">
+                                        <div class="lang-opt-left">
+                                            <span class="flag-icon-badge"><svg class="flag-svg" viewBox="0 0 20 14" width="16" height="11" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#009C3B"/><polygon points="10,1.5 18.5,7 10,12.5 1.5,7" fill="#FFDF00"/><circle cx="10" cy="7" r="3.5" fill="#002776"/><path d="M6.8,8 a3.5,3.5 0 0,1 6.4,-2" stroke="#fff" stroke-width="0.7" fill="none"/></svg></span>
+                                            <div class="lang-opt-names">
+                                                <span class="lang-opt-title">Português (BR)</span>
+                                                <span class="lang-opt-sub">Portuguese</span>
+                                            </div>
+                                        </div>
+                                        <span class="lang-opt-check" data-lang="pt">✓</span>
+                                    </button>
+                                    <button type="button" class="custom-lang-option" onclick="selectProfileLanguage('ja')">
+                                        <div class="lang-opt-left">
+                                            <span class="flag-icon-badge"><svg class="flag-svg" viewBox="0 0 3 2" width="16" height="11" xmlns="http://www.w3.org/2000/svg"><rect width="3" height="2" fill="#FFFFFF"/><circle cx="1.5" cy="1" r="0.6" fill="#BC002D"/></svg></span>
+                                            <div class="lang-opt-names">
+                                                <span class="lang-opt-title">日本語 (JA)</span>
+                                                <span class="lang-opt-sub">Japanese</span>
+                                            </div>
+                                        </div>
+                                        <span class="lang-opt-check" data-lang="ja">✓</span>
+                                    </button>
+                                </div>
+                                <input type="hidden" id="profileSelectLanguage" value="en">
+                            </div>
                         </div>
                         <div>
                             <label class="form-label">Theme Mode</label>
@@ -308,6 +403,132 @@
                     </div>
                     <div id="updateRecentReleasesList" style="display: flex; flex-direction: column; gap: 6px;">
                         <!-- Dynamically filled -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: Server Maintenance & RAM Optimizer -->
+        <div id="profileTabPaneMaintenance" class="profile-tab-pane">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Current Status Hero Banner -->
+                <div class="glass-card" style="padding: 16px; border-radius: var(--radius-md); background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(139, 92, 246, 0.12); color: var(--accent-purple);">
+                                <i data-lucide="cpu" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <h3 style="font-size: 1rem; font-weight: 700; margin: 0; color: var(--text-primary);">Server Runtime &amp; RAM Telemetry</h3>
+                                    <span id="maintPlatformBadge" class="badge-pill badge-neutral" style="font-size: 0.72rem;">Linux</span>
+                                    <span id="maintStatusBadge" class="badge-pill badge-bullish" style="font-size: 0.72rem;">Healthy</span>
+                                </div>
+                                <div id="maintUptimeSubtext" style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">
+                                    Uptime: Calculating... • Worker PID: --
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button type="button" id="btnRefreshMaintTelemetry" class="btn-watchlist-refresh" onclick="loadMaintenanceStatus(false)" style="padding: 6px 12px; font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
+                                <i data-lucide="refresh-cw" id="btnRefreshMaintIcon" style="width: 13px; height: 13px;"></i>
+                                <span>Refresh</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4-Card Telemetry Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                    <!-- Card 1: Process RSS RAM -->
+                    <div class="glass-card" style="padding: 14px; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-subtle);">
+                        <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
+                            <span>FinDashIQ Process RAM</span>
+                            <i data-lucide="activity" style="width: 14px; color: var(--accent-cyan);"></i>
+                        </div>
+                        <div id="maintProcessRssVal" style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin: 6px 0 2px 0; font-family: monospace;">-- MB</div>
+                        <div style="font-size: 0.72rem; color: var(--text-secondary);">Resident physical memory</div>
+                    </div>
+
+                    <!-- Card 2: System Physical Memory -->
+                    <div class="glass-card" style="padding: 14px; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-subtle);">
+                        <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
+                            <span>OS Physical RAM</span>
+                            <i data-lucide="pie-chart" style="width: 14px; color: var(--accent-purple);"></i>
+                        </div>
+                        <div id="maintOsMemVal" style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin: 6px 0 2px 0; font-family: monospace;">-- %</div>
+                        <div id="maintOsMemSub" style="font-size: 0.72rem; color: var(--text-secondary);">-- GB free of -- GB</div>
+                    </div>
+
+                    <!-- Card 3: In-Memory Caches -->
+                    <div class="glass-card" style="padding: 14px; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-subtle);">
+                        <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
+                            <span>In-Memory LRUs</span>
+                            <i data-lucide="layers" style="width: 14px; color: var(--accent-blue);"></i>
+                        </div>
+                        <div id="maintMemCachesVal" style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin: 6px 0 2px 0; font-family: monospace;">-- Caches</div>
+                        <div id="maintMemItemsSub" style="font-size: 0.72rem; color: var(--text-secondary);">-- items registered</div>
+                    </div>
+
+                    <!-- Card 4: Persistent Disk Cache -->
+                    <div class="glass-card" style="padding: 14px; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-subtle);">
+                        <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
+                            <span>L2 Disk Cache</span>
+                            <i data-lucide="hard-drive" style="width: 14px; color: var(--accent-amber);"></i>
+                        </div>
+                        <div id="maintDiskFilesVal" style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin: 6px 0 2px 0; font-family: monospace;">-- Files</div>
+                        <div id="maintDiskSizeSub" style="font-size: 0.72rem; color: var(--text-secondary);">-- MB on disk</div>
+                    </div>
+                </div>
+
+                <!-- 1-Click Optimize RAM Hero Action Card -->
+                <div class="glass-card" style="padding: 18px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(59, 130, 246, 0.05)); border: 1px solid rgba(139, 92, 246, 0.25);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div style="flex: 1; min-width: 260px;">
+                            <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); display: flex; align-items: gap: 8px;">
+                                <i data-lucide="zap" style="color: var(--accent-amber); width: 18px; height: 18px; margin-right: 6px;"></i>
+                                <span>1-Click RAM Cleaner &amp; Memory Defragmenter</span>
+                            </div>
+                            <div style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-top: 4px;">
+                                Safely prunes expired disk cache files, cleans inactive in-memory LRUs, closes idle yfinance/curl network handles, and executes OS-level memory trim (<code style="font-size: 0.75rem; color: var(--accent-cyan);">malloc_trim(0)</code> / <code style="font-size: 0.75rem; color: var(--accent-cyan);">_heapmin()</code>). Completely non-intrusive with <strong>0 downtime</strong> and zero lost client state.
+                            </div>
+                        </div>
+                        <button type="button" id="btn1ClickOptimizeRam" class="btn-watchlist-add" onclick="handle1ClickOptimize()" style="padding: 10px 22px; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #8b5cf6, #3b82f6); border: none; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35); flex-shrink: 0;">
+                            <i data-lucide="sparkles" id="btn1ClickOptimizeIcon" style="width: 16px; height: 16px;"></i>
+                            <span id="btn1ClickOptimizeText">Optimize Memory Now</span>
+                        </button>
+                    </div>
+
+                    <!-- Optimization Result Report Banner (Dynamic) -->
+                    <div id="maintOptimizeResultBanner" style="display: none; margin-top: 14px; padding: 12px 14px; border-radius: var(--radius-sm); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); color: #34d399;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.82rem;">
+                                <i data-lucide="check-circle-2" style="width: 16px; height: 16px; color: #10b981;"></i>
+                                <span id="maintOptimizeResultMsg">RAM Optimization completed!</span>
+                            </div>
+                            <div id="maintOptimizeStatsPills" style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 0.72rem;">
+                                <!-- Filled dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Action Card: Graceful Soft Server Restart -->
+                <div class="glass-card" style="padding: 16px; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-subtle);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                        <div style="flex: 1; min-width: 240px;">
+                            <div style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                                <i data-lucide="power" style="width: 16px; color: var(--accent-purple);"></i>
+                                <span>Graceful Server Soft-Recycle</span>
+                            </div>
+                            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">
+                                Refreshes the server process like a clean reboot. In Gunicorn, workers are retired rolling with 0.0s downtime. In standalone mode, process restarts in ~350ms. Users stay logged in.
+                            </div>
+                        </div>
+                        <button type="button" id="btnSoftRestartServer" class="btn-toggle" onclick="handleSoftRestart()" style="padding: 8px 16px; font-size: 0.78rem; font-weight: 700; color: var(--accent-amber); border-color: rgba(245, 158, 11, 0.4); display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="rotate-cw" id="btnSoftRestartIcon" style="width: 13px; height: 13px;"></i>
+                            <span id="btnSoftRestartText">Soft Restart Server</span>
+                        </button>
                     </div>
                 </div>
             </div>

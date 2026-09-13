@@ -1,20 +1,27 @@
-# ⚡ FinDashIQ v0.1.4 — Strategy Backtesting Studio, System Updates & Historical AI Conviction Graph
+# ⚡ FinDashIQ v0.1.5 — Startup Performance Overhaul, Backtesting Polish & Multi-Currency Engine
 
-FinDashIQ **v0.1.4** introduces the **Strategy Backtesting & Simulation Studio** for institutional multi-factor strategy simulation and forward paper trading, alongside the Historical AI Conviction Score chart in the Charts subtab, automated GitHub Releases update verification, and an administrator update management panel.
+FinDashIQ **v0.1.5** delivers a comprehensive performance overhaul that slashes startup CPU load, introduces intelligent cache-aware scanning, optimizes the Strategy Backtesting Studio for short-history assets and ETFs, adds real-time multi-currency support, and refreshes high-resolution UI documentation assets.
 
 ---
 
-### 🚀 Highlights in v0.1.4 (Brief Summary)
+### 🚀 Highlights in v0.1.5 (Brief Summary)
 
-* 🎮 **Strategy Backtesting & Simulation Studio**:
-  * **Institutional Backtesting Suite**: Test strategies over custom time horizons (1M, 3M, 6M, 1Y, 2Y, 3Y, 5Y, MAX) in Long-Only or Long & Short modes with configurable capital allocation, stop-loss %, take-profit %, and slippage/fees.
-* 🔄 **GitHub Releases Update Checker**: Automated version comparison against official releases on GitHub (`TheyAreMe/FinDashIQ/releases`).
-* 🛡️ **Administrator Updates Tab**: Dedicated System Updates management tab in the profile modal displaying release notes, upgrade commands, and recent release history.
-* 📈 **Historical AI Conviction Graph (0–100%)**: Added backwards-calculated AI Conviction Score chart as the second graph in the Charts & Technicals subtab to see stability of conviction over time.
+* 🛡️ **Dedicated Admin Maintenance Tab**: Added an admin-only Maintenance tab inside the Profile & Preferences modal with live server telemetry tracking FinDashIQ process
+* ⚡ **RAM Optimization**: Streamlined in-memory caching to significantly reduce active RAM usage.
+* 🛠️ **Code Maintainability**: Refactored core modules and reduced redundancy for a cleaner, more modular architecture.
 
 ---
 
 ## ⚡ Previous Releases
+
+### FinDashIQ v0.1.4 — Strategy Backtesting Studio, System Updates & Historical AI Conviction Graph
+
+FinDashIQ **v0.1.4** introduced the **Strategy Backtesting & Simulation Studio** for institutional multi-factor strategy simulation and forward paper trading, alongside the Historical AI Conviction Score chart in the Charts subtab, automated GitHub Releases update verification, and an administrator update management panel.
+
+* 🎮 **Strategy Backtesting & Simulation Studio**: Test strategies over custom time horizons (1M, 3M, 6M, 1Y, 2Y, 3Y, 5Y, MAX) in Long-Only or Long & Short modes with configurable capital allocation, stop-loss %, take-profit %, and slippage/fees.
+* 🔄 **GitHub Releases Update Checker**: Automated version comparison against official releases on GitHub (`TheyAreMe/FinDashIQ/releases`).
+* 🛡️ **Administrator Updates Tab**: Dedicated System Updates management tab in the profile modal displaying release notes, upgrade commands, and recent release history.
+* 📈 **Historical AI Conviction Graph (0–100%)**: Added backwards-calculated AI Conviction Score chart as the second graph in the Charts & Technicals subtab to see stability of conviction over time.
 
 ### FinDashIQ v0.1.3 — Stock Scanner Enhancements & UX Polish
 

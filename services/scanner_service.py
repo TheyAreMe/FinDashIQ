@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 from services.scanner_universe_data import SCANNER_UNIVERSE_500
+from services.cache_utils import collect_garbage, ProcessLock, get_yf_session
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class ScannerService:
     5. Precalculated master opportunities, market baskets, and ETF baskets persisted to disk.
     6. Sub-1ms in-memory RAM querying for zero-loading user experience (<10ms HTTP latency).
     7. Admin-only asynchronous non-blocking Force Update (Option A).
+    8. Cross-process single-leader coordination and memory-bounded streaming architecture.
     """
 
     def __init__(self, stock_service, ai_service):
@@ -36,8 +38,8 @@ class ScannerService:
         self.cache_dir = os.path.join(self.data_dir, 'cache')
         os.makedirs(self.cache_dir, exist_ok=True)
 
-        self.cache_file = os.path.join(self.cache_dir, 'scanner_universe_500.json')
-        self.legacy_cache_file = os.path.join(self.cache_dir, 'scanner.json')
+        self.cache_file = os.path.join(self.cache_dir, 'scanner.json')
+        self.legacy_cache_file = os.path.join(self.cache_dir, 'scanner_universe_500.json')
         self.config_file = os.path.join(self.data_dir, 'scanner_config.json')
         self.custom_universe_file = os.path.join(self.data_dir, 'scanner_custom_universe.json')
 
@@ -54,11 +56,7 @@ class ScannerService:
         self._custom_universe = []
         self._load_custom_universe()
 
-        # In-memory caches
-        self._universe_cache = {
-            "timestamp": 0,
-            "stocks_data": {}
-        }
+        # In-memory caches (only lean opportunity & basket arrays, no raw DataFrame/timeseries graphs)
         self._opportunities_cache = []
         self._market_baskets_cache = {}
         self._etf_baskets_cache = {}
@@ -217,14 +215,14 @@ class ScannerService:
             company_name = ""
         if not company_name or company_name == clean_ticker:
             try:
-                t_obj = yf.Ticker(clean_ticker)
+                t_obj = yf.Ticker(clean_ticker, session=get_yf_session())
                 fi = getattr(t_obj, 'fast_info', None)
                 curr = getattr(fi, 'currency', None) if fi else None
                 lp = getattr(fi, 'last_price', None) if fi else None
                 if curr or lp:
                     company_name = clean_ticker
                 else:
-                    df_test = yf.download(clean_ticker, period="5d", interval="1d", progress=False)
+                    df_test = yf.download(clean_ticker, period="5d", interval="1d", session=get_yf_session(), progress=False)
                     if df_test is not None and not df_test.empty:
                         company_name = clean_ticker
                     else:
@@ -286,7 +284,7 @@ class ScannerService:
         """Immediately downloads and calculates indicators for a newly added stock."""
         ticker = item['ticker']
         try:
-            df = yf.download(ticker, period="3mo", interval="1d", progress=False)
+            df = yf.download(ticker, period="3mo", interval="1d", session=get_yf_session(), progress=False)
             if df is not None and not df.empty and len(df) >= 5:
                 # Handle MultiIndex if present
                 if isinstance(df.columns, pd.MultiIndex):
@@ -299,17 +297,19 @@ class ScannerService:
 
                 stock_data = self._build_stock_data_from_df(ticker, item, df, preloaded_news=[])
                 if stock_data:
-                    with self._lock:
-                        self._universe_cache.setdefault('stocks_data', {})[ticker] = stock_data
                     # Recompute single opportunity
                     opp = self._evaluate_single_opportunity(ticker, item, stock_data)
+                    del stock_data
                     if opp:
                         with self._lock:
                             # Remove old if exists
                             self._opportunities_cache = [o for o in self._opportunities_cache if o['ticker'] != ticker]
                             self._opportunities_cache.append(opp)
                             self._opportunities_cache.sort(key=lambda x: x['convictionScore'], reverse=True)
+                            self._market_baskets_cache = self._compute_market_baskets_from_opps(self._opportunities_cache)
+                            self._etf_baskets_cache = self._compute_etf_baskets_from_opps(self._opportunities_cache)
                             self._persist_warm_cache_to_disk()
+                        collect_garbage("ScannerService")
         except Exception as e:
             logger.warning(f"[ScannerService] Fast calculation for {ticker} error: {e}")
 
@@ -325,7 +325,6 @@ class ScannerService:
                     with open(target_file, 'r', encoding='utf-8') as f:
                         data = json.load(f)
                         if data and isinstance(data, dict):
-                            stocks_data = data.get('stocks_data', {})
                             opps = data.get('opportunities', [])
                             market_baskets = data.get('market_baskets', {})
                             etf_baskets = data.get('etf_baskets', {})
@@ -338,10 +337,6 @@ class ScannerService:
                                     epoch = time.time()
 
                             with self._lock:
-                                self._universe_cache = {
-                                    "timestamp": epoch,
-                                    "stocks_data": stocks_data
-                                }
                                 if opps:
                                     self._opportunities_cache = opps
                                 if market_baskets:
@@ -355,16 +350,18 @@ class ScannerService:
                                 self._next_scan_time = datetime.fromtimestamp(self._next_scan_epoch).isoformat()
                                 self._last_scan_duration = float(data.get('scan_duration', 0.0) or 0.0)
 
-                            logger.info(f"[ScannerService] Loaded warm cache with {len(stocks_data)} assets, {len(opps)} opportunities.")
+                            logger.info(f"[ScannerService] Loaded warm cache from {os.path.basename(target_file)} with {len(opps)} opportunities.")
+                            collect_garbage("ScannerServiceInit")
                             return
                 except Exception as e:
                     logger.warning(f"[ScannerService] Error loading disk cache from {target_file}: {e}")
 
     def _persist_warm_cache_to_disk(self):
-        """Atomically saves warm universe, full precomputed opportunities, and baskets to disk."""
+        """Atomically saves clean precomputed opportunities and baskets to disk."""
         tmp_file = f"{self.cache_file}.tmp"
         try:
             with self._lock:
+                combined_count = len(self.get_combined_universe())
                 payload = {
                     "timestamp": self._last_scan_time or datetime.now().isoformat(),
                     "timestamp_epoch": self._last_scan_epoch,
@@ -373,9 +370,10 @@ class ScannerService:
                     "scan_interval_minutes": self.scan_interval_minutes,
                     "scan_interval_seconds": self.scan_interval_seconds,
                     "scan_duration": self._last_scan_duration,
-                    "totalAssets": len(self.get_combined_universe()),
+                    "totalAssets": combined_count,
+                    "totalUniverse": combined_count,
+                    "totalUniverseScanned": combined_count,
                     "opportunitiesCount": len(self._opportunities_cache),
-                    "stocks_data": self._universe_cache.get('stocks_data', {}),
                     "opportunities": self._opportunities_cache,
                     "market_baskets": self._market_baskets_cache,
                     "etf_baskets": self._etf_baskets_cache
@@ -402,10 +400,11 @@ class ScannerService:
 
     def _background_scan_loop(self):
         """
-        Autonomous daemon loop:
+        Autonomous daemon loop with Cross-Process Leader Election:
         1. Checks if disk cache is already warm & fresh. Only scans on boot if cache is missing or stale.
         2. Staggers initial scan by 15s to keep server boot snappy and low-load.
-        3. Periodically re-executes every N minutes (default 30m).
+        3. Uses ProcessLock("scanner_daemon") to ensure ONLY 1 Gunicorn worker process executes scans.
+        4. Periodically re-executes every N minutes (default 30m).
         """
         logger.info("[ScannerService] Background scanner daemon worker started.")
         time.sleep(2.0)  # Brief pause to allow Flask/server initialization
@@ -414,22 +413,28 @@ class ScannerService:
         now = time.time()
         is_cache_fresh = False
         with self._lock:
-            cached_count = len(self._universe_cache.get('stocks_data', {}))
+            cached_count = len(self._opportunities_cache)
             cache_age = now - self._last_scan_epoch
-            if cached_count >= 100 and cache_age < self.scan_interval_seconds:
+            if cached_count >= 50 and cache_age < self.scan_interval_seconds:
                 is_cache_fresh = True
 
         if is_cache_fresh:
-            logger.info(f"[ScannerService] Disk cache is warm & valid ({cached_count} assets, scanned {int(cache_age)}s ago). Skipping heavy boot scan.")
+            logger.info(f"[ScannerService] Disk cache is warm & valid ({cached_count} opportunities, scanned {int(cache_age)}s ago). Skipping heavy boot scan.")
         else:
-            # Stagger startup scan by 15s to let StockWarmup and incoming user requests complete smoothly
             time.sleep(15.0)
             if not self._stop_event.is_set():
-                try:
-                    logger.info("[ScannerService] Launching initial startup scan across all assets...")
-                    self.run_full_scan()
-                except Exception as e:
-                    logger.error(f"[ScannerService] Initial startup scan failed: {e}")
+                lock = ProcessLock("scanner_daemon")
+                if lock.acquire():
+                    try:
+                        logger.info("[ScannerService] Acquired background scanner lock. Launching startup scan...")
+                        self.run_full_scan()
+                    except Exception as e:
+                        logger.error(f"[ScannerService] Startup scan failed: {e}")
+                    finally:
+                        lock.release()
+                else:
+                    logger.info("[ScannerService] Another worker holds the scan lock. Syncing warm cache from disk.")
+                    self._load_warm_cache_from_disk()
 
         # Step 2: Continuous loop
         while not self._stop_event.is_set():
@@ -449,11 +454,18 @@ class ScannerService:
 
             now = time.time()
             if now >= (self._next_scan_epoch - 1.0):
-                try:
-                    logger.info("[ScannerService] Executing scheduled background market scan...")
-                    self.run_full_scan()
-                except Exception as e:
-                    logger.error(f"[ScannerService] Scheduled background scan encountered error: {e}")
+                lock = ProcessLock("scanner_daemon")
+                if lock.acquire():
+                    try:
+                        logger.info("[ScannerService] Acquired background scanner lock. Executing scheduled scan...")
+                        self.run_full_scan()
+                    except Exception as e:
+                        logger.error(f"[ScannerService] Scheduled background scan error: {e}")
+                    finally:
+                        lock.release()
+                else:
+                    logger.info("[ScannerService] Another worker is running scheduled scan. Loading warm cache from disk.")
+                    self._load_warm_cache_from_disk()
 
     def trigger_async_scan(self) -> bool:
         """
@@ -463,10 +475,16 @@ class ScannerService:
             return True
 
         def _async_runner():
-            try:
-                self.run_full_scan()
-            except Exception as e:
-                logger.error(f"[ScannerService] Async force scan error: {e}")
+            lock = ProcessLock("scanner_daemon")
+            if lock.acquire():
+                try:
+                    self.run_full_scan()
+                except Exception as e:
+                    logger.error(f"[ScannerService] Async force scan error: {e}")
+                finally:
+                    lock.release()
+            else:
+                logger.info("[ScannerService] Scan already running in another process.")
 
         t = threading.Thread(target=_async_runner, daemon=True, name="ScannerAsyncTrigger")
         t.start()
@@ -475,12 +493,13 @@ class ScannerService:
     def run_full_scan(self) -> dict:
         """
         Performs full multi-market quantitative scan across the entire combined universe:
-        - Bulk vectorized downloading via yf.download
-        - Global news catalyst wire ingestion
-        - In-memory indicator calculation
-        - Master opportunities precalculation & scoring
+        - Memory-safe chunked streaming ingestion
+        - Immediate per-chunk indicator calculation and opportunity evaluation
+        - Instant intermediate DataFrame and C-array disposal to keep RAM footprint minimal
+        - Multi-process lock coordination across Gunicorn workers
         - Top-5 Market & ETF basket precomputation
         - Atomic persistence to disk
+        - Full OS-level memory trim and garbage collection
         """
         with self._lock:
             if self._is_scanning:
@@ -491,13 +510,79 @@ class ScannerService:
         try:
             combined_items = self.get_combined_universe()
             all_tickers = [item['ticker'] for item in combined_items]
+            item_map = {item['ticker'].strip().upper(): item for item in combined_items}
 
-            logger.info(f"[ScannerService] Starting full scan for {len(all_tickers)} universe assets...")
-            stocks_data = self._fetch_bulk_universe_data(all_tickers, universe_items=combined_items)
+            logger.info(f"[ScannerService] Starting full memory-streamed scan for {len(all_tickers)} universe assets...")
 
-            if stocks_data:
-                # Precompute all opportunities across the entire universe
-                opportunities = self._evaluate_universe_opportunities(stocks_data, combined_items)
+            # Fetch global news headlines in advance
+            news_by_ticker = {}
+            try:
+                from services.news_service import news_service
+                global_news = news_service.fetch_global_news(ticker='MARKET', company_name='Market Wire', limit=150, force_refresh=False) or []
+                for n in global_news:
+                    t = str(n.get('ticker', '')).upper()
+                    if t:
+                        news_by_ticker.setdefault(t, []).append(n)
+                    for rel_t in n.get('relatedTickers', []):
+                        if rel_t:
+                            news_by_ticker.setdefault(rel_t.upper(), []).append(n)
+            except Exception:
+                pass
+
+            opportunities = []
+            CHUNK_SIZE = 50
+            max_threads = min(2, os.cpu_count() or 2)
+
+            for i in range(0, len(all_tickers), CHUNK_SIZE):
+                chunk = all_tickers[i:i + CHUNK_SIZE]
+                try:
+                    df_batch = yf.download(
+                        tickers=chunk,
+                        period="3mo",
+                        interval="1d",
+                        group_by="ticker",
+                        threads=max_threads,
+                        session=get_yf_session(),
+                        progress=False
+                    )
+
+                    if df_batch is not None and not df_batch.empty:
+                        for ticker in chunk:
+                            item = item_map.get(ticker)
+                            if not item:
+                                continue
+
+                            try:
+                                df_ticker = None
+                                if isinstance(df_batch.columns, pd.MultiIndex):
+                                    if ticker in df_batch.columns.levels[0]:
+                                        df_ticker = df_batch[ticker].dropna(subset=['Close'])
+                                else:
+                                    df_ticker = df_batch.dropna(subset=['Close'])
+
+                                if df_ticker is None or df_ticker.empty or len(df_ticker) < 5:
+                                    continue
+
+                                ticker_news = news_by_ticker.get(ticker, [])
+                                opp = self._evaluate_single_opportunity_from_df(ticker, item, df_ticker, ticker_news)
+                                if opp:
+                                    opportunities.append(opp)
+                            except Exception:
+                                pass
+                            finally:
+                                df_ticker = None
+
+                    del df_batch
+                except Exception as e:
+                    logger.warning(f"[ScannerService] Batch chunk {i // CHUNK_SIZE + 1} scan error: {e}")
+
+                # Immediate intermediate GC and yield to keep RAM completely flat
+                collect_garbage("ScannerChunk")
+                time.sleep(0.05)
+
+            if opportunities:
+                # Sort opportunities by conviction score
+                opportunities.sort(key=lambda x: x['convictionScore'], reverse=True)
 
                 # Precompute top regional and ETF baskets
                 market_baskets = self._compute_market_baskets_from_opps(opportunities)
@@ -510,10 +595,6 @@ class ScannerService:
                 iso_next = datetime.fromtimestamp(next_epoch).isoformat()
 
                 with self._lock:
-                    self._universe_cache = {
-                        "timestamp": now,
-                        "stocks_data": stocks_data
-                    }
                     self._opportunities_cache = opportunities
                     self._market_baskets_cache = market_baskets
                     self._etf_baskets_cache = etf_baskets
@@ -525,7 +606,8 @@ class ScannerService:
                     self._last_scan_duration = scan_dur
 
                 self._persist_warm_cache_to_disk()
-                logger.info(f"[ScannerService] Scan complete in {scan_dur}s: {len(opportunities)} opportunities precalculated.")
+                logger.info(f"[ScannerService] Memory-streamed scan complete in {scan_dur}s: {len(opportunities)} opportunities calculated.")
+                collect_garbage("ScannerServiceFull")
                 return {
                     "success": True,
                     "totalAssets": len(all_tickers),
@@ -533,94 +615,15 @@ class ScannerService:
                     "durationSeconds": scan_dur
                 }
             else:
-                logger.warning("[ScannerService] Scan produced empty stock data; retaining existing cache.")
+                logger.warning("[ScannerService] Scan produced empty results; retaining existing warm disk cache.")
                 return {"success": False, "message": "Data ingestion returned no results."}
         finally:
             with self._lock:
                 self._is_scanning = False
             self._scan_event.set()
 
-    def _fetch_bulk_universe_data(self, tickers: list[str], universe_items: list[dict] = None) -> dict:
-        """
-        Ingests multi-ticker historical price data using high-speed vectorized batching.
-        Slashes individual connections down to 1-2 streaming requests (~2.0-4.0s total).
-        """
-        from services.news_service import news_service
-        clean_tickers = [t.strip().upper() for t in tickers if t and t.strip()]
-        if not clean_tickers:
-            return {}
-
-        items = universe_items or self.get_combined_universe()
-        item_map = {item['ticker'].strip().upper(): item for item in items}
-        results = {}
-
-        # 1. Fetch global news stream in ONE single bulk call (0ms from RAM / ~150ms SWR)
-        news_by_ticker = {}
-        try:
-            global_news = news_service.fetch_global_news(limit=150, force_refresh=False) or []
-            for n in global_news:
-                t = str(n.get('ticker', '')).upper()
-                if t:
-                    news_by_ticker.setdefault(t, []).append(n)
-                for rel_t in n.get('relatedTickers', []):
-                    if rel_t:
-                        news_by_ticker.setdefault(rel_t.upper(), []).append(n)
-        except Exception:
-            pass
-
-        # 2. Download multi-ticker batches in controlled chunks with controlled thread concurrency
-        CHUNK_SIZE = 75
-        max_threads = min(4, os.cpu_count() or 2)
-
-        for i in range(0, len(clean_tickers), CHUNK_SIZE):
-            chunk = clean_tickers[i:i + CHUNK_SIZE]
-            try:
-                df_batch = yf.download(
-                    tickers=chunk,
-                    period="3mo",
-                    interval="1d",
-                    group_by="ticker",
-                    threads=max_threads,
-                    progress=False
-                )
-
-                if df_batch is not None and not df_batch.empty:
-                    for ticker in chunk:
-                        item = item_map.get(ticker)
-                        if not item:
-                            continue
-
-                        try:
-                            df_ticker = None
-                            if isinstance(df_batch.columns, pd.MultiIndex):
-                                if ticker in df_batch.columns.levels[0]:
-                                    df_ticker = df_batch[ticker].dropna(subset=['Close'])
-                            else:
-                                df_ticker = df_batch.dropna(subset=['Close'])
-
-                            if df_ticker is None or df_ticker.empty or len(df_ticker) < 5:
-                                continue
-
-                            ticker_news = news_by_ticker.get(ticker, [])
-                            stock_data = self._build_stock_data_from_df(ticker, item, df_ticker, preloaded_news=ticker_news)
-                            if stock_data:
-                                results[ticker] = stock_data
-                        except Exception:
-                            continue
-
-            except Exception as e:
-                logger.warning(f"[ScannerService] Batch chunk {i // CHUNK_SIZE + 1} download error: {e}")
-
-            # Gentle yield between batches to keep CPU cool and server responsive
-            time.sleep(0.05)
-
-        if not results:
-            return self._universe_cache.get('stocks_data', {})
-
-        return results
-
-    def _build_stock_data_from_df(self, ticker: str, item: dict, df: pd.DataFrame, preloaded_news: list[dict] = None) -> dict:
-        """Converts raw OHLCV DataFrame into full indicator timeseries and fundamental profile in RAM."""
+    def _evaluate_single_opportunity_from_df(self, ticker: str, item: dict, df: pd.DataFrame, news: list[dict] = None) -> dict | None:
+        """Directly calculates indicators, scores conviction, and returns clean opportunity dictionary."""
         try:
             timeseries, signals, profile = self.stock_service.calculate_indicators_from_df(df, ticker, item.get('name', ticker))
             if not profile or not signals:
@@ -635,15 +638,16 @@ class ScannerService:
             profile['esgRating'] = item.get('esgRating', 'Leader (90/100)')
             profile['ecoBadge'] = item.get('ecoBadge', '🌿 Alpha')
 
-            news = preloaded_news if preloaded_news is not None else []
-
-            return {
+            stock_info = {
                 'profile': profile,
                 'signals': signals,
                 'timeseries': timeseries,
-                'news': news,
+                'news': news or [],
                 'backtests': None
             }
+            opp = self._evaluate_single_opportunity(ticker, item, stock_info)
+            del stock_info, timeseries, signals, profile
+            return opp
         except Exception:
             return None
 
@@ -966,7 +970,9 @@ class ScannerService:
             "nextScanInSeconds": next_in_sec,
             "ageSeconds": age_sec,
             "scanIntervalMinutes": interval_m,
+            "totalUniverse": total_uni,
             "totalUniverseScanned": total_uni,
+            "totalAssets": total_uni,
             "universeTickers": universe_tickers,
             "opportunitiesCount": len(opps),
             "opportunities": opps
@@ -1138,7 +1144,9 @@ class ScannerService:
                 "excludeWatchlist": exclude_watchlist,
                 "requiredIndicators": required_indicators
             },
+            "totalUniverse": len(self.get_combined_universe()),
             "totalUniverseScanned": len(self.get_combined_universe()),
+            "totalAssets": len(self.get_combined_universe()),
             "opportunitiesCount": len(filtered),
             "opportunities": filtered[:limit] if limit else filtered
         }

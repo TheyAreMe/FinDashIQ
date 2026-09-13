@@ -20,7 +20,7 @@ except ImportError:
             return tuple(parts) or (0, 0, 0)
     version = _VersionFallback()
 
-APP_VERSION = "0.1.4"
+APP_VERSION = "0.1.5"
 GITHUB_REPO = "TheyAreMe/FinDashIQ"
 CACHE_TTL_SECONDS = 3600  # 1 hour cache to respect GitHub API rate limits
 

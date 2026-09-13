@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 import concurrent.futures
 import threading
+from services.cache_utils import BoundedTTLCache
 
 class NewsService:
     """
@@ -25,10 +26,10 @@ class NewsService:
     5. Permanent translation hash caching for 100% English unified delivery.
     """
     
-    _l1_cache = {}
+    _l1_cache = BoundedTTLCache(max_size=40, default_ttl=1800, name="NewsL1Cache")
     _cache_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'cache', 'news')
     _trans_cache_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'cache', 'translations.json')
-    _translations = {}
+    _translations = BoundedTTLCache(max_size=500, default_ttl=86400, name="NewsTranslationCache")
     _swr_inflight = set()
     _swr_lock = threading.Lock()
     
@@ -90,14 +91,21 @@ class NewsService:
         if os.path.exists(self._trans_cache_file):
             try:
                 with open(self._trans_cache_file, 'r', encoding='utf-8') as f:
-                    self._translations = json.load(f)
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        # Load most recent 500 entries
+                        for k, v in list(data.items())[-500:]:
+                            if k and v:
+                                self._translations.set(k, v)
             except Exception:
-                self._translations = {}
+                pass
 
     def _save_translations(self):
         try:
+            # Persist only active bounded translations
+            active_dict = dict(self._translations.items()[-500:])
             with open(self._trans_cache_file, 'w', encoding='utf-8') as f:
-                json.dump(self._translations, f, ensure_ascii=False, indent=2)
+                json.dump(active_dict, f, ensure_ascii=False, indent=2)
         except Exception:
             pass
 
@@ -194,7 +202,7 @@ class NewsService:
     def translate_to_english(self, text: str) -> str:
         """
         Translates foreign headlines directly to English.
-        Uses cached translations for 0ms overhead, with fallback to fast lexical substitution.
+        Uses bounded cached translations for 0ms overhead, with fallback to fast lexical substitution.
         """
         if not text or not isinstance(text, str):
             return ""
@@ -202,10 +210,11 @@ class NewsService:
         if not text:
             return ""
             
-        # Fast hash check
+        # Fast hash check in bounded LRU cache
         h = hashlib.sha256(text.encode('utf-8')).hexdigest()
-        if h in self._translations:
-            return self._translations[h]
+        cached_trans = self._translations.get(h)
+        if cached_trans is not None:
+            return cached_trans
 
         words = text.split()
         foreign_match_count = 0
@@ -221,11 +230,11 @@ class NewsService:
         if foreign_match_count > 0:
             translated_text = " ".join(translated_words)
             translated_text = translated_text[0].upper() + translated_text[1:]
-            self._translations[h] = translated_text
+            self._translations.set(h, translated_text)
             self._save_translations()
             return translated_text
 
-        self._translations[h] = text
+        # Pass-through for English headlines without consuming cache RAM
         return text
 
     def _fetch_rss_url(self, url: str, source_name: str, country: str, flag: str, timeout: float = 2.5) -> list[dict]:

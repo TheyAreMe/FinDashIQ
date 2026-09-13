@@ -270,7 +270,7 @@ After=network.target
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/FinDashIQ
-ExecStart=/home/ubuntu/FinDashIQ/venv/bin/gunicorn --bind 0.0.0.0:5000 --workers 4 --threads 4 --timeout 120 app:app
+ExecStart=/home/ubuntu/FinDashIQ/venv/bin/gunicorn -c gunicorn.conf.py app:app
 Restart=always
 RestartSec=5
 Environment=PYTHONUNBUFFERED=1

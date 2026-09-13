@@ -12,7 +12,7 @@ import pandas as pd
 import urllib.request
 import urllib.parse
 import yfinance as yf
-from services.news_service import news_service
+from services.cache_utils import BoundedTTLCache, CacheRegistry, collect_garbage, ProcessLock, get_yf_session
 
 logger = logging.getLogger(__name__)
 logging.getLogger('yfinance').setLevel(logging.CRITICAL)
@@ -88,7 +88,7 @@ GLOBAL_TICKER_NAME_MAP = {
     'EMR': 'Emerson Electric Co.'
 }
 
-_NAME_LOOKUP_CACHE = {}
+_NAME_LOOKUP_CACHE = BoundedTTLCache(max_size=150, default_ttl=86400, name="StockNameLookupCache")
 
 TICKER_ALIASES = {}
 
@@ -159,9 +159,9 @@ class StockService:
     def __init__(self):
         self.cache_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'cache')
         os.makedirs(self.cache_dir, exist_ok=True)
-        self._analysis_cache = {}
-        self._profile_cache = {}
-        self._news_cache = {}
+        self._analysis_cache = BoundedTTLCache(max_size=30, default_ttl=1800, name="StockAnalysisCache")
+        self._profile_cache = BoundedTTLCache(max_size=50, default_ttl=900, name="StockProfileCache")
+        self._news_cache = BoundedTTLCache(max_size=30, default_ttl=1800, name="StockNewsCache")
         self._lock = threading.RLock()
         self._warmup_thread = None
         self._stop_warmup = threading.Event()
@@ -361,10 +361,12 @@ class StockService:
         - Average True Range (ATR 14)
         - On-Balance Volume (OBV)
         """
-        if df.empty or len(df) < 5:
-            return df
+        if df is None or df.empty:
+            return pd.DataFrame() if df is None else df
 
-        df = df.copy()
+        df = df[df.index.notna()].copy()
+        if len(df) < 5:
+            return df
 
         # 1. Moving Averages
         df['SMA_20'] = df['Close'].rolling(window=20, min_periods=5).mean()
@@ -947,8 +949,11 @@ class StockService:
         if df is None or df.empty or 'Close' not in df.columns:
             return df
         try:
+            df = df[df.index.notna()]
+            if df.empty:
+                return df
             if pd.isna(df['Close'].iloc[-1]):
-                t = yf.Ticker(ticker)
+                t = yf.Ticker(ticker, session=get_yf_session())
                 fi = getattr(t, 'fast_info', None)
                 if fi:
                     last_price = getattr(fi, 'last_price', None)
@@ -997,6 +1002,7 @@ class StockService:
                 cached_df = pd.read_csv(cache_file, index_col=0, parse_dates=True)
                 if isinstance(cached_df.columns, pd.MultiIndex):
                     cached_df.columns = [col[0] for col in cached_df.columns]
+                cached_df = cached_df[cached_df.index.notna()]
                 file_age = now - os.path.getmtime(cache_file)
                 # If cache is fresh (< 1800 seconds / 30 mins), not forced, and non-empty
                 if not force_refresh and file_age < 1800 and not cached_df.empty:
@@ -1007,41 +1013,57 @@ class StockService:
         # If we have existing cached data, perform a lightweight DELTA download
         if cached_df is not None and not cached_df.empty and 'Close' in cached_df.columns:
             try:
-                last_dt = cached_df.index[-1]
-                if isinstance(last_dt, str):
-                    last_dt = pd.to_datetime(last_dt)
-
-                # Fetch only from 3 days prior to last cached bar to today
-                delta_start = (last_dt - timedelta(days=3)).strftime('%Y-%m-%d')
-                delta_df = yf.download(actual_ticker, start=delta_start, interval=interval, progress=False)
-
-                if isinstance(delta_df.columns, pd.MultiIndex):
-                    delta_df.columns = [col[0] for col in delta_df.columns]
-
-                if not delta_df.empty and 'Close' in delta_df.columns:
-                    delta_df = self._patch_latest_bar_if_nan(actual_ticker, delta_df)
-                    # Combine cached and delta, removing duplicate timestamps keeping the latest
-                    combined_df = pd.concat([cached_df, delta_df])
-                    combined_df = combined_df.loc[~combined_df.index.duplicated(keep='last')]
-                    combined_df = self._patch_latest_bar_if_nan(actual_ticker, combined_df)
-                    combined_df = combined_df.dropna(subset=['Close'])
-                    combined_df.to_csv(cache_file)
-                    return combined_df
+                valid_index = cached_df.index[cached_df.index.notna()]
+                if len(valid_index) == 0:
+                    cached_df = None
                 else:
-                    # No new bars (e.g. weekend/closed), touch file mtime
-                    os.utime(cache_file, None)
-                    return cached_df
+                    last_dt = valid_index[-1]
+                    if isinstance(last_dt, str):
+                        try:
+                            last_dt = pd.to_datetime(last_dt)
+                        except Exception:
+                            last_dt = None
+
+                    if last_dt is None or pd.isna(last_dt) or str(last_dt).strip().lower() in ('nat', 'nan'):
+                        delta_start = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+                    else:
+                        try:
+                            delta_start = (last_dt - timedelta(days=3)).strftime('%Y-%m-%d')
+                        except Exception:
+                            delta_start = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+
+                    delta_df = yf.download(actual_ticker, start=delta_start, interval=interval, session=get_yf_session(), progress=False)
+
+                    if isinstance(delta_df.columns, pd.MultiIndex):
+                        delta_df.columns = [col[0] for col in delta_df.columns]
+
+                    if not delta_df.empty and 'Close' in delta_df.columns:
+                        delta_df = delta_df[delta_df.index.notna()]
+                        delta_df = self._patch_latest_bar_if_nan(actual_ticker, delta_df)
+                        # Combine cached and delta, removing duplicate timestamps keeping the latest
+                        combined_df = pd.concat([cached_df, delta_df])
+                        combined_df = combined_df[combined_df.index.notna()]
+                        combined_df = combined_df.loc[~combined_df.index.duplicated(keep='last')]
+                        combined_df = self._patch_latest_bar_if_nan(actual_ticker, combined_df)
+                        combined_df = combined_df.dropna(subset=['Close'])
+                        combined_df.to_csv(cache_file)
+                        return combined_df
+                    else:
+                        # No new bars (e.g. weekend/closed), touch file mtime
+                        os.utime(cache_file, None)
+                        return cached_df
             except Exception:
                 return cached_df
 
         # If no cache exists, download full history
         try:
             download_period = period if period in ('2y', '5y', 'max') else '2y'
-            full_df = yf.download(actual_ticker, period=download_period, interval=interval, progress=False)
+            full_df = yf.download(actual_ticker, period=download_period, interval=interval, session=get_yf_session(), progress=False)
             if isinstance(full_df.columns, pd.MultiIndex):
                 full_df.columns = [col[0] for col in full_df.columns]
 
             if not full_df.empty and 'Close' in full_df.columns:
+                full_df = full_df[full_df.index.notna()]
                 full_df = self._patch_latest_bar_if_nan(actual_ticker, full_df)
                 full_df = full_df.dropna(subset=['Close'])
                 full_df.to_csv(cache_file)
@@ -1060,11 +1082,10 @@ class StockService:
         now = time.time()
         cache_key = f"{actual_ticker}_{period}_{interval}"
         
-        with self._lock:
-            cached_entry = self._analysis_cache.get(cache_key)
-            # Check if in-memory cache is valid (< 1800s / 30m) and not force_refresh
-            if not force_refresh and cached_entry and (now - cached_entry['timestamp'] < 1800):
-                return ticker, cached_entry['data']
+        if not force_refresh:
+            cached_data = self._analysis_cache.get(cache_key)
+            if cached_data is not None:
+                return ticker, cached_data
 
         try:
             ticker_df = self.get_historical_dataframe(actual_ticker, period=period, interval=interval, force_refresh=force_refresh)
@@ -1101,9 +1122,17 @@ class StockService:
             sector = 'Equities'
 
             try:
-                t_obj = yf.Ticker(actual_ticker)
+                t_obj = yf.Ticker(actual_ticker, session=get_yf_session())
                 fund_profile = StockService.get_stock_profile(t_obj, actual_ticker, skip_info_scrape=True)
                 if fund_profile:
+                    if fund_profile.get('currentPrice') is not None:
+                        curr_price = fund_profile['currentPrice']
+                    if fund_profile.get('previousClose') is not None:
+                        prev_close = fund_profile['previousClose']
+                    if fund_profile.get('change') is not None:
+                        change = fund_profile['change']
+                    if fund_profile.get('changePercent') is not None:
+                        change_pct = fund_profile['changePercent']
                     market_cap = _safe_int(fund_profile.get('marketCap'), None)
                     pe_ratio = _safe_float(fund_profile.get('peRatio'))
                     forward_pe = _safe_float(fund_profile.get('forwardPE'))
@@ -1147,10 +1176,16 @@ class StockService:
 
             timeseries = []
             for row in enriched_df.reset_index().to_dict('records'):
-                idx = row.get('Date') or row.get('index')
-                if isinstance(idx, (pd.Timestamp, datetime)):
-                    time_str = idx.strftime('%Y-%m-%d')
-                    timestamp_ms = int(idx.timestamp() * 1000)
+                idx = row.get('Date') or row.get('index') or row.get('Datetime')
+                if idx is None or pd.isna(idx) or str(idx).strip().lower() in ('nat', 'nan', 'none', ''):
+                    continue
+                if isinstance(idx, (pd.Timestamp, datetime)) and not pd.isna(idx):
+                    try:
+                        time_str = idx.strftime('%Y-%m-%d')
+                        timestamp_ms = int(idx.timestamp() * 1000)
+                    except Exception:
+                        time_str = str(idx)[:10]
+                        timestamp_ms = 0
                 else:
                     time_str = str(idx)[:10] if idx is not None else ''
                     timestamp_ms = 0
@@ -1281,7 +1316,6 @@ class StockService:
                 'profile': profile,
                 'signals': signals,
                 'timeseries': display_timeseries,
-                'fullTimeseries': timeseries if period == 'max' else (timeseries[-1260:] if len(timeseries) > 1260 else timeseries),
                 'period': period,
                 'convictionHistoryStats': conviction_history_stats,
                 'backtests': backtests,
@@ -1289,10 +1323,7 @@ class StockService:
                 'dataPointsCount': len(display_timeseries)
             })
 
-            with self._lock:
-                self._analysis_cache[cache_key] = {'timestamp': now, 'data': stock_entry}
-                if actual_ticker != ticker:
-                    self._analysis_cache[f"{ticker}_{period}_{interval}"] = {'timestamp': now, 'data': stock_entry}
+            self._analysis_cache.set(cache_key, stock_entry, ttl=1800)
             return ticker, stock_entry
 
         except Exception as e:
@@ -1304,10 +1335,10 @@ class StockService:
         now = time.time()
         fast_cache_key = f"{actual_ticker}_fast"
         
-        with self._lock:
-            cached_entry = self._analysis_cache.get(fast_cache_key)
-            if not force_refresh and cached_entry and (now - cached_entry['timestamp'] < 900):
-                return ticker, cached_entry['data']
+        if not force_refresh:
+            cached_data = self._analysis_cache.get(fast_cache_key)
+            if cached_data is not None:
+                return ticker, cached_data
 
         try:
             safe_ticker = actual_ticker.replace('/', '_').replace('^', '_')
@@ -1319,6 +1350,7 @@ class StockService:
                     ticker_df = pd.read_csv(cache_file, index_col=0, parse_dates=True)
                     if isinstance(ticker_df.columns, pd.MultiIndex):
                         ticker_df.columns = [col[0] for col in ticker_df.columns]
+                    ticker_df = ticker_df[ticker_df.index.notna()]
                     ticker_df = self._patch_latest_bar_if_nan(actual_ticker, ticker_df)
                 except Exception:
                     ticker_df = None
@@ -1329,6 +1361,7 @@ class StockService:
             if ticker_df.empty or 'Close' not in ticker_df.columns:
                 return ticker, {'error': f'No historical data found for {ticker}.'}
 
+            ticker_df = ticker_df[ticker_df.index.notna()]
             ticker_df = self._patch_latest_bar_if_nan(actual_ticker, ticker_df)
             ticker_df = ticker_df.dropna(subset=['Close'])
 
@@ -1343,6 +1376,20 @@ class StockService:
             prev_price = _safe_float(prev_row.get('Close'), curr_price)
             change = _safe_float(curr_price - prev_price, 0.0) if (curr_price is not None and prev_price is not None) else 0.0
             change_percent = _safe_float((change / prev_price * 100) if (prev_price and prev_price > 0) else 0.0, 0.0)
+
+            # Query real-time fast_info on force_refresh for live tick updates
+            if force_refresh:
+                try:
+                    t_obj = yf.Ticker(actual_ticker, session=get_yf_session())
+                    fi = getattr(t_obj, 'fast_info', None)
+                    if fi and hasattr(fi, 'last_price') and fi.last_price is not None and not np.isnan(fi.last_price) and fi.last_price > 0:
+                        curr_price = float(fi.last_price)
+                        if hasattr(fi, 'previous_close') and fi.previous_close is not None and not np.isnan(fi.previous_close) and fi.previous_close > 0:
+                            prev_price = float(fi.previous_close)
+                            change = round(curr_price - prev_price, 2)
+                            change_percent = round((change / prev_price) * 100, 2) if prev_price > 0 else 0.0
+                except Exception:
+                    pass
 
             comp_name = self._resolve_company_name(actual_ticker, {})
             currency = 'EUR' if ('.DE' in actual_ticker or '.PA' in actual_ticker or '.AS' in actual_ticker) else ('NOK' if '.OL' in actual_ticker else ('SEK' if '.ST' in actual_ticker else ('JPY' if '.T' in actual_ticker else 'USD')))
@@ -1367,9 +1414,17 @@ class StockService:
             # Extract lightweight sparkline (last 30 closes)
             sparkline = []
             for idx, row in enriched_df.tail(30).iterrows():
+                if idx is None or pd.isna(idx) or str(idx).strip().lower() in ('nat', 'nan', 'none', ''):
+                    continue
                 close_val = _safe_float(row.get('Close'))
                 if close_val is not None:
-                    time_str = idx.strftime('%Y-%m-%d') if isinstance(idx, (pd.Timestamp, datetime)) else str(idx)
+                    if isinstance(idx, (pd.Timestamp, datetime)) and not pd.isna(idx):
+                        try:
+                            time_str = idx.strftime('%Y-%m-%d')
+                        except Exception:
+                            time_str = str(idx)[:10]
+                    else:
+                        time_str = str(idx)[:10] if idx is not None else ''
                     sparkline.append({
                         'time': time_str,
                         'close': close_val
@@ -1383,10 +1438,7 @@ class StockService:
                 'isFastHydration': True
             })
 
-            with self._lock:
-                self._analysis_cache[fast_cache_key] = {'timestamp': now, 'data': fast_entry}
-                if actual_ticker != ticker:
-                    self._analysis_cache[f"{ticker}_fast"] = {'timestamp': now, 'data': fast_entry}
+            self._analysis_cache.set(fast_cache_key, fast_entry, ttl=900)
             return ticker, fast_entry
 
         except Exception as e:
@@ -1503,8 +1555,18 @@ class StockService:
 
             for i in range(n_rows):
                 idx = idx_list[i]
-                time_str = idx.strftime('%Y-%m-%d') if isinstance(idx, (pd.Timestamp, datetime)) else str(idx)
-                ts_ms = int(idx.timestamp() * 1000) if isinstance(idx, (pd.Timestamp, datetime)) else 0
+                if idx is None or pd.isna(idx) or str(idx).strip().lower() in ('nat', 'nan', 'none', ''):
+                    continue
+                if isinstance(idx, (pd.Timestamp, datetime)) and not pd.isna(idx):
+                    try:
+                        time_str = idx.strftime('%Y-%m-%d')
+                        ts_ms = int(idx.timestamp() * 1000)
+                    except Exception:
+                        time_str = str(idx)[:10]
+                        ts_ms = 0
+                else:
+                    time_str = str(idx)[:10] if idx is not None else ''
+                    ts_ms = 0
                 point = {
                     'time': time_str,
                     'timestamp': ts_ms,
@@ -1595,12 +1657,13 @@ class StockService:
 
         # 2. Fallback to cached news wire if external feeds fail
         now = time.time()
-        cached_entry = self._news_cache.get(actual_ticker)
-        if cached_entry and (now - cached_entry['timestamp'] < 1800):
-            return cached_entry['news'][:limit]
+        if not force_refresh:
+            cached_news = self._news_cache.get(actual_ticker)
+            if cached_news:
+                return cached_news[:limit]
 
         try:
-            t = yf.Ticker(actual_ticker)
+            t = yf.Ticker(actual_ticker, session=get_yf_session())
             raw_news = getattr(t, 'news', []) or []
             parsed = []
             for item in raw_news:
@@ -1639,9 +1702,7 @@ class StockService:
                 if len(parsed) >= limit:
                     break
 
-            self._news_cache[actual_ticker] = {'timestamp': now, 'news': parsed}
-            if actual_ticker != ticker_symbol:
-                self._news_cache[ticker_symbol] = {'timestamp': now, 'news': parsed}
+            self._news_cache.set(actual_ticker, parsed, ttl=1800)
             return parsed
         except Exception:
             return []
@@ -1879,6 +1940,9 @@ class StockService:
         self._warmed_tickers = tickers
         logger.info(f"[StockService] Pre-hydration completed for {len(tickers)} tickers in {duration}s.")
 
+        # Reclaim intermediate memory allocations from batch pre-hydration
+        self.purge_expired_caches()
+
         return {
             "warmed_count": len(tickers),
             "duration": duration,
@@ -1886,14 +1950,29 @@ class StockService:
             "tickers": tickers
         }
 
+    def purge_expired_caches(self) -> dict:
+        """Sweeps and purges expired entries across all in-memory caches, then triggers OS working set trimming."""
+        purged_map = CacheRegistry.purge_all()
+        reclaimed_objects = collect_garbage("StockService")
+        return {
+            "purged_caches": purged_map,
+            "reclaimed_objects": reclaimed_objects
+        }
+
     def _background_warmup_loop(self):
-        """Continuous background daemon loop: hydrates on boot, then syncs deltas every 15 minutes."""
+        """Continuous background daemon loop: hydrates on boot, then syncs deltas every 15 minutes with single-leader process lock."""
         time.sleep(1.0)
-        logger.info("[StockService] Launching initial server boot pre-hydration...")
-        try:
-            self.prehydrate_universe(force_refresh=False)
-        except Exception as e:
-            logger.error(f"[StockService] Boot pre-hydration error: {e}")
+        lock = ProcessLock("stock_warmup_daemon")
+        if lock.acquire():
+            try:
+                logger.info("[StockService] Acquired warmup process lock. Launching initial server boot pre-hydration...")
+                self.prehydrate_universe(force_refresh=False)
+            except Exception as e:
+                logger.error(f"[StockService] Boot pre-hydration error: {e}")
+            finally:
+                lock.release()
+        else:
+            logger.debug("[StockService] Warmup lock held by another process. Skipping boot pre-hydration.")
 
         while not self._stop_warmup.is_set():
             for _ in range(180):
@@ -1901,11 +1980,17 @@ class StockService:
                     return
                 time.sleep(5)
 
-            try:
-                logger.info("[StockService] Running periodic delta pre-hydration cycle...")
-                self.prehydrate_universe(force_refresh=False)
-            except Exception as e:
-                logger.error(f"[StockService] Periodic warmup error: {e}")
+            lock = ProcessLock("stock_warmup_daemon")
+            if lock.acquire():
+                try:
+                    logger.info("[StockService] Acquired warmup process lock. Running periodic delta pre-hydration cycle...")
+                    self.prehydrate_universe(force_refresh=False)
+                except Exception as e:
+                    logger.error(f"[StockService] Periodic warmup error: {e}")
+                finally:
+                    lock.release()
+            else:
+                logger.debug("[StockService] Warmup lock held by another process. Skipping periodic cycle.")
 
     def start_background_warmup(self):
         """Starts the background pre-hydration daemon thread if not already running."""

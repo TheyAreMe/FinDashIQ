@@ -9,6 +9,7 @@ import urllib.error
 import urllib.request
 import numpy as np
 import pandas as pd
+from services.cache_utils import BoundedTTLCache
 
 
 class AIService:
@@ -20,8 +21,8 @@ class AIService:
     """
 
     def __init__(self, cache_dir: str = None):
-        # In-memory response cache: {cache_key: {"value": ..., "expires_at": float}}
-        self._cache = {}
+        # In-memory response cache with bounded LRU eviction (max 30 items)
+        self._cache = BoundedTTLCache(max_size=30, default_ttl=14400, name="AICache")
         if cache_dir:
             self.cache_dir = cache_dir
         else:
@@ -42,12 +43,9 @@ class AIService:
         """Retrieves a cached item from RAM or persistent disk if not expired."""
         now = time.time()
         # 1. Check in-memory cache
-        if key in self._cache:
-            entry = self._cache[key]
-            if entry["expires_at"] > now:
-                return entry["value"]
-            else:
-                del self._cache[key]
+        val = self._cache.get(key)
+        if val is not None:
+            return val
 
         # 2. Check persistent disk cache
         if hasattr(self, 'cache_dir') and self.cache_dir:
@@ -58,11 +56,9 @@ class AIService:
                         disk_entry = json.load(f)
                     if disk_entry.get("expires_at", 0) > now:
                         val = disk_entry.get("value")
-                        # Hydrate RAM cache
-                        self._cache[key] = {
-                            "value": val,
-                            "expires_at": disk_entry["expires_at"]
-                        }
+                        # Hydrate RAM cache with remaining TTL
+                        rem_ttl = max(1.0, disk_entry["expires_at"] - now)
+                        self._cache.set(key, val, ttl=rem_ttl)
                         return val
                     else:
                         try:
@@ -78,14 +74,8 @@ class AIService:
         now = time.time()
         expires_at = now + ttl_seconds
 
-        # Prune memory cache if growing large
-        if len(self._cache) > 300:
-            self._cache = {k: v for k, v in self._cache.items() if v["expires_at"] > now}
-
-        self._cache[key] = {
-            "value": value,
-            "expires_at": expires_at
-        }
+        # Save to Bounded RAM cache
+        self._cache.set(key, value, ttl=ttl_seconds)
 
         # Persist to disk
         if hasattr(self, 'cache_dir') and self.cache_dir:

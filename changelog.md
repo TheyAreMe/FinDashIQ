@@ -1,5 +1,15 @@
 # 📋 Changelog
 
+## v0.1.4 ➔ v0.1.5 Delta
+
+### 🛡️ Administrator Server Maintenance & Memory Optimization
+- **Dedicated Admin Maintenance Tab**: Added an admin-only Maintenance tab inside the Profile & Preferences modal with live server telemetry tracking FinDashIQ process
+
+### ⚡ Performance & Maintainability
+- **RAM Optimization**: Reduced memory footprint through streamlined in-memory caching and cache cleanup.
+- **Code Maintainability**: Refactored core modules, reduced redundancy, and improved codebase structure.
+
+---------------------------------------------------------------
 ## v0.1.3 ➔ v0.1.4 Delta
 
 ### 🎮 Strategy Backtesting & Simulation Studio

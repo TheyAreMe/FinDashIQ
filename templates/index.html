@@ -47,7 +47,8 @@
         <div class="auth-card-institutional">
             <div class="auth-card-header">
                 <div class="auth-card-logo">
-                    <i data-lucide="brain" style="width: 32px; height: 32px; color: #fff;"></i>
+                    <img class="logo-img logo-dark" src="{{ url_for('static', filename='img/logo-dark.svg') }}" alt="FinDashIQ Logo">
+                    <img class="logo-img logo-light" src="{{ url_for('static', filename='img/logo-light.svg') }}" alt="FinDashIQ Logo">
                 </div>
                 <h1 class="auth-card-title">FinDashIQ</h1>
                 <div class="auth-card-subtitle">Quantitative AI Financial Dashboard</div>
@@ -251,7 +252,21 @@
     <!-- ApexCharts (Non-blocking deferred load) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
 
-    <!-- Application Logic (with cache-busting versioning) -->
+    <!-- Application Domain Modules (with cache-busting versioning) -->
+    <script src="{{ url_for('static', filename='js/modules/core/state.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/core/currency.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/core/utils.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/core/i18n.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/auth/auth.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/terminal/charts.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/terminal/deep_dive.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/backtest/backtest_engine.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/backtest/paper_trades.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/watchlist/watchlist.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/scanner/scanner.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/alerts/alerts.js') }}?v={{ asset_version }}"></script>
+
+    <!-- Application Lifecycle Bootstrapper -->
     <script src="{{ url_for('static', filename='js/app.js') }}?v={{ asset_version }}"></script>
 
 </body>

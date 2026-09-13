@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <!-- Bright Mode Backdrop Gradient: Clean Crisp White with Deep Sapphire Border -->
+    <linearGradient id="fdLightBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="60%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#eff6ff" />
+    </linearGradient>
+
+    <!-- Deep Saturated Royal Sapphire & Cobalt Gradient -->
+    <linearGradient id="fdLightSapphire" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="50%" stop-color="#1d4ed8" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+
+    <!-- High-Contrast Deep Emerald Wave Gradient -->
+    <linearGradient id="fdLightEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="60%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+
+    <!-- High-Contrast Deep Violet Gradient -->
+    <linearGradient id="fdLightViolet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#581c87" />
+    </linearGradient>
+
+    <!-- Bold Outer Shadow Frame Gradient -->
+    <linearGradient id="fdLightBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="50%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+
+    <filter id="fdLightShadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#1e293b" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <!-- Base Rounded Container with Crisp Saturated Border (Stands out boldly on pure white or light grey #f1f5f9) -->
+  <rect width="128" height="128" rx="28" fill="url(#fdLightBg)" stroke="url(#fdLightBorder)" stroke-width="3.5" filter="url(#fdLightShadow)" />
+
+  <!-- Background Quantitative Grid Mesh -->
+  <path d="M22 64 H106 M64 22 V106" stroke="#0284c7" stroke-width="1.2" stroke-opacity="0.25" stroke-dasharray="4 3" />
+  <circle cx="64" cy="64" r="38" stroke="#7c3aed" stroke-width="1.2" stroke-opacity="0.22" fill="none" />
+
+  <!-- Background Candlestick Bars (Deep Blue & Rich Forest Green) -->
+  <g opacity="0.6">
+    <line x1="36" y1="50" x2="36" y2="88" stroke="#0284c7" stroke-width="2.2" />
+    <rect x="33" y="56" width="6" height="20" rx="1.5" fill="#0284c7" />
+    <line x1="92" y1="38" x2="92" y2="82" stroke="#059669" stroke-width="2.2" />
+    <rect x="89" y="44" width="6" height="26" rx="1.5" fill="#059669" />
+  </g>
+
+  <!-- Central Quant Neural Brain / Dynamic Pulse Wave (Deep, Crisp & High Contrast) -->
+  <g>
+    <!-- Dynamic AI Exponential Trend Arc -->
+    <path d="M 26 84 Q 46 94, 58 64 T 92 40 T 104 34" fill="none" stroke="url(#fdLightEmerald)" stroke-width="5.5" stroke-linecap="round" />
+    
+    <!-- Central Processing Node -->
+    <circle cx="64" cy="64" r="11" fill="#ffffff" stroke="url(#fdLightSapphire)" stroke-width="3.8" />
+    <circle cx="64" cy="64" r="5.5" fill="#1d4ed8" />
+
+    <!-- Top Left Node -->
+    <line x1="64" y1="64" x2="42" y2="42" stroke="url(#fdLightSapphire)" stroke-width="3.2" stroke-linecap="round" />
+    <circle cx="42" cy="42" r="7.5" fill="#ffffff" stroke="#0284c7" stroke-width="2.8" />
+    <circle cx="42" cy="42" r="3.8" fill="#0284c7" />
+
+    <!-- Top Right Node -->
+    <line x1="64" y1="64" x2="86" y2="42" stroke="url(#fdLightViolet)" stroke-width="3.2" stroke-linecap="round" />
+    <circle cx="86" cy="42" r="7.5" fill="#ffffff" stroke="#7c3aed" stroke-width="2.8" />
+    <circle cx="86" cy="42" r="3.8" fill="#7c3aed" />
+
+    <!-- Bottom Left Node -->
+    <line x1="64" y1="64" x2="42" y2="86" stroke="url(#fdLightEmerald)" stroke-width="3.2" stroke-linecap="round" />
+    <circle cx="42" cy="86" r="7.5" fill="#ffffff" stroke="#047857" stroke-width="2.8" />
+    <circle cx="42" cy="86" r="3.8" fill="#047857" />
+
+    <!-- Bottom Right Node -->
+    <line x1="64" y1="64" x2="86" y2="86" stroke="url(#fdLightSapphire)" stroke-width="3.2" stroke-linecap="round" />
+    <circle cx="86" cy="86" r="7.5" fill="#ffffff" stroke="#1d4ed8" stroke-width="2.8" />
+    <circle cx="86" cy="86" r="3.8" fill="#1d4ed8" />
+
+    <!-- Inter-node Neural Synapse Connectors -->
+    <line x1="42" y1="42" x2="86" y2="42" stroke="#7c3aed" stroke-width="2.4" stroke-dasharray="3 3" />
+    <line x1="42" y1="86" x2="86" y2="86" stroke="#047857" stroke-width="2.4" stroke-dasharray="3 3" />
+  </g>
+
+  <!-- Deep Micro Accent Dots -->
+  <circle cx="96" cy="32" r="3" fill="#1d4ed8" />
+  <circle cx="32" cy="96" r="2.5" fill="#047857" />
+  <circle cx="100" cy="92" r="2" fill="#7c3aed" />
+</svg>

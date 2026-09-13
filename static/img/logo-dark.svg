@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <!-- Dark Mode Rich Backdrop Gradient: Vibrant Royal Blue to Deep Indigo Core with Bright Neon Edge -->
+    <linearGradient id="fdDarkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="45%" stop-color="#172554" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+
+    <!-- High-Luminance Neon Cyan & Laser Blue Gradient -->
+    <linearGradient id="fdNeonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#67e8f9" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+
+    <!-- High-Luminance Neon Emerald Wave Gradient -->
+    <linearGradient id="fdNeonEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a7f3d0" />
+      <stop offset="40%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+
+    <!-- Neon Violet Accent Gradient -->
+    <linearGradient id="fdNeonViolet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e9d5ff" />
+      <stop offset="50%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+
+    <!-- Glowing Outer Border Gradient -->
+    <linearGradient id="fdBorderGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+
+    <filter id="fdGlowDark" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur1" />
+      <feGaussianBlur stdDeviation="1.5" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur1" />
+        <feMergeNode in="blur2" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer Rounded Badge Base with Crisp Neon Border (High Pop on #0a0e17 dark backgrounds) -->
+  <rect width="128" height="128" rx="28" fill="url(#fdDarkBg)" stroke="url(#fdBorderGlow)" stroke-width="3.5" />
+
+  <!-- Background Subtle Quant Grid Mesh -->
+  <path d="M22 64 H106 M64 22 V106" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.3" stroke-dasharray="4 3" />
+  <circle cx="64" cy="64" r="38" stroke="#a855f7" stroke-width="1.2" stroke-opacity="0.35" fill="none" />
+
+  <!-- Background Candlestick Bars (Bright Cyan & Emerald Green) -->
+  <g opacity="0.65">
+    <line x1="36" y1="50" x2="36" y2="88" stroke="#38bdf8" stroke-width="2" />
+    <rect x="33" y="56" width="6" height="20" rx="1.5" fill="#38bdf8" />
+    <line x1="92" y1="38" x2="92" y2="82" stroke="#34d399" stroke-width="2" />
+    <rect x="89" y="44" width="6" height="26" rx="1.5" fill="#34d399" />
+  </g>
+
+  <!-- Central Quant Neural Brain / Dynamic Neon Trend Wave (Bright, High Contrast) -->
+  <g filter="url(#fdGlowDark)">
+    <!-- Dynamic AI Exponential Trend Arc -->
+    <path d="M 26 84 Q 46 94, 58 64 T 92 40 T 104 34" fill="none" stroke="url(#fdNeonEmerald)" stroke-width="5" stroke-linecap="round" />
+    
+    <!-- Central Processing Node -->
+    <circle cx="64" cy="64" r="10.5" fill="#090d16" stroke="url(#fdNeonCyan)" stroke-width="3.5" />
+    <circle cx="64" cy="64" r="5.5" fill="#ffffff" />
+
+    <!-- Top Left Node -->
+    <line x1="64" y1="64" x2="42" y2="42" stroke="url(#fdNeonCyan)" stroke-width="3" stroke-linecap="round" />
+    <circle cx="42" cy="42" r="7" fill="#090d16" stroke="#38bdf8" stroke-width="2.5" />
+    <circle cx="42" cy="42" r="3.5" fill="#67e8f9" />
+
+    <!-- Top Right Node -->
+    <line x1="64" y1="64" x2="86" y2="42" stroke="url(#fdNeonViolet)" stroke-width="3" stroke-linecap="round" />
+    <circle cx="86" cy="42" r="7" fill="#090d16" stroke="#c084fc" stroke-width="2.5" />
+    <circle cx="86" cy="42" r="3.5" fill="#e9d5ff" />
+
+    <!-- Bottom Left Node -->
+    <line x1="64" y1="64" x2="42" y2="86" stroke="url(#fdNeonEmerald)" stroke-width="3" stroke-linecap="round" />
+    <circle cx="42" cy="86" r="7" fill="#090d16" stroke="#34d399" stroke-width="2.5" />
+    <circle cx="42" cy="86" r="3.5" fill="#a7f3d0" />
+
+    <!-- Bottom Right Node -->
+    <line x1="64" y1="64" x2="86" y2="86" stroke="url(#fdNeonCyan)" stroke-width="3" stroke-linecap="round" />
+    <circle cx="86" cy="86" r="7" fill="#090d16" stroke="#38bdf8" stroke-width="2.5" />
+    <circle cx="86" cy="86" r="3.5" fill="#67e8f9" />
+
+    <!-- Inter-node Neural Synapse Connectors -->
+    <line x1="42" y1="42" x2="86" y2="42" stroke="#c084fc" stroke-width="2.2" stroke-dasharray="3 3" />
+    <line x1="42" y1="86" x2="86" y2="86" stroke="#34d399" stroke-width="2.2" stroke-dasharray="3 3" />
+  </g>
+
+  <!-- High-Luminance Micro Star Sparkles -->
+  <circle cx="96" cy="32" r="2.8" fill="#ffffff" />
+  <circle cx="32" cy="96" r="2.2" fill="#34d399" />
+  <circle cx="100" cy="92" r="1.8" fill="#67e8f9" />
+</svg>

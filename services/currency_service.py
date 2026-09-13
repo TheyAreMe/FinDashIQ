@@ -2,6 +2,7 @@ import os
 import json
 import time
 import yfinance as yf
+from services.cache_utils import get_yf_session
 
 # Fallback static rates against USD if network is offline
 DEFAULT_USD_RATES = {
@@ -71,8 +72,8 @@ class CurrencyService:
         rates = dict(DEFAULT_USD_RATES)
         try:
             symbols = list(FOREX_TICKERS.values())
-            # Batch fetch via yfinance Tickers
-            tickers = yf.Tickers(' '.join(symbols))
+            # Batch fetch via yfinance Tickers with managed session
+            tickers = yf.Tickers(' '.join(symbols), session=get_yf_session())
             for curr, symbol in FOREX_TICKERS.items():
                 try:
                     t = tickers.tickers.get(symbol)
@@ -144,3 +145,7 @@ class CurrencyService:
         converted_amount = amount_in_usd * to_rate
 
         return round(converted_amount, 4)
+
+
+currency_service = CurrencyService()
+

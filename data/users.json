@@ -3,13 +3,14 @@
     "username": "admin",
     "passwordHash": "scrypt:32768:8:1$pN5dqnLObndn0TqW$c48550cf9773efa9a205a77493a52710d9e07103c8939e01d00f98aa99476113965a0534735140adb6d24ce19a016ac0b23e2dbe5a0c30fee8625b1904596799",
     "role": "admin",
-    "displayName": "Administrator",
+    "displayName": "Lead Administrator",
     "email": "admin@findashiq.internal",
     "avatar": "shield",
     "riskProfile": "Aggressive Quant",
     "baseCurrency": "USD",
     "createdAt": "2026-08-23T14:35:26.286702",
     "watchlist": [
+      "MU",
       "NVDA",
       "MSFT",
       "IFX.DE",
@@ -107,8 +108,22 @@
         "status": "OPEN",
         "id": "pt_1788715332_b22c7b",
         "entryDate": "2026-09-06T19:22:12.674644"
+      },
+      {
+        "ticker": "SIE.DE",
+        "side": "LONG",
+        "capital": 1000,
+        "entryPrice": 271.05,
+        "shares": 3.689356207341819,
+        "stopLoss": 257.5,
+        "takeProfit": 303.58,
+        "reason": "Quantitative Bullish Setup",
+        "status": "OPEN",
+        "id": "pt_1788790083_dc4c2b",
+        "entryDate": "2026-09-07T16:08:03.926798"
       }
-    ]
+    ],
+    "language": "en"
   },
   "user": {
     "username": "user",
