@@ -1,15 +1,15 @@
 <!-- Authentication Modal (Sign In) -->
-<div id="authModal" class="modal-overlay">
+<div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="FinDashIQ Sign In">
     <div class="modal-card auth-modal-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
             <div
-                style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.15rem; color: #fff;">
+                style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.15rem; color: var(--text-primary);">
                 <div class="auth-icon-badge">
                     <i data-lucide="lock" style="width: 18px; height: 18px; color: #fff;"></i>
                 </div>
                 <span>FinDashIQ Access</span>
             </div>
-            <button type="button" onclick="closeAuthModal()"
+            <button type="button" onclick="closeAuthModal()" aria-label="Close sign in dialog"
                 style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
                 <i data-lucide="x"></i>
             </button>

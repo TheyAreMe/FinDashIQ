@@ -192,7 +192,16 @@ function shouldSkipElement(el) {
     return false;
 }
 
+function pruneDisconnectedTranslatedNodes() {
+    for (let i = _translatedNodes.length - 1; i >= 0; i--) {
+        if (!_translatedNodes[i] || !_translatedNodes[i].isConnected) {
+            _translatedNodes.splice(i, 1);
+        }
+    }
+}
+
 function restoreOriginalDOM() {
+    pruneDisconnectedTranslatedNodes();
     // Restore text nodes
     for (const node of _translatedNodes) {
         if (node && node._origText !== undefined) {
@@ -231,6 +240,7 @@ async function translatePageDOM(targetLang = null) {
     }
 
     _isTranslating = true;
+    pruneDisconnectedTranslatedNodes();
     const missing = new Set();
     const bundle = _i18nMemoryBundle[lang] || {};
 
@@ -410,3 +420,28 @@ function formatLocalizedNumber(num, decimals = 2) {
     }).format(Number(num));
 }
 window.formatLocalizedNumber = formatLocalizedNumber;
+
+// Debounced MutationObserver to translate dynamically rendered DOM fragments (UX-6)
+(function initDynamicI18nObserver() {
+    if (typeof document === 'undefined' || typeof MutationObserver === 'undefined') return;
+    let timer = null;
+    const setupObserver = () => {
+        const root = document.getElementById('mainAppContainer') || document.body;
+        if (!root) return;
+        const obs = new MutationObserver((mutations) => {
+            if (typeof getCurrentLanguage !== 'function' || getCurrentLanguage() === 'en') return;
+            const hasAdditions = mutations.some(m => m.addedNodes && m.addedNodes.length > 0);
+            if (!hasAdditions) return;
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                if (!_isTranslating) translatePageDOM();
+            }, 350);
+        });
+        obs.observe(root, { childList: true, subtree: true });
+    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupObserver);
+    } else {
+        setupObserver();
+    }
+})();

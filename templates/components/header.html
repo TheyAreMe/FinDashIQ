@@ -1,6 +1,6 @@
 <!-- Header -->
-<header>
-    <div class="logo-area" onclick="switchTopTab('watchlist')" title="Return to Watchlist Hub">
+<header id="topHeader">
+    <button type="button" class="logo-area" onclick="switchTopTab('watchlist')" aria-label="Return to Watchlist Hub" title="Return to Watchlist Hub">
         <div class="logo-icon">
             <img class="logo-img logo-dark" src="{{ url_for('static', filename='img/logo-dark.svg') }}" alt="FinDashIQ Logo">
             <img class="logo-img logo-light" src="{{ url_for('static', filename='img/logo-light.svg') }}" alt="FinDashIQ Logo">
@@ -9,7 +9,7 @@
             <h1 class="logo-title">FinDashIQ</h1>
             <div class="logo-subtitle">Quantitative AI Financial Intelligence & Dynamic Dashboard</div>
         </div>
-    </div>
+    </button>
     <div style="display: flex; gap: 12px; align-items: center;">
         <!-- Quick Currency Selector (Commented out)
         <div class="header-currency-container">
@@ -29,10 +29,10 @@
         </div>
         -->
 
-        <div id="headerAIBadge" class="live-badge" onclick="openAISettings()" style="cursor: pointer;" title="Configure AI Intelligence &amp; Google Gemini API Key">
+        <button type="button" id="headerAIBadge" class="live-badge" onclick="openAISettings()" style="cursor: pointer;" aria-label="Configure AI Intelligence and Provider API Keys" title="Configure AI Intelligence &amp; Provider API Keys (Gemini, Claude, OpenAI)">
             <span class="live-dot"></span>
             <span id="headerAIBadgeText">No AI models active</span>
-        </div>
+        </button>
 
         <!-- User Profile & Auth Trigger Container -->
         <div id="headerUserContainer" class="user-header-container">

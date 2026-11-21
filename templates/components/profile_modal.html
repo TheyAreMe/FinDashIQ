@@ -1,5 +1,5 @@
 <!-- User Profile & Account Management Modal -->
-<div id="profileModal" class="modal-overlay">
+<div id="profileModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="profileModalDisplayName">
     <div class="modal-card profile-modal-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 10px;">
@@ -15,7 +15,7 @@
                     <div id="profileModalUsernameSub" style="font-size: 0.76rem; color: var(--text-muted);">@admin</div>
                 </div>
             </div>
-            <button type="button" onclick="closeProfileModal()"
+            <button type="button" onclick="closeProfileModal()" aria-label="Close profile modal"
                 style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
                 <i data-lucide="x"></i>
             </button>
@@ -242,9 +242,9 @@
 
                     <div class="form-grid-2">
                         <div>
-                            <label class="form-label">New Password</label>
-                            <input type="password" id="passInputNew" class="form-input"
-                                placeholder="At least 4 characters" required autocomplete="new-password">
+                            <label for="passInputNew" class="form-label">New Password</label>
+                            <input type="password" id="passInputNew" class="form-input" minlength="12"
+                                placeholder="At least 12 characters" required autocomplete="new-password">
                         </div>
                         <div>
                             <label class="form-label">Confirm New Password</label>
@@ -282,9 +282,9 @@
                                     required>
                             </div>
                             <div>
-                                <label class="form-label">Initial Password</label>
-                                <input type="password" id="newAccPassword" class="form-input"
-                                    placeholder="Temporary password" required>
+                                <label for="newAccPassword" class="form-label">Initial Password</label>
+                                <input type="password" id="newAccPassword" class="form-input" minlength="12"
+                                    placeholder="Min 12 characters" required>
                             </div>
                             <div>
                                 <label class="form-label">Display Name</label>
@@ -443,11 +443,11 @@
                     <!-- Card 1: Process RSS RAM -->
                     <div class="glass-card" style="padding: 14px; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-subtle);">
                         <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
-                            <span>FinDashIQ Process RAM</span>
+                            <span id="maintRamCardLabel">Server RAM</span>
                             <i data-lucide="activity" style="width: 14px; color: var(--accent-cyan);"></i>
                         </div>
                         <div id="maintProcessRssVal" style="font-size: 1.45rem; font-weight: 800; color: var(--text-primary); margin: 6px 0 2px 0; font-family: monospace;">-- MB</div>
-                        <div style="font-size: 0.72rem; color: var(--text-secondary);">Resident physical memory</div>
+                        <div id="maintProcessRssSub" style="font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Resident physical memory</div>
                     </div>
 
                     <!-- Card 2: System Physical Memory -->
@@ -490,7 +490,7 @@
                                 <span>1-Click RAM Cleaner &amp; Memory Defragmenter</span>
                             </div>
                             <div style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; margin-top: 4px;">
-                                Safely prunes expired disk cache files, cleans inactive in-memory LRUs, closes idle yfinance/curl network handles, and executes OS-level memory trim (<code style="font-size: 0.75rem; color: var(--accent-cyan);">malloc_trim(0)</code> / <code style="font-size: 0.75rem; color: var(--accent-cyan);">_heapmin()</code>). Completely non-intrusive with <strong>0 downtime</strong> and zero lost client state.
+                                Safely prunes expired disk cache files, cleans inactive in-memory LRUs, closes idle network handles, defragments OS heap memory (<code style="font-size: 0.75rem; color: var(--accent-cyan);">malloc_trim(0)</code>), and orchestrates zero-downtime rolling worker recycling under Gunicorn to completely flush fragmented C/Python heaps with <strong>0 downtime</strong>.
                             </div>
                         </div>
                         <button type="button" id="btn1ClickOptimizeRam" class="btn-watchlist-add" onclick="handle1ClickOptimize()" style="padding: 10px 22px; font-size: 0.88rem; font-weight: 700; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #8b5cf6, #3b82f6); border: none; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35); flex-shrink: 0;">

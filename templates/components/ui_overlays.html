@@ -1,0 +1,78 @@
+<!-- Non-blocking Toast Notification Stack (UX-5) -->
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Reusable Custom Confirmation Dialog (replaces window.confirm) (UX-5) -->
+<div id="confirmActionModal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="confirmActionTitle">
+    <div class="modal-card" style="max-width: 440px;">
+        <div class="modal-header">
+            <h3 id="confirmActionTitle" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                <i data-lucide="alert-triangle" style="width: 18px; height: 18px; color: #f59e0b;"></i>
+                <span id="confirmActionTitleText">Confirm Action</span>
+            </h3>
+            <button type="button" id="btnConfirmCloseX" class="modal-close-btn" aria-label="Close confirmation dialog" style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
+        </div>
+        <div class="modal-body" style="padding: 16px 20px;">
+            <p id="confirmActionMessage" style="margin: 0; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;"></p>
+            <div class="confirm-modal-actions">
+                <button type="button" id="btnConfirmCancel" class="btn-toggle">Cancel</button>
+                <button type="button" id="btnConfirmApprove" class="btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Watchlist & Scanner Universe Export / Import Modal (UX-4) -->
+<div id="importExportModal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="importExportTitle">
+    <div class="modal-card" style="max-width: 520px;">
+        <div class="modal-header">
+            <h3 id="importExportTitle" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                <i data-lucide="arrow-up-down" style="width: 18px; height: 18px; color: var(--accent-cyan);"></i>
+                <span id="importExportTitleText">Export / Import Tickers</span>
+            </h3>
+            <button type="button" onclick="closeImportExportModal()" class="modal-close-btn" aria-label="Close export and import modal" style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
+        </div>
+        <div class="modal-body" style="padding: 16px 20px; display: flex; flex-direction: column; gap: 16px;">
+            <input type="hidden" id="importExportTarget" value="watchlist">
+            <div>
+                <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Export Current List</div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" class="btn-toggle" onclick="handleExportData('csv')" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="file-spreadsheet" style="width: 14px; height: 14px;"></i>
+                        <span>Download CSV</span>
+                    </button>
+                    <button type="button" class="btn-toggle" onclick="handleExportData('json')" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="braces" style="width: 14px; height: 14px;"></i>
+                        <span>Download JSON</span>
+                    </button>
+                </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="importRawTextarea" style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Import CSV / JSON / Ticker List</label>
+                    <select id="importModeSelect" aria-label="Import merge mode" style="padding: 4px 8px; border-radius: 6px; background: var(--surface-subtle); color: var(--text-primary); border: 1px solid var(--border-subtle); font-size: 0.78rem;">
+                        <option value="merge">Merge with Existing</option>
+                        <option value="replace">Replace Existing</option>
+                    </select>
+                </div>
+                <div class="import-file-picker" id="importFilePicker">
+                    <input type="file" id="importFileInput" class="import-file-native" accept=".csv,.json,.txt" aria-label="Choose CSV or JSON file">
+                    <label for="importFileInput" class="import-file-btn">
+                        <i data-lucide="upload" style="width: 14px; height: 14px;"></i>
+                        <span>Choose File</span>
+                    </label>
+                    <span id="importFileNameDisplay" class="import-file-name">No file selected (.csv, .json, .txt)</span>
+                </div>
+                <textarea id="importRawTextarea" class="import-dropzone" rows="4" placeholder="Paste comma/newline separated tickers (e.g. NVDA, MSFT, IFX.DE) or JSON payload..."></textarea>
+                <div class="confirm-modal-actions" style="margin-top: 4px;">
+                    <button type="button" class="btn-toggle" onclick="closeImportExportModal()">Close</button>
+                    <button type="button" id="btnRunImportData" class="btn-primary" onclick="handleImportData()">Import Tickers</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

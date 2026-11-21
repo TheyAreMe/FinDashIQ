@@ -1,14 +1,18 @@
 import concurrent.futures
+import csv
+import io
+import json
+import re
 import threading
 from datetime import datetime
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, Response, jsonify, request, session
 from services.stock_service import stock_service, normalize_ticker, sanitize_for_json
 from services.currency_service import currency_service
 from services.ai_service import ai_service
 from services.news_service import news_service
 from routes.helpers import (
     load_users, save_users, get_current_user_data_from_session,
-    WATCHLIST_FILE, DEFAULT_WATCHLIST
+    get_decrypted_user_ai_settings, require_auth_json, DEFAULT_WATCHLIST
 )
 
 stock_bp = Blueprint('stock', __name__)
@@ -88,6 +92,10 @@ def api_search_stocks():
 @stock_bp.route('/api/stocks/resolve', methods=['POST'])
 def api_resolve_stocks():
     """Resolves a batch of mixed tickers and/or company names into validated ticker symbols."""
+    _, _, auth_err = require_auth_json(session)
+    if auth_err:
+        return auth_err
+
     data = request.get_json(silent=True) or {}
     raw_queries = data.get('queries') or data.get('query') or []
     if isinstance(raw_queries, str):
@@ -199,6 +207,10 @@ def api_get_single_stock(ticker):
 @stock_bp.route('/api/analyze', methods=['POST'])
 def api_analyze():
     """Primary API endpoint to analyze stock tickers and generate AI Intelligence."""
+    user, _, auth_err = require_auth_json(session)
+    if auth_err:
+        return auth_err
+
     data = request.get_json(silent=True)
     if not data or 'tickers' not in data:
         return jsonify({"error": "Missing 'tickers' list in request body."}), 400
@@ -229,16 +241,38 @@ def api_analyze():
     interval = data.get('interval', '1d')
     force_refresh = data.get('forceRefresh', False)
     phase = str(data.get('phase', 'full')).strip().lower()
-    api_key = data.get('apiKey')
-    provider = data.get('provider', 'gemini')
-    model = data.get('model', 'gemini-3.7-flash')
+    include_timeseries = bool(data.get('includeTimeseries', False))
+    user_ai = get_decrypted_user_ai_settings(user)
+
+    raw_model = str(data.get('model') or user_ai.get('customModel') or user_ai.get('model') or '').strip()
+    provider = ai_service.normalize_provider(data.get('provider') or user_ai.get('provider'), raw_model)
+    model = raw_model or ai_service.get_default_model(provider)
+
+    api_keys = dict(user_ai.get('apiKeys') or {})
+    if isinstance(data.get('apiKeys'), dict):
+        for k, v in data['apiKeys'].items():
+            clean_v = str(v or '').strip()
+            if clean_v and '••' not in clean_v and '...' not in clean_v:
+                api_keys[ai_service.normalize_provider(k)] = clean_v
+
+    explicit_key = str(data.get('apiKey') or '').strip()
+    if '••' in explicit_key or '...' in explicit_key:
+        explicit_key = ''
+    api_key = explicit_key or api_keys.get(provider, '')
 
     valid_periods = {'1mo', '3mo', '6mo', '1y', '2y', '5y', 'ytd', 'max'}
     if period not in valid_periods:
         period = '6mo'
 
     try:
-        results = stock_service.fetch_full_stock_analysis(tickers, period=period, interval=interval, force_refresh=force_refresh, phase=phase)
+        results = stock_service.fetch_full_stock_analysis(
+            tickers,
+            period=period,
+            interval=interval,
+            force_refresh=force_refresh,
+            phase=phase,
+            include_timeseries=include_timeseries,
+        )
 
         if 'error' in results and not results.get('stocks'):
             return jsonify({"error": results['error']}), 500
@@ -263,10 +297,12 @@ def api_analyze():
                     backtest_data=sdata.get('backtests'),
                     news=sdata.get('news', [])
                 )
+                confluence = ai_service.compute_technical_confluence(signals, profile)
                 sdata['aiAnalysis'] = {
                     'convictionScore': c_score,
                     'directionalBias': bias,
-                    'stanceColor': stance_color
+                    'stanceColor': stance_color,
+                    'confluence': confluence,
                 }
 
                 current_prices[ticker] = {
@@ -285,16 +321,17 @@ def api_analyze():
                     'ConvictionScore': c_score
                 }
 
-            return jsonify({
+            return jsonify(sanitize_for_json({
                 'success': True,
                 'phase': 'fast',
                 'isFastHydration': True,
+                'period': results.get('period', period),
                 'tickers': results.get('tickers', tickers),
                 'stocks': results.get('stocks', {}),
                 'current_prices': current_prices,
                 'analysis': analysis_summary,
                 'timestamp': results.get('timestamp', datetime.now().isoformat())
-            }), 200
+            })), 200
 
         is_single_stock = (len(tickers) == 1)
         allow_batch_llm = data.get('allowLLM', is_single_stock)
@@ -309,7 +346,7 @@ def api_analyze():
             timeseries = sdata.get('timeseries', [])
             backtests = sdata.get('backtests', {})
 
-            cached_memo_key = f"memo:{ticker}:{model}"
+            cached_memo_key = f"memo:{ticker}:{provider}:{model}"
             is_cached = bool(ai_service._get_cached(cached_memo_key))
             item_allow_llm = allow_batch_llm or is_cached or is_single_stock
 
@@ -325,10 +362,12 @@ def api_analyze():
                     api_key=api_key,
                     provider=provider,
                     model=model,
+                    api_keys=api_keys,
                     allow_llm=item_allow_llm,
                     force_refresh=force_refresh
                 )
                 sdata['aiAnalysis'] = ai_analysis
+            sdata['isFastHydration'] = False
 
             c_price = {
                 'price': profile.get('currentPrice'),
@@ -388,6 +427,10 @@ def api_analyze():
 @stock_bp.route('/api/stocks/<path:ticker>/news', methods=['GET'])
 def api_get_stock_news(ticker):
     """Returns multi-source global financial news for a specific stock."""
+    user, _, auth_err = require_auth_json(session)
+    if auth_err:
+        return auth_err
+
     clean_ticker = str(ticker).strip().upper()
     force_refresh = request.args.get('forceRefresh', '').lower() in ('true', '1')
     company_name = request.args.get('name', '').strip()
@@ -400,9 +443,11 @@ def api_get_stock_news(ticker):
         force_refresh=force_refresh
     )
 
-    user, _ = get_current_user_data()
-    api_key = user.get('aiSettings', {}).get('apiKey') if user else None
-    model = user.get('aiSettings', {}).get('model', 'gemini-3.7-flash') if user else 'gemini-3.7-flash'
+    user_ai = get_decrypted_user_ai_settings(user)
+    provider = user_ai.get('provider', 'gemini')
+    model = user_ai.get('customModel') or user_ai.get('model') or ai_service.get_default_model(provider)
+    api_key = user_ai.get('apiKey') or ''
+    api_keys = user_ai.get('apiKeys') or {}
 
     synthesis = ai_service.synthesize_news_sentiment(
         ticker=clean_ticker,
@@ -410,7 +455,9 @@ def api_get_stock_news(ticker):
         current_price=100.0,
         news_items=news_items,
         api_key=api_key,
-        model=model
+        provider=provider,
+        model=model,
+        api_keys=api_keys,
     )
 
     return jsonify({
@@ -443,40 +490,157 @@ def api_stock_warmup_trigger():
     return jsonify({"success": True, "message": "Background universe pre-hydration initiated."}), 200
 
 
+def _parse_watchlist_import_tokens(raw_tickers) -> list[str]:
+    """Extracts and validates normalized ticker symbols from list/CSV/text inputs."""
+    candidates = []
+    if isinstance(raw_tickers, list):
+        for item in raw_tickers:
+            if isinstance(item, dict):
+                val = item.get('ticker') or item.get('symbol') or ''
+            else:
+                val = item
+            if val:
+                candidates.append(str(val))
+    elif isinstance(raw_tickers, str):
+        for line in raw_tickers.splitlines():
+            for part in re.split(r'[,\s;|]+', line.strip()):
+                if part:
+                    candidates.append(part)
+
+    cleaned = []
+    seen = set()
+    for token in candidates:
+        up = normalize_ticker(token.strip().strip('"').strip("'"))
+        if not up or up in ('TICKER', 'SYMBOL', 'ASSET', 'WATCHLIST'):
+            continue
+        if not re.fullmatch(r'[A-Z0-9.\-^=]{1,16}', up):
+            continue
+        if up not in seen:
+            seen.add(up)
+            cleaned.append(up)
+    return cleaned
+
+
 @stock_bp.route('/api/watchlist', methods=['GET', 'POST'])
 def api_watchlist():
-    """Permanent watchlist endpoint with strict per-user isolation."""
-    import json
-    import os
-    user, username = get_current_user_data()
+    """Permanent watchlist endpoint with strict per-user authentication and isolation."""
+    user, username, auth_err = require_auth_json(session)
+    if auth_err:
+        return auth_err
+
     users = load_users()
 
     if request.method == 'POST':
         data = request.get_json(silent=True) or {}
-        tickers = data.get('tickers', [])
-        cleaned = [str(t).strip().upper() for t in tickers if str(t).strip()]
-
-        if user and username in users:
+        cleaned = _parse_watchlist_import_tokens(data.get('tickers', []))
+        if username in users:
             users[username]['watchlist'] = cleaned
             save_users(users)
-        else:
-            with open(WATCHLIST_FILE, 'w', encoding='utf-8') as f:
-                json.dump(cleaned, f, indent=2)
-
         return jsonify({"success": True, "tickers": cleaned}), 200
 
-    # GET request
-    if user and username in users:
-        user_wl = users[username].get('watchlist')
-        if user_wl is not None:
-            return jsonify({"success": True, "tickers": user_wl}), 200
+    user_wl = user.get('watchlist')
+    if user_wl is None:
+        user_wl = list(DEFAULT_WATCHLIST)
+    return jsonify({"success": True, "tickers": user_wl}), 200
 
-    if os.path.exists(WATCHLIST_FILE):
+
+@stock_bp.route('/api/watchlist/export', methods=['GET'])
+def api_watchlist_export():
+    """Exports the authenticated user's watchlist as CSV or JSON."""
+    user, username, auth_err = require_auth_json(session)
+    if auth_err:
+        return auth_err
+
+    fmt = request.args.get('format', 'json').strip().lower()
+    watchlist = list(user.get('watchlist') if user.get('watchlist') is not None else DEFAULT_WATCHLIST)
+
+    if fmt == 'csv':
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(['ticker'])
+        for t in watchlist:
+            writer.writerow([t])
+        return Response(
+            buf.getvalue(),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': 'attachment; filename="findashiq_watchlist.csv"',
+                'Cache-Control': 'no-store',
+            },
+        )
+
+    payload = {
+        'version': 1,
+        'username': username,
+        'exportedAt': datetime.now().isoformat(),
+        'tickers': watchlist,
+    }
+    return Response(
+        json.dumps(payload, indent=2),
+        mimetype='application/json',
+        headers={
+            'Content-Disposition': 'attachment; filename="findashiq_watchlist.json"',
+            'Cache-Control': 'no-store',
+        },
+    )
+
+
+@stock_bp.route('/api/watchlist/import', methods=['POST'])
+def api_watchlist_import():
+    """Imports tickers from CSV/JSON/list into the authenticated user's watchlist."""
+    user, username, auth_err = require_auth_json(session)
+    if auth_err:
+        return auth_err
+
+    data = request.get_json(silent=True)
+    mode = 'merge'
+    raw_input = None
+
+    if isinstance(data, dict):
+        mode = str(data.get('mode', 'merge')).strip().lower()
+        raw_input = data.get('tickers') if data.get('tickers') is not None else (
+            data.get('csvText') or data.get('rawText') or data.get('content')
+        )
+    elif 'file' in request.files:
+        uploaded = request.files['file']
+        text = uploaded.read().decode('utf-8', errors='ignore')
+        mode = str(request.form.get('mode', 'merge')).strip().lower()
         try:
-            with open(WATCHLIST_FILE, 'r', encoding='utf-8') as f:
-                tickers = json.load(f)
-                return jsonify({"success": True, "tickers": tickers}), 200
+            parsed_json = json.loads(text)
+            if isinstance(parsed_json, dict) and isinstance(parsed_json.get('tickers'), list):
+                raw_input = parsed_json['tickers']
+            elif isinstance(parsed_json, list):
+                raw_input = parsed_json
+            else:
+                raw_input = text
         except Exception:
-            pass
+            raw_input = text
 
-    return jsonify({"success": True, "tickers": DEFAULT_WATCHLIST}), 200
+    parsed = _parse_watchlist_import_tokens(raw_input)
+    if not parsed:
+        return jsonify({"success": False, "error": "No valid ticker symbols found to import."}), 400
+
+    users = load_users()
+    existing = list(users.get(username, {}).get('watchlist') or DEFAULT_WATCHLIST)
+
+    if mode == 'replace':
+        updated = parsed
+    else:
+        seen = set(existing)
+        updated = list(existing)
+        for t in parsed:
+            if t not in seen:
+                seen.add(t)
+                updated.append(t)
+
+    added_count = len([t for t in updated if t not in set(existing)])
+    if username in users:
+        users[username]['watchlist'] = updated
+        save_users(users)
+
+    return jsonify({
+        "success": True,
+        "tickers": updated,
+        "importedCount": len(parsed),
+        "addedCount": added_count,
+    }), 200

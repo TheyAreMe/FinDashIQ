@@ -2,7 +2,7 @@ import os
 import re
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
 
 try:
@@ -20,7 +20,7 @@ except ImportError:
             return tuple(parts) or (0, 0, 0)
     version = _VersionFallback()
 
-APP_VERSION = "0.1.5"
+APP_VERSION = "0.1.6"
 GITHUB_REPO = "TheyAreMe/FinDashIQ"
 CACHE_TTL_SECONDS = 3600  # 1 hour cache to respect GitHub API rate limits
 
@@ -112,7 +112,7 @@ class UpdateService:
                     "latest_version": APP_VERSION,
                     "latest_release_name": f"v{APP_VERSION}",
                     "latest_release_url": f"https://github.com/{GITHUB_REPO}/releases",
-                    "latest_release_date": datetime.utcnow().isoformat(),
+                    "latest_release_date": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
                     "latest_release_notes": "No public releases found on GitHub repository.",
                     "recent_releases": [],
                     "timestamp_epoch": time.time(),

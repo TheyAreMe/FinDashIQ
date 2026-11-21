@@ -10,6 +10,7 @@
     "baseCurrency": "USD",
     "createdAt": "2026-08-23T14:35:26.286702",
     "watchlist": [
+      "ANT",
       "MU",
       "NVDA",
       "MSFT",
@@ -38,8 +39,15 @@
       }
     ],
     "aiSettings": {
+      "provider": "gemini",
+      "model": "gemini-4-hydrogen",
+      "customModel": "",
       "apiKey": "",
-      "model": "gemini-3.7-flash"
+      "apiKeys": {
+        "gemini": "",
+        "anthropic": "",
+        "openai": ""
+      }
     },
     "theme": "dark",
     "watchlistViewMode": "cards",
@@ -121,6 +129,19 @@
         "status": "OPEN",
         "id": "pt_1788790083_dc4c2b",
         "entryDate": "2026-09-07T16:08:03.926798"
+      },
+      {
+        "ticker": "ANT",
+        "side": "LONG",
+        "capital": 10000,
+        "entryPrice": 88.91,
+        "shares": 112.47328759419638,
+        "stopLoss": 84.46,
+        "takeProfit": 99.58,
+        "reason": "Quantitative Bullish Setup",
+        "status": "OPEN",
+        "id": "pt_1795267792_248556",
+        "entryDate": "2026-11-21T14:29:52.755336"
       }
     ],
     "language": "en"
@@ -164,7 +185,7 @@
     ],
     "aiSettings": {
       "apiKey": "",
-      "model": "gemini-3.7-flash"
+      "model": "gemini-4-hydrogen"
     },
     "theme": "bright",
     "watchlistViewMode": "cards"

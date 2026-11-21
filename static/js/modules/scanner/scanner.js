@@ -1095,6 +1095,30 @@ function renderScannerCards(oppList) {
                 </div>
             </div>
 
+            ${(() => {
+                if (typeof renderConfluenceGauge !== 'function') return '';
+                if (item.confluence) return renderConfluenceGauge(item.confluence);
+                let bull = 0, bear = 0, total = 3;
+                if (item.superTrend === 'bullish') bull++; else bear++;
+                if (item.rsi !== null && item.rsi !== undefined) {
+                    if (item.rsi >= 50 && item.rsi <= 72) bull++; else if (item.rsi < 45 || item.rsi > 75) bear++;
+                }
+                if (item.cmf !== null && item.cmf !== undefined) {
+                    if (item.cmf > 0.02) bull++; else if (item.cmf < -0.02) bear++;
+                }
+                const dom = Math.max(bull, bear);
+                const dir = bull > bear ? 'Bullish' : (bear > bull ? 'Bearish' : 'Mixed');
+                const sc = Math.round((dom / total) * 100);
+                return renderConfluenceGauge({
+                    score: sc,
+                    direction: dir,
+                    tier: sc >= 72 ? 'High Confluence' : (sc >= 45 ? 'Moderate Confluence' : 'Divergent / Split'),
+                    alignedCount: dom,
+                    totalOscillators: total,
+                    badgeLabel: `${dom}/${total} ${dir}`
+                });
+            })()}
+
             <!-- Trend Sparkline with Timeframe Axis -->
             ${sparklineSvg}
 
@@ -1365,4 +1389,4 @@ if (typeof window !== 'undefined') {
 
 // -------------------------------------------------------------
 // SIGNAL ALERTS & NOTIFICATIONS HUB
-// -------------------------------------------------------------
+// -------------------------------------------------------------

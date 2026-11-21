@@ -16,6 +16,7 @@
                             </div>
                         </div>
                     </div>
+                    <span id="aiEngineMetaBadge" class="badge-pill badge-neutral" style="font-size: 0.72rem;">Built-in Quant</span>
                 </div>
 
                 <div class="ai-main-grid">
@@ -36,7 +37,7 @@
 
                             <!-- Progress Bar & Multi-Factor Inputs -->
                             <div style="flex: 1; max-width: 320px;">
-                                <div style="height: 10px; background: #1e293b; border-radius: 5px; overflow: hidden;">
+                                <div style="height: 10px; background: var(--progress-track); border-radius: 5px; overflow: hidden;">
                                     <div id="aiConvictionBar"
                                         style="height: 100%; width: 50%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 0.4s ease;">
                                     </div>
@@ -46,6 +47,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div id="aiConfluenceContainer"></div>
 
                         <!-- Thesis Text -->
                         <div id="aiThesisText" class="ai-thesis-text">
@@ -128,7 +131,7 @@
                 </div>
 
                 <!-- 30-Day Probabilistic Scenario Projections -->
-                <div style="padding: 16px 24px 8px 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                <div style="padding: 16px 24px 8px 24px; border-bottom: 1px solid var(--border-subtle);">
                     <span class="preset-label">Probabilistic 30-Day Scenario Modeling:</span>
                 </div>
                 <div class="scenario-grid">
@@ -276,7 +279,7 @@
                         Synthesizing global breaking headlines, corporate earnings, and macroeconomic catalyst impact...
                     </div>
                     <div id="aiNewsCatalystBulletsContainer"
-                        style="display: none; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                        style="display: none; padding-top: 12px; border-top: 1px solid var(--border-subtle);">
                         <div
                             style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; letter-spacing: 0.5px;">
                             <i data-lucide="zap" style="width: 13px; height: 13px; color: var(--accent-cyan);"></i>
@@ -287,7 +290,7 @@
 
                     <!-- Read Full Wire Action Bar -->
                     <div
-                        style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
                         <span id="aiNewsCountBadge" class="badge-pill badge-neutral"
                             style="font-size: 0.72rem; padding: 3px 8px;">
                             <span id="aiNewsCount">0</span> Wire Articles

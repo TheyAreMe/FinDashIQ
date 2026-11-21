@@ -274,6 +274,7 @@ ExecStart=/home/ubuntu/FinDashIQ/venv/bin/gunicorn -c gunicorn.conf.py app:app
 Restart=always
 RestartSec=5
 Environment=PYTHONUNBUFFERED=1
+Environment=MALLOC_ARENA_MAX=2
 
 [Install]
 WantedBy=multi-user.target

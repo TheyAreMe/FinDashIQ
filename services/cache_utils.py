@@ -13,6 +13,14 @@ from typing import Any, Callable, Iterator, Optional
 if "MALLOC_ARENA_MAX" not in os.environ:
     os.environ["MALLOC_ARENA_MAX"] = "2"
 
+if sys.platform.startswith('linux'):
+    try:
+        import ctypes
+        libc = ctypes.CDLL('libc.so.6')
+        libc.mallopt(-8, 2)
+    except Exception:
+        pass
+
 logger = logging.getLogger('FinDashIQ')
 
 _yf_session = None
@@ -156,6 +164,41 @@ class CacheRegistry:
                 total_disk_pruned = sum(disk_pruned.values()) if disk_pruned else 0
                 if total_purged > 0 or total_disk_pruned > 0 or reclaimed > 50:
                     logger.info(f"[MemorySweeperDaemon] Autonomous 5m sweep complete: purged {total_purged} RAM entries, removed {total_disk_pruned} expired disk files, reclaimed {reclaimed} objects.")
+
+                # Autonomous Memory Watchdog for Gunicorn workers
+                if sys.platform.startswith('linux'):
+                    is_gunicorn = (
+                        'gunicorn' in sys.modules
+                        or 'gunicorn.app.base' in sys.modules
+                        or 'gunicorn' in os.environ.get('SERVER_SOFTWARE', '').lower()
+                    )
+                    if not is_gunicorn:
+                        try:
+                            ppid = os.getppid()
+                            cmd_path = f"/proc/{ppid}/cmdline"
+                            if os.path.exists(cmd_path):
+                                with open(cmd_path, 'rb') as fh:
+                                    if b'gunicorn' in fh.read().lower():
+                                        is_gunicorn = True
+                        except Exception:
+                            pass
+
+                    if is_gunicorn:
+                        try:
+                            rss_mb = 0.0
+                            with open('/proc/self/status', 'r', encoding='utf-8') as fh:
+                                for line in fh:
+                                    if line.startswith('VmRSS:'):
+                                        rss_mb = round(int(line.split()[1]) / 1024.0, 1)
+                                        break
+                            max_allowed = float(os.environ.get("GUNICORN_MAX_WORKER_MEMORY_MB", "260"))
+                            if rss_mb > max_allowed:
+                                import signal
+                                logger.info(f"[MemorySweeperDaemon] Gunicorn worker PID {os.getpid()} RSS ({rss_mb} MB) exceeded threshold ({max_allowed} MB). Initiating graceful worker retirement.")
+                                os.kill(os.getpid(), signal.SIGTERM)
+                        except Exception as ex:
+                            logger.debug(f"[MemorySweeperDaemon] Watchdog check error: {ex}")
+
             except Exception as e:
                 logger.debug(f"[MemorySweeperDaemon] Sweep iteration warning: {e}")
 

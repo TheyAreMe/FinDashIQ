@@ -163,6 +163,144 @@ function getCountryFlagHtml(countryOrEmoji, codeHint = '') {
     return `<span class="flag-icon-badge" title="Global Wire"><i data-lucide="globe" style="width: 13px; height: 13px; color: var(--accent-cyan); vertical-align: middle;"></i></span>`;
 }
 
+// Multi-Provider AI Catalog (Synced with backend AIService)
+const AI_PROVIDER_CATALOG = {
+    gemini: {
+        id: 'gemini',
+        name: 'Google Gemini',
+        shortName: 'Gemini',
+        defaultModel: 'gemini-4-hydrogen',
+        keyLabel: 'Google Gemini API Key (Optional)',
+        keyPlaceholder: 'AIzaSy...',
+        docsUrl: 'https://aistudio.google.com/app/apikey',
+        docsLabel: 'Get Key at Google AI Studio',
+        models: [
+            { id: 'gemini-4-hydrogen', label: 'Gemini 4 Hydrogen (Fast & Recommended)' },
+            { id: 'gemini-4-neon', label: 'Gemini 4 Neon (Balanced Frontier — Paid Tier)' },
+            { id: 'gemini-4-carbon', label: 'Gemini 4 Carbon (Flagship Reasoning — Paid Tier)' },
+            { id: 'gemini-4-argon', label: 'Gemini 4 Argon (Long-Horizon Frontier — Paid Tier)' },
+            { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash (Fast Free-Tier Fallback)' },
+            { id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite (Ultra-Low Latency Free Tier)' },
+            { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (Stable Legacy Free Tier)' }
+        ]
+    },
+    anthropic: {
+        id: 'anthropic',
+        name: 'Anthropic Claude',
+        shortName: 'Claude',
+        defaultModel: 'claude-sonnet-5-5',
+        keyLabel: 'Anthropic API Key (Optional)',
+        keyPlaceholder: 'sk-ant-...',
+        docsUrl: 'https://console.anthropic.com/settings/keys',
+        docsLabel: 'Get Key at Anthropic Console',
+        models: [
+            { id: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5 (Balanced & Recommended)' },
+            { id: 'claude-haiku-5-5', label: 'Claude Haiku 5.5 (Fast & Low-Latency)' },
+            { id: 'claude-opus-5-5', label: 'Claude Opus 5.5 (Flagship Agentic)' },
+            { id: 'claude-fable-5-2', label: 'Claude Fable 5.2 (Frontier Deep Reasoning)' }
+        ]
+    },
+    openai: {
+        id: 'openai',
+        name: 'OpenAI GPT',
+        shortName: 'OpenAI',
+        defaultModel: 'gpt-6.1-sol',
+        keyLabel: 'OpenAI API Key (Optional)',
+        keyPlaceholder: 'sk-proj-...',
+        docsUrl: 'https://platform.openai.com/api-keys',
+        docsLabel: 'Get Key at OpenAI Platform',
+        models: [
+            { id: 'gpt-6.1-sol', label: 'GPT-6.1 Sol (Balanced & Recommended)' },
+            { id: 'gpt-6-luna', label: 'GPT-6 Luna (Fast & Cost-Effective)' },
+            { id: 'gpt-6.1-terra', label: 'GPT-6.1 Terra (Mid-Tier Balanced)' },
+            { id: 'gpt-6-astra', label: 'GPT-6 Astra (Flagship Reasoning)' },
+            { id: 'gpt-6.2-astra', label: 'GPT-6.2 Astra (Latest Flagship)' }
+        ]
+    }
+};
+
+function inferAIProvider(provider, model) {
+    const p = String(provider || '').trim().toLowerCase();
+    if (p === 'gemini' || p === 'google' || p === 'google-gemini') return 'gemini';
+    if (p === 'anthropic' || p === 'claude') return 'anthropic';
+    if (p === 'openai' || p === 'gpt') return 'openai';
+    const m = String(model || '').trim().toLowerCase();
+    if (m.startsWith('claude')) return 'anthropic';
+    if (m.startsWith('gpt-') || m.startsWith('o1') || m.startsWith('o3') || m.startsWith('o4') || m.startsWith('chatgpt')) return 'openai';
+    return 'gemini';
+}
+
+function normalizeClientAISettings(raw) {
+    const src = (raw && typeof raw === 'object') ? raw : {};
+    const customModel = String(src.customModel || '').trim();
+    const rawModel = String(src.model || '').trim();
+    const provider = inferAIProvider(src.provider, customModel || rawModel);
+    const cfg = AI_PROVIDER_CATALOG[provider] || AI_PROVIDER_CATALOG.gemini;
+    const model = rawModel || cfg.defaultModel;
+
+    const apiKeys = {
+        gemini: '',
+        anthropic: '',
+        openai: ''
+    };
+    if (src.apiKeys && typeof src.apiKeys === 'object') {
+        ['gemini', 'anthropic', 'openai'].forEach(k => {
+            if (typeof src.apiKeys[k] === 'string') {
+                apiKeys[k] = src.apiKeys[k].trim();
+            }
+        });
+    }
+    if (typeof src.apiKey === 'string' && src.apiKey.trim()) {
+        apiKeys[provider] = src.apiKey.trim();
+    }
+
+    const configuredProviders = {
+        gemini: Boolean(apiKeys.gemini || (src.configuredProviders && src.configuredProviders.gemini)),
+        anthropic: Boolean(apiKeys.anthropic || (src.configuredProviders && src.configuredProviders.anthropic)),
+        openai: Boolean(apiKeys.openai || (src.configuredProviders && src.configuredProviders.openai))
+    };
+    if (src.hasKey) {
+        configuredProviders[provider] = true;
+    }
+
+    const keyHints = {
+        gemini: String((src.keyHints && src.keyHints.gemini) || '').trim(),
+        anthropic: String((src.keyHints && src.keyHints.anthropic) || '').trim(),
+        openai: String((src.keyHints && src.keyHints.openai) || '').trim()
+    };
+    const activeHint = String(src.keyHint || keyHints[provider] || '').trim();
+    if (activeHint && !keyHints[provider]) {
+        keyHints[provider] = activeHint;
+    }
+
+    return {
+        provider,
+        model,
+        customModel,
+        apiKey: apiKeys[provider] || '',
+        apiKeys,
+        hasKey: Boolean(apiKeys[provider] || src.hasKey || configuredProviders[provider]),
+        keyHint: activeHint,
+        configuredProviders,
+        keyHints
+    };
+}
+
+function getActiveAIRequestConfig() {
+    const norm = normalizeClientAISettings(state?.aiSettings);
+    const effectiveModel = norm.customModel || norm.model || (AI_PROVIDER_CATALOG[norm.provider]?.defaultModel || 'gemini-4-hydrogen');
+    return {
+        provider: norm.provider,
+        model: effectiveModel,
+        apiKey: norm.apiKey || '',
+        apiKeys: norm.apiKeys,
+        hasKey: Boolean((norm.apiKey && norm.apiKey.trim().length > 6) || norm.hasKey || norm.configuredProviders[norm.provider]),
+        keyHint: norm.keyHint || norm.keyHints[norm.provider] || '',
+        configuredProviders: norm.configuredProviders,
+        keyHints: norm.keyHints
+    };
+}
+
 // State Management
 const state = {
     currentPeriod: '6mo',
@@ -213,11 +351,10 @@ const state = {
         }
     })(),
     user: null, // { username, role, displayName, email, avatar, riskProfile, theme, baseCurrency, ... }
+    isDemoMode: false,
+    copilotHistory: {}, // { [ticker]: [{ role: 'user' | 'assistant', content: string }] }
     aiStatus: 'none', // 'active' | 'quota_exceeded' | 'none'
-    aiSettings: {
-        apiKey: '',
-        model: 'gemini-3.7-flash'
-    },
+    aiSettings: normalizeClientAISettings(null),
     exchangeRates: {
         USD: 1.0,
         EUR: 0.92,

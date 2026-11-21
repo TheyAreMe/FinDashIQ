@@ -1,14 +1,22 @@
 {
   "success": true,
-  "current_version": "0.1.5",
+  "current_version": "0.1.6",
   "update_available": false,
-  "latest_version": "0.1.4",
-  "latest_release_name": "v0.1.4",
-  "latest_release_url": "https://github.com/TheyAreMe/FinDashIQ/releases/tag/betav3",
-  "latest_release_date": "2026-09-06T20:29:40Z",
-  "latest_release_notes": "# \u26a1 FinDashIQ v0.1.4 \u2014 Strategy Backtesting Studio, System Updates & Historical AI Conviction Graph\r\n\r\nFinDashIQ **v0.1.4** introduces the **Strategy Backtesting & Simulation Studio** for institutional multi-factor strategy simulation and forward paper trading, alongside the Historical AI Conviction Score chart in the Charts subtab, automated GitHub Releases update verification, and an administrator update management panel.\r\n\r\n---\r\n\r\n### \ud83d\ude80 Highlights in v0.1.4 (Brief Summary)\r\n\r\n* \ud83c\udfae **Strategy Backtesting & Simulation Studio**:\r\n  * **Institutional Backtesting Suite**: Test strategies over custom time horizons (1M, 3M, 6M, 1Y, 2Y, 3Y, 5Y, MAX) in Long-Only or Long & Short modes with configurable capital allocation, stop-loss %, take-profit %, and slippage/fees.\r\n* \ud83d\udd04 **GitHub Releases Update Checker**: Automated version comparison against official releases on GitHub (`TheyAreMe/FinDashIQ/releases`).\r\n* \ud83d\udee1\ufe0f **Administrator Updates Tab**: Dedicated System Updates management tab in the profile modal displaying release notes, upgrade commands, and recent release history.\r\n* \ud83d\udcc8 **Historical AI Conviction Graph (0\u2013100%)**: Added backwards-calculated AI Conviction Score chart as the second graph in the Charts & Technicals subtab to see stability of conviction over time.",
+  "latest_version": "0.1.5",
+  "latest_release_name": "v0.1.5",
+  "latest_release_url": "https://github.com/TheyAreMe/FinDashIQ/releases/tag/betav4",
+  "latest_release_date": "2026-09-13T13:23:53Z",
+  "latest_release_notes": "# \u26a1 FinDashIQ v0.1.5 \u2014 Startup Performance Overhaul, Backtesting Polish & Multi-Currency Engine\r\n\r\nFinDashIQ **v0.1.5** delivers a comprehensive performance overhaul that slashes startup CPU load, introduces intelligent cache-aware scanning, optimizes the Strategy Backtesting Studio for short-history assets and ETFs, adds real-time multi-currency support, and refreshes high-resolution UI documentation assets.\r\n\r\n---\r\n\r\n### \ud83d\ude80 Highlights in v0.1.5 (Brief Summary)\r\n\r\n* \ud83d\udee1\ufe0f **Dedicated Admin Maintenance Tab**: Added an admin-only Maintenance tab inside the Profile & Preferences modal with live server telemetry tracking FinDashIQ process\r\n* \u26a1 **RAM Optimization**: Streamlined in-memory caching to significantly reduce active RAM usage.\r\n* \ud83d\udee0\ufe0f **Code Maintainability**: Refactored core modules and reduced redundancy for a cleaner, more modular architecture.",
   "is_prerelease": false,
   "recent_releases": [
+    {
+      "version": "0.1.5",
+      "name": "v0.1.5",
+      "tag": "betav4",
+      "html_url": "https://github.com/TheyAreMe/FinDashIQ/releases/tag/betav4",
+      "published_at": "2026-09-13T13:23:53Z",
+      "prerelease": false
+    },
     {
       "version": "0.1.4",
       "name": "v0.1.4",
@@ -42,6 +50,6 @@
       "prerelease": false
     }
   ],
-  "timestamp_epoch": 1789302595.8755033,
+  "timestamp_epoch": 1795266181.1433547,
   "cached": false
 }

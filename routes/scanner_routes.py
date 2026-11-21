@@ -1,8 +1,11 @@
-from flask import Blueprint, jsonify, request, session
+import csv
+import io
+import re
+from flask import Blueprint, Response, jsonify, request, session
 from services.stock_service import stock_service
 from services.ai_service import ai_service
 from services.scanner_service import ScannerService
-from routes.helpers import get_current_user_data_from_session, DEFAULT_WATCHLIST
+from routes.helpers import get_current_user_data_from_session, require_auth_json, DEFAULT_WATCHLIST
 
 scanner_bp = Blueprint('scanner', __name__)
 scanner_service = ScannerService(stock_service, ai_service)
@@ -41,14 +44,16 @@ def api_scanner_universe():
 
 @scanner_bp.route('/api/scanner/universe/add', methods=['POST'])
 def api_scanner_universe_add():
-    """Dynamically adds a new stock to the monitoring universe with duplicate crosscheck."""
-    user, _ = get_current_user_data()
+    """Dynamically adds a new stock to the monitoring universe (Auth Required)."""
+    user, _, err_resp = require_auth_json(session)
+    if err_resp:
+        return err_resp
     data = request.get_json(silent=True) or {}
     ticker = str(data.get('ticker', '')).strip().upper()
     if not ticker:
         return jsonify({"success": False, "message": "Ticker symbol is required."}), 400
 
-    user_role = user.get('role', 'user') if user else 'user'
+    user_role = user.get('role', 'user')
     result = scanner_service.add_stock_to_universe(ticker, user_role=user_role)
     if not result.get('success'):
         status_code = 409 if "already in monitoring universe" in str(result.get('error', '')) else 400
@@ -59,6 +64,94 @@ def api_scanner_universe_add():
         "message": result.get('message'),
         "item": result.get('item'),
         "totalUniverse": result.get('totalUniverse')
+    }), 200
+
+
+@scanner_bp.route('/api/scanner/universe/export', methods=['GET'])
+def api_scanner_universe_export():
+    """Exports the combined scanner monitoring universe as CSV or JSON (Auth Required)."""
+    _, _, err_resp = require_auth_json(session)
+    if err_resp:
+        return err_resp
+
+    fmt = str(request.args.get('format', 'json')).strip().lower()
+    items = scanner_service.get_combined_universe()
+    if fmt == 'csv':
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(['ticker', 'name', 'market', 'sector', 'parentETF'])
+        for it in items:
+            writer.writerow([
+                it.get('ticker', ''),
+                it.get('name', ''),
+                it.get('market', ''),
+                it.get('sector', ''),
+                it.get('parentETF', ''),
+            ])
+        return Response(
+            buf.getvalue(),
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment; filename="findashiq_universe.csv"'},
+        )
+
+    return jsonify({
+        "success": True,
+        "count": len(items),
+        "tickers": [it.get('ticker') for it in items if it.get('ticker')],
+        "items": items,
+    }), 200
+
+
+@scanner_bp.route('/api/scanner/universe/import', methods=['POST'])
+def api_scanner_universe_import():
+    """Batch-imports ticker symbols into the monitoring universe from JSON or CSV text (Auth Required)."""
+    user, _, err_resp = require_auth_json(session)
+    if err_resp:
+        return err_resp
+
+    data = request.get_json(silent=True) or {}
+    raw_items = data.get('tickers')
+    raw_text = data.get('text') or data.get('csv') or data.get('rawText') or data.get('csvText') or ''
+
+    candidates = []
+    if isinstance(raw_items, list):
+        candidates.extend(str(t).strip().upper() for t in raw_items if str(t).strip())
+    if raw_text:
+        for line in str(raw_text).splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            token = line.split(',')[0].strip().strip('"').strip("'").upper()
+            if token in ('TICKER', 'SYMBOL', 'STOCK'):
+                continue
+            if re.match(r'^[A-Z0-9.\-^=]{1,15}$', token):
+                candidates.append(token)
+            else:
+                for tok in re.split(r'[\s,;]+', line):
+                    tok_clean = tok.strip().upper()
+                    if re.match(r'^[A-Z0-9.\-^=]{1,15}$', tok_clean) and tok_clean not in ('TICKER', 'SYMBOL'):
+                        candidates.append(tok_clean)
+
+    unique_candidates = list(dict.fromkeys(candidates))[:30]
+    if not unique_candidates:
+        return jsonify({"success": False, "error": "No valid ticker symbols supplied."}), 400
+
+    added = []
+    skipped = []
+    user_role = user.get('role', 'user')
+    for tk in unique_candidates:
+        res = scanner_service.add_stock_to_universe(tk, user_role=user_role)
+        if res.get('success'):
+            added.append(tk)
+        else:
+            skipped.append({"ticker": tk, "reason": res.get('error', 'skipped')})
+
+    return jsonify({
+        "success": True,
+        "added": added,
+        "importedCount": len(added),
+        "skipped": skipped,
+        "totalUniverse": len(scanner_service.get_combined_universe()),
     }), 200
 
 

@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import time
 import logging
@@ -73,8 +74,12 @@ class ScannerService:
         self._load_warm_cache_from_disk()
 
         # Start continuous background daemon thread
-        # Guard against Flask debug reloader double-spawning
-        if os.environ.get('WERKZEUG_RUN_MAIN') != 'false':
+        # Guard against Flask debug reloader double-spawning and pytest test isolation
+        if (
+            os.environ.get('WERKZEUG_RUN_MAIN') != 'false'
+            and 'pytest' not in sys.modules
+            and not os.environ.get('PYTEST_CURRENT_TEST')
+        ):
             self._daemon_thread = threading.Thread(
                 target=self._background_scan_loop,
                 daemon=True,
@@ -608,6 +613,19 @@ class ScannerService:
                 self._persist_warm_cache_to_disk()
                 logger.info(f"[ScannerService] Memory-streamed scan complete in {scan_dur}s: {len(opportunities)} opportunities calculated.")
                 collect_garbage("ScannerServiceFull")
+
+                if sys.platform.startswith('linux'):
+                    try:
+                        from services.maintenance_service import maintenance_service
+                        if maintenance_service.is_gunicorn_running():
+                            rss = maintenance_service.get_process_rss_mb()
+                            if rss > 250.0:
+                                logger.info(f"[ScannerService] Worker PID {os.getpid()} RSS reached {rss} MB after full scan. Initiating graceful worker retirement.")
+                                import signal
+                                os.kill(os.getpid(), signal.SIGTERM)
+                    except Exception:
+                        pass
+
                 return {
                     "success": True,
                     "totalAssets": len(all_tickers),

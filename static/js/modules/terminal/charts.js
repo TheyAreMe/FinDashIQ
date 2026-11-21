@@ -2,10 +2,155 @@
 // PRIMARY DYNAMIC CHART RENDERING (ApexCharts)
 // -------------------------------------------------------------
 
-async function renderPrimaryChart(timeseries) {
+let _chartRenderGeneration = 0;
+let _primaryRenderSeq = 0;
+
+function buildChartRenderKey(ticker, timeseries, period) {
+    const sym = String(ticker || '').trim().toUpperCase();
+    const per = String(period || state?.currentPeriod || '6mo').trim().toLowerCase();
+    const arr = Array.isArray(timeseries) ? timeseries : [];
+    const len = arr.length;
+    const firstTime = len > 0 ? (arr[0]?.time || arr[0]?.timestamp || '') : '';
+    const lastPt = len > 0 ? arr[len - 1] : null;
+    const lastTime = lastPt ? (lastPt.time || lastPt.timestamp || '') : '';
+    const lastClose = (lastPt && typeof lastPt.close === 'number') ? lastPt.close : '';
+    return `${sym}|${per}|${len}|${firstTime}|${lastTime}|${lastClose}`;
+}
+
+function clearDeepDiveCharts() {
+    _chartRenderGeneration++;
+    _primaryRenderSeq++;
+
+    const chartKeys = ['primary', 'conviction', 'stoch', 'rsi', 'macd', 'cmf'];
+    chartKeys.forEach(k => {
+        if (state?.charts?.[k]) {
+            try { state.charts[k].destroy(); } catch (e) { console.warn(e); }
+            state.charts[k] = null;
+        }
+    });
+
+    const containerIds = [
+        '#primaryChartContainer',
+        '#convictionChartContainer',
+        '#stochChartContainer',
+        '#rsiChartContainer',
+        '#macdChartContainer',
+        '#cmfChartContainer'
+    ];
+    containerIds.forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el) el.innerHTML = '';
+    });
+
+    setText('currentConvictionChartLabel', 'Conviction: --%');
+    setText('convictionStabilityLabel', 'Stability: --');
+    const badge = document.getElementById('convictionRegimeBadge');
+    if (badge) {
+        badge.className = 'badge-pill badge-neutral';
+        badge.textContent = 'Regime: --';
+    }
+    setText('currentStochLabel', 'Stoch: --');
+    setText('currentRsiLabel', 'RSI: --');
+    setText('currentCmfLabel', 'CMF: --');
+
+    if (state) {
+        state._renderedChartsTicker = null;
+        state._renderedChartsKey = null;
+    }
+}
+
+async function renderAllDeepDiveCharts(ticker, timeseries, period) {
+    const terminalView = document.getElementById('topView-terminal');
+    const chartsPane = document.getElementById('tabPane-charts');
+    const isVisible = Boolean(
+        terminalView && terminalView.classList.contains('active') &&
+        chartsPane && chartsPane.classList.contains('active') &&
+        chartsPane.offsetParent !== null
+    );
+    if (!isVisible) {
+        if (state) {
+            state._renderedChartsTicker = null;
+            state._renderedChartsKey = null;
+        }
+        return false;
+    }
+
+    if (!Array.isArray(timeseries) || timeseries.length === 0) {
+        clearDeepDiveCharts();
+        return false;
+    }
+
+    const gen = ++_chartRenderGeneration;
+    _primaryRenderSeq++;
+    const renderKey = buildChartRenderKey(ticker, timeseries, period);
+
+    try {
+        await ensureApexChartsLoaded();
+    } catch (loadErr) {
+        console.warn('[renderAllDeepDiveCharts] ApexCharts failed to load:', loadErr);
+        if (gen !== _chartRenderGeneration) return false;
+        const primaryContainer = document.querySelector('#primaryChartContainer');
+        if (primaryContainer) {
+            primaryContainer.innerHTML = '<div style="padding: 32px 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Unable to load charting library. Please check your network connection and retry.</div>';
+        }
+        if (state) {
+            state._renderedChartsTicker = null;
+            state._renderedChartsKey = null;
+        }
+        if (typeof hideChartLoading === 'function') hideChartLoading();
+        return false;
+    }
+
+    if (gen !== _chartRenderGeneration) return false;
+
+    const primaryEl = document.querySelector('#primaryChartContainer');
+    if (primaryEl && primaryEl.clientWidth === 0) {
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        if (gen !== _chartRenderGeneration) return false;
+    }
+
+    await Promise.allSettled([
+        renderPrimaryChart(timeseries, gen),
+        renderConvictionChart(timeseries, gen),
+        renderStochChart(timeseries, gen),
+        renderRSIChart(timeseries, gen),
+        renderMACDChart(timeseries, gen),
+        renderCMFChart(timeseries, gen)
+    ]);
+
+    if (gen !== _chartRenderGeneration) return false;
+
+    if (state) {
+        if (state.charts.primary || timeseries.length > 0) {
+            state._renderedChartsTicker = ticker;
+            state._renderedChartsKey = renderKey;
+        } else {
+            state._renderedChartsTicker = null;
+            state._renderedChartsKey = null;
+        }
+    }
+
+    if (typeof hideChartLoading === 'function') hideChartLoading();
+
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 60);
+    });
+
+    return true;
+}
+
+async function renderPrimaryChart(timeseries, renderGen = null) {
     if (!timeseries || timeseries.length === 0) return;
 
+    const startGen = _chartRenderGeneration;
+    const mySeq = (renderGen === null) ? ++_primaryRenderSeq : _primaryRenderSeq;
+
     await ensureApexChartsLoaded();
+
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
+    if (renderGen === null && (mySeq !== _primaryRenderSeq || startGen !== _chartRenderGeneration)) return;
 
     const container = document.querySelector("#primaryChartContainer");
     if (!container) return;
@@ -180,8 +325,13 @@ async function renderPrimaryChart(timeseries) {
         chart: {
             id: 'primaryStockChart',
             type: 'line',
-            height: 440,
+            height: window.innerWidth < 768 ? 330 : 440,
             background: 'transparent',
+            zoom: {
+                enabled: true,
+                type: 'x',
+                autoScaleYaxis: true
+            },
             toolbar: {
                 show: true,
                 tools: {
@@ -193,7 +343,7 @@ async function renderPrimaryChart(timeseries) {
                     pan: true,
                     reset: true
                 },
-                autoSelected: 'zoom'
+                autoSelected: window.innerWidth < 768 ? 'pan' : 'zoom'
             },
             animations: { enabled: false }
         },
@@ -252,10 +402,12 @@ async function renderPrimaryChart(timeseries) {
 // HISTORICAL AI CONVICTION SCORE CHART (ApexCharts)
 // -------------------------------------------------------------
 
-async function renderConvictionChart(timeseries) {
+async function renderConvictionChart(timeseries, renderGen = null) {
     if (!timeseries || timeseries.length === 0) return;
 
     await ensureApexChartsLoaded();
+
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
 
     const container = document.querySelector("#convictionChartContainer");
     if (!container) return;
@@ -279,7 +431,14 @@ async function renderConvictionChart(timeseries) {
     }));
 
     if (convData.length === 0) {
-        container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Historical AI conviction data is being computed...</div>';
+        const limited = timeseries.length < 5;
+        if (limited) {
+            setText('currentConvictionChartLabel', 'N/A (Limited history)');
+            setText('convictionStabilityLabel', 'Limited sessions');
+        }
+        container.innerHTML = limited
+            ? `<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Limited trading history (${timeseries.length} session(s)) — requires at least 5 sessions for historical AI conviction trends.</div>`
+            : '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Historical AI conviction data is being computed...</div>';
         return;
     }
 
@@ -402,14 +561,21 @@ async function renderConvictionChart(timeseries) {
         }
     };
 
-    state.charts.conviction = new ApexCharts(container, options);
-    state.charts.conviction.render();
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
+    try {
+        state.charts.conviction = new ApexCharts(container, options);
+        await state.charts.conviction.render();
+    } catch (chartErr) {
+        console.warn('[renderConvictionChart] ApexCharts render error:', chartErr);
+    }
 }
 
-async function renderStochChart(timeseries) {
+async function renderStochChart(timeseries, renderGen = null) {
     if (!timeseries || timeseries.length === 0) return;
 
     await ensureApexChartsLoaded();
+
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
 
     const container = document.querySelector("#stochChartContainer");
     if (!container) return;
@@ -432,14 +598,18 @@ async function renderStochChart(timeseries) {
         y: p.stochD
     }));
 
-    const latestK = stochK.length > 0 ? stochK[stochK.length - 1].y : 50;
-    const latestD = stochD.length > 0 ? stochD[stochD.length - 1].y : 50;
-    setText('currentStochLabel', `%K: ${typeof latestK === 'number' ? latestK.toFixed(1) : '--'} / %D: ${typeof latestD === 'number' ? latestD.toFixed(1) : '--'}`);
-
     if (stochK.length === 0) {
-        container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Stochastic oscillator data is being computed...</div>';
+        const limited = timeseries.length < 5;
+        setText('currentStochLabel', limited ? 'N/A (Limited history)' : 'Stoch: --');
+        container.innerHTML = limited
+            ? `<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Limited trading history (${timeseries.length} session(s)) — requires at least 5 sessions to compute Stochastic oscillator.</div>`
+            : '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Stochastic oscillator data is being computed...</div>';
         return;
     }
+
+    const latestK = stochK[stochK.length - 1].y;
+    const latestD = stochD.length > 0 ? stochD[stochD.length - 1].y : latestK;
+    setText('currentStochLabel', `%K: ${typeof latestK === 'number' ? latestK.toFixed(1) : '--'} / %D: ${typeof latestD === 'number' ? latestD.toFixed(1) : '--'}`);
 
     const options = {
         series: [
@@ -488,14 +658,21 @@ async function renderStochChart(timeseries) {
         tooltip: { theme: themeOpts.tooltipTheme, shared: true, x: { format: 'dd MMM yyyy' } }
     };
 
-    state.charts.stoch = new ApexCharts(container, options);
-    state.charts.stoch.render();
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
+    try {
+        state.charts.stoch = new ApexCharts(container, options);
+        await state.charts.stoch.render();
+    } catch (chartErr) {
+        console.warn('[renderStochChart] ApexCharts render error:', chartErr);
+    }
 }
 
-async function renderRSIChart(timeseries) {
+async function renderRSIChart(timeseries, renderGen = null) {
     if (!timeseries || timeseries.length === 0) return;
 
     await ensureApexChartsLoaded();
+
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
 
     const container = document.querySelector("#rsiChartContainer");
     if (!container) return;
@@ -513,13 +690,17 @@ async function renderRSIChart(timeseries) {
         y: p.rsi
     }));
 
-    const latestRsi = rsiData.length > 0 ? rsiData[rsiData.length - 1].y : 50;
-    setText('currentRsiLabel', `RSI: ${typeof latestRsi === 'number' ? latestRsi.toFixed(2) : '--'}`);
-
     if (rsiData.length === 0) {
-        container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">RSI momentum data is being computed...</div>';
+        const limited = timeseries.length < 5;
+        setText('currentRsiLabel', limited ? 'N/A (Limited history)' : 'RSI: --');
+        container.innerHTML = limited
+            ? `<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Limited trading history (${timeseries.length} session(s)) — requires at least 5 sessions to compute RSI momentum.</div>`
+            : '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">RSI momentum data is being computed...</div>';
         return;
     }
+
+    const latestRsi = rsiData[rsiData.length - 1].y;
+    setText('currentRsiLabel', `RSI: ${typeof latestRsi === 'number' ? latestRsi.toFixed(2) : '--'}`);
 
     const options = {
         series: [{ name: 'RSI (14)', data: rsiData }],
@@ -555,14 +736,21 @@ async function renderRSIChart(timeseries) {
         tooltip: { theme: themeOpts.tooltipTheme, x: { format: 'dd MMM yyyy' }, y: { formatter: val => typeof val === 'number' ? val.toFixed(2) : '' } }
     };
 
-    state.charts.rsi = new ApexCharts(container, options);
-    state.charts.rsi.render();
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
+    try {
+        state.charts.rsi = new ApexCharts(container, options);
+        await state.charts.rsi.render();
+    } catch (chartErr) {
+        console.warn('[renderRSIChart] ApexCharts render error:', chartErr);
+    }
 }
 
-async function renderMACDChart(timeseries) {
+async function renderMACDChart(timeseries, renderGen = null) {
     if (!timeseries || timeseries.length === 0) return;
 
     await ensureApexChartsLoaded();
+
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
 
     const container = document.querySelector("#macdChartContainer");
     if (!container) return;
@@ -591,7 +779,10 @@ async function renderMACDChart(timeseries) {
     }));
 
     if (macdLine.length === 0) {
-        container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">MACD trend data is being computed...</div>';
+        const limited = timeseries.length < 5;
+        container.innerHTML = limited
+            ? `<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Limited trading history (${timeseries.length} session(s)) — requires at least 5 sessions to compute MACD momentum.</div>`
+            : '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">MACD trend data is being computed...</div>';
         return;
     }
 
@@ -635,14 +826,21 @@ async function renderMACDChart(timeseries) {
         tooltip: { theme: themeOpts.tooltipTheme, shared: true, x: { format: 'dd MMM yyyy' } }
     };
 
-    state.charts.macd = new ApexCharts(container, options);
-    state.charts.macd.render();
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
+    try {
+        state.charts.macd = new ApexCharts(container, options);
+        await state.charts.macd.render();
+    } catch (chartErr) {
+        console.warn('[renderMACDChart] ApexCharts render error:', chartErr);
+    }
 }
 
-async function renderCMFChart(timeseries) {
+async function renderCMFChart(timeseries, renderGen = null) {
     if (!timeseries || timeseries.length === 0) return;
 
     await ensureApexChartsLoaded();
+
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
 
     const container = document.querySelector("#cmfChartContainer");
     if (!container) return;
@@ -660,13 +858,17 @@ async function renderCMFChart(timeseries) {
         y: p.cmf
     }));
 
-    const latestCmf = cmfData.length > 0 ? cmfData[cmfData.length - 1].y : 0;
-    setText('currentCmfLabel', `CMF: ${typeof latestCmf === 'number' ? (latestCmf > 0 ? '+' : '') + latestCmf.toFixed(3) : 'N/A'}`);
-
     if (cmfData.length === 0) {
-        container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Money flow data is being computed...</div>';
+        const limited = timeseries.length < 5;
+        setText('currentCmfLabel', limited ? 'N/A (Limited history)' : 'CMF: --');
+        container.innerHTML = limited
+            ? `<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Limited trading history (${timeseries.length} session(s)) — insufficient money flow bars.</div>`
+            : '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Money flow data is being computed...</div>';
         return;
     }
+
+    const latestCmf = cmfData[cmfData.length - 1].y;
+    setText('currentCmfLabel', `CMF: ${typeof latestCmf === 'number' ? (latestCmf > 0 ? '+' : '') + latestCmf.toFixed(3) : 'N/A'}`);
 
     const options = {
         series: [{
@@ -715,8 +917,13 @@ async function renderCMFChart(timeseries) {
         tooltip: { theme: themeOpts.tooltipTheme, x: { format: 'dd MMM yyyy' }, y: { formatter: val => typeof val === 'number' ? val.toFixed(3) : '' } }
     };
 
-    state.charts.cmf = new ApexCharts(container, options);
-    state.charts.cmf.render();
+    if (renderGen !== null && renderGen !== _chartRenderGeneration) return;
+    try {
+        state.charts.cmf = new ApexCharts(container, options);
+        await state.charts.cmf.render();
+    } catch (chartErr) {
+        console.warn('[renderCMFChart] ApexCharts render error:', chartErr);
+    }
 }
 
 function formatCompactNumber(number) {
@@ -730,4 +937,19 @@ function formatCompactNumber(number) {
 
 // =============================================================
 // TOP-LEVEL NAVIGATION & MULTI-VIEW SWITCHER
-// =============================================================
+// =============================================================
+
+function toggleChartControlsDrawer(forceState = null) {
+    const drawer = document.getElementById('chartControlsDrawer');
+    if (!drawer) return;
+    const nextOpen = (forceState !== null) ? Boolean(forceState) : !drawer.classList.contains('open');
+    drawer.classList.toggle('open', nextOpen);
+    const btn = document.getElementById('btnMobileChartControls');
+    if (btn) btn.setAttribute('aria-expanded', String(nextOpen));
+}
+if (typeof window !== 'undefined') {
+    window.toggleChartControlsDrawer = toggleChartControlsDrawer;
+    window.buildChartRenderKey = buildChartRenderKey;
+    window.clearDeepDiveCharts = clearDeepDiveCharts;
+    window.renderAllDeepDiveCharts = renderAllDeepDiveCharts;
+}

@@ -12,6 +12,8 @@
     <meta name="author" content="FinDashIQ">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0a0e17">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="manifest" href="/manifest.json">
 
     <!-- Open Graph / Social Sharing Metadata -->
     <meta property="og:type" content="website">
@@ -24,20 +26,24 @@
     <meta name="twitter:title" content="FinDashIQ | Quantitative AI Financial Terminal">
     <meta name="twitter:description" content="Institutional-grade quantitative intelligence, backtesting simulation, and algorithmic indicators.">
 
-    <!-- Google Fonts (Optimized Non-Blocking Asynchronous Load with preconnect & display=swap) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-    <noscript>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
-    </noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
 
-    <!-- Custom CSS Stylesheet (with cache-busting versioning) -->
+    {% if turnstile_site_key %}
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    {% endif %}
+
+    <!-- Custom CSS Stylesheet (minified dist bundle when built, or source stylesheet) -->
+    {% if use_asset_bundle %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/style.min.css') }}?v={{ asset_version }}">
+    {% else %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ asset_version }}">
+    {% endif %}
 </head>
 
 <body>
@@ -81,6 +87,12 @@
                             </div>
                         </div>
 
+                        <div id="authTurnstileContainer">
+                            {% if turnstile_site_key %}
+                            <div class="cf-turnstile" data-sitekey="{{ turnstile_site_key }}" data-theme="dark"></div>
+                            {% endif %}
+                        </div>
+
                         <!-- Status / Error Banner -->
                         <div id="authStatusMessage"
                             style="display: none; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 0.82rem;">
@@ -92,6 +104,12 @@
                         </button>
                     </div>
                 </form>
+
+                <button type="button" id="btnExploreLiveDemo" class="btn-toggle" onclick="enterDemoMode()"
+                    style="width: 100%; margin-top: 10px; padding: 10px 14px; justify-content: center; display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                    <i data-lucide="sparkles" style="width: 15px; color: var(--accent-cyan);"></i>
+                    <span>Explore Live Demo (Read-Only)</span>
+                </button>
 
                 <!-- Auth Screen Legal Disclaimer & Impressum Trigger -->
                 <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-subtle); text-align: center;">
@@ -128,8 +146,13 @@
         </div>
     </div>
 
-    <!-- Main Application Workspace (Visible ONLY when logged in) -->
+    <!-- Main Application Workspace (Visible when logged in or exploring Live Demo) -->
     <div id="mainAppContainer" class="app-container" style="display: {{ 'block' if is_authenticated else 'none' }};">
+        <div id="demoModeBanner" class="demo-banner" role="status">
+            <span><strong>Live Demo Mode</strong> — Exploring a read-only sample showcase. Sign in for live market refreshes, watchlists, alerts &amp; streaming AI.</span>
+            <button type="button" class="btn-toggle" onclick="exitDemoMode()" style="font-size: 0.78rem; padding: 4px 12px;">Sign In</button>
+        </div>
+
         <!-- Header -->
         {% include 'components/header.html' %}
 
@@ -208,6 +231,7 @@
     {% include 'components/impressum_modal.html' %}
     {% include 'components/global_news_modal.html' %}
     {% include 'components/paper_trade_modal.html' %}
+    {% include 'components/ui_overlays.html' %}
 
     <!-- Direct Official Ko-fi Widget Overlay (Pure Official Embed) -->
     <div id="kofiDirectOverlay" class="vendor-direct-overlay" style="display: none;">
@@ -240,34 +264,39 @@
     </div>
 
     <!-- Server-Hydrated Auth Bootstrap State -->
-    <script>
+    <script nonce="{{ csp_nonce }}">
         window.__INITIAL_AUTH__ = {{ 'true' if is_authenticated else 'false' }};
-        window.__INITIAL_USER__ = {{ user | tojson | safe if user else 'null' }};
-        window.__ASSET_VERSION__ = "{{ asset_version }}";
+        window.__INITIAL_USER__ = {{ (user if user else none) | tojson }};
+        window.__CSRF_TOKEN__ = {{ csrf_token | tojson }};
+        window.__ASSET_VERSION__ = {{ asset_version | tojson }};
     </script>
 
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide Icons (Deferred non-blocking) -->
+    <script src="https://unpkg.com/lucide@1.77.0/dist/umd/lucide.min.js"
+        integrity="sha384-fwFZu/W4jQGjDm7nioPLVWVdT/j9eDRcHN7Otg9U/hRD60LEhWduz/qvBAT1A/Q2"
+        crossorigin="anonymous" defer></script>
 
-    <!-- ApexCharts (Non-blocking deferred load) -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
-
+    {% if use_asset_bundle %}
+    <!-- Bundled & Minified Application Script -->
+    <script src="{{ url_for('static', filename='dist/app.bundle.min.js') }}?v={{ asset_version }}" defer></script>
+    {% else %}
     <!-- Application Domain Modules (with cache-busting versioning) -->
-    <script src="{{ url_for('static', filename='js/modules/core/state.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/core/currency.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/core/utils.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/core/i18n.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/auth/auth.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/terminal/charts.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/terminal/deep_dive.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/backtest/backtest_engine.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/backtest/paper_trades.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/watchlist/watchlist.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/scanner/scanner.js') }}?v={{ asset_version }}"></script>
-    <script src="{{ url_for('static', filename='js/modules/alerts/alerts.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/modules/core/state.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/core/currency.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/core/utils.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/core/i18n.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/auth/auth.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/terminal/charts.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/terminal/deep_dive.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/backtest/backtest_engine.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/backtest/paper_trades.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/watchlist/watchlist.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/scanner/scanner.js') }}?v={{ asset_version }}" defer></script>
+    <script src="{{ url_for('static', filename='js/modules/alerts/alerts.js') }}?v={{ asset_version }}" defer></script>
 
     <!-- Application Lifecycle Bootstrapper -->
-    <script src="{{ url_for('static', filename='js/app.js') }}?v={{ asset_version }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v={{ asset_version }}" defer></script>
+    {% endif %}
 
 </body>
 

@@ -14,10 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             state.baseCurrency = state.user.baseCurrency;
         }
         if (state.user.aiSettings) {
-            state.aiSettings = {
-                apiKey: state.user.aiSettings.apiKey || '',
-                model: state.user.aiSettings.model || 'gemini-3.7-flash'
-            };
+            state.aiSettings = normalizeClientAISettings(state.user.aiSettings);
         }
         isAuthenticated = true;
         setAppAuthState(true);
@@ -29,11 +26,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         lucide.createIcons();
     }
 
-    const apiKeyEl = document.getElementById('aiApiKeyInput');
-    const modelEl = document.getElementById('aiModelSelect');
-    if (apiKeyEl) apiKeyEl.value = state.aiSettings.apiKey;
-    if (modelEl) modelEl.value = state.aiSettings.model;
+    if (typeof syncAISettingsModalUI === 'function') {
+        syncAISettingsModalUI();
+    } else {
+        const modelEl = document.getElementById('aiModelSelect');
+        if (modelEl) modelEl.value = state.aiSettings.model || 'gemini-4-hydrogen';
+    }
     updateAIBadges();
+
+    // Register PWA Service Worker (UX-3)
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+    }
     // Initialize i18n language bundle
     if (typeof initI18n === 'function') {
         initI18n(state.language);
@@ -135,4 +139,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 });
-
+

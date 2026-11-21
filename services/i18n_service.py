@@ -1313,7 +1313,15 @@ class I18nService:
             bundle.update(cached)
             return bundle
 
-    def translate_batch(self, strings: list[str], target_lang: str, api_key: str = None) -> dict:
+    def translate_batch(
+        self,
+        strings: list[str],
+        target_lang: str,
+        api_key: str = None,
+        provider: str = 'gemini',
+        model: str = None,
+        api_keys: dict = None,
+    ) -> dict:
         """
         Translates a batch of English phrases into the target language.
         Returns a dictionary: { "English String": "Translated String" }
@@ -1352,8 +1360,15 @@ class I18nService:
         # Deduplicate missing strings
         missing = list(dict.fromkeys(missing))
 
-        # Perform AI Translation if API key is provided
-        ai_translations = self._perform_ai_translation(missing, target_lang, api_key)
+        # Perform AI Translation if an API key is configured for any supported provider
+        ai_translations = self._perform_ai_translation(
+            missing,
+            target_lang,
+            api_key=api_key,
+            provider=provider,
+            model=model,
+            api_keys=api_keys,
+        )
 
         with self._lock:
             lang_cache = self._cache.setdefault(target_lang, {})
@@ -1367,16 +1382,29 @@ class I18nService:
 
         return results
 
-    def _perform_ai_translation(self, missing_strings: list[str], target_lang: str, api_key: str = None) -> dict:
-        """Invokes Gemini Flash with specialized prompt for financial trading terminology."""
+    def _perform_ai_translation(
+        self,
+        missing_strings: list[str],
+        target_lang: str,
+        api_key: str = None,
+        provider: str = 'gemini',
+        model: str = None,
+        api_keys: dict = None,
+    ) -> dict:
+        """Invokes the configured LLM provider with a specialized prompt for financial trading terminology."""
         lang_info = SUPPORTED_LANGUAGES.get(target_lang, {'name': target_lang})
         target_name = lang_info.get('name', target_lang)
         native_name = lang_info.get('native', target_name)
 
-        env_key = api_key or os.environ.get('GEMINI_API_KEY', '').strip()
+        resolved_provider, resolved_key, resolved_model = self._ai_service.resolve_any_provider_key(
+            preferred_provider=provider,
+            api_key=api_key,
+            api_keys=api_keys,
+            model=model,
+        )
 
-        # Fallback if no Gemini key: return original string without saving as translated
-        if not env_key or len(env_key) < 6:
+        # Fallback if no provider API key: return original string without saving as translated
+        if not resolved_key or len(resolved_key) < 6:
             return {s: s for s in missing_strings}
 
         prompt = f"""
@@ -1404,7 +1432,15 @@ OUTPUT JSON FORMAT (ONLY valid JSON, no markdown formatting outside JSON):
 """
 
         try:
-            raw_res, _, _ = self._ai_service._call_gemini_api(prompt, env_key, model_name="gemini-3.7-flash", allow_fallback=True)
+            raw_res, _, _ = self._ai_service.call_llm(
+                prompt,
+                resolved_key,
+                provider=resolved_provider,
+                model_name=resolved_model,
+                allow_fallback=True,
+                thinking_level="low",
+                reasoning_effort="low",
+            )
             if raw_res:
                 clean_json_str = raw_res.strip()
                 if clean_json_str.startswith('```'):

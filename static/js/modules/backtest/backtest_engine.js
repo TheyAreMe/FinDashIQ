@@ -6,49 +6,30 @@ function ensureApexChartsLoaded() {
         return _apexChartsPromise;
     }
     _apexChartsPromise = new Promise((resolve, reject) => {
-        let checks = 0;
-        const checkInterval = setInterval(() => {
-            checks++;
+        const existingScript = document.querySelector('script[src*="apexcharts"]');
+        if (existingScript) {
             if (typeof ApexCharts !== 'undefined') {
-                clearInterval(checkInterval);
                 resolve();
-            } else if (checks > 30) {
-                clearInterval(checkInterval);
-                const existingScript = document.querySelector('script[src*="apexcharts"]');
-                if (existingScript && !existingScript.dataset.fallbackInjected) {
-                    existingScript.dataset.fallbackInjected = 'true';
-                    let subChecks = 0;
-                    const subInterval = setInterval(() => {
-                        subChecks++;
-                        if (typeof ApexCharts !== 'undefined') {
-                            clearInterval(subInterval);
-                            resolve();
-                        } else if (subChecks > 30) {
-                            clearInterval(subInterval);
-                            const script = document.createElement('script');
-                            script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
-                            script.async = true;
-                            script.onload = () => resolve();
-                            script.onerror = (err) => {
-                                _apexChartsPromise = null;
-                                reject(err);
-                            };
-                            document.head.appendChild(script);
-                        }
-                    }, 50);
-                } else {
-                    const script = document.createElement('script');
-                    script.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
-                    script.async = true;
-                    script.onload = () => resolve();
-                    script.onerror = (err) => {
-                        _apexChartsPromise = null;
-                        reject(err);
-                    };
-                    document.head.appendChild(script);
-                }
+                return;
             }
-        }, 50);
+            existingScript.addEventListener('load', () => resolve(), { once: true });
+            existingScript.addEventListener('error', (err) => {
+                _apexChartsPromise = null;
+                reject(err);
+            }, { once: true });
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/apexcharts@8.9.1/dist/apexcharts.min.js';
+        script.integrity = 'sha384-NMzs+HvEnYQxcfWzTfKMJdncu8Hl66AUsbR9Lj+7oRso0Li/Aa5I4OpzHMyesaue';
+        script.crossOrigin = 'anonymous';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = (err) => {
+            _apexChartsPromise = null;
+            reject(err);
+        };
+        document.head.appendChild(script);
     });
     return _apexChartsPromise;
 }
@@ -66,8 +47,10 @@ function getChartThemeDefaults() {
 
 // Request sequence tracking for backtest studio to eliminate race conditions
 let _backtestCurrentRequestId = 0;
+let _backtestWorkerRequestId = 0;
 let _isBacktestLoading = false;
 let _hideBacktestTimer = null;
+let _lastRenderedBacktestTicker = null;
 
 /**
  * Initialize the Backtesting Studio View
@@ -77,6 +60,10 @@ async function initBacktestStudio(targetTicker = null) {
     state.backtestTicker = ticker;
 
     const reqId = ++_backtestCurrentRequestId;
+
+    if (_lastRenderedBacktestTicker && _lastRenderedBacktestTicker !== ticker && typeof clearBacktestStudioViews === 'function') {
+        clearBacktestStudioViews(ticker);
+    }
 
     // Decoupled: Immediately sync and render paper trades in background without blocking on backtest charts
     loadPaperTrades();
@@ -191,6 +178,73 @@ function hideBacktestLoading() {
 }
 window.hideBacktestLoading = hideBacktestLoading;
 
+function clearBacktestStudioViews(ticker = '', emptyMessage = null) {
+    _backtestWorkerRequestId++;
+
+    if (state?.charts?.equity) {
+        try { state.charts.equity.destroy(); } catch (e) { console.warn(e); }
+        state.charts.equity = null;
+    }
+    if (state?.charts?.drawdown) {
+        try { state.charts.drawdown.destroy(); } catch (e) { console.warn(e); }
+        state.charts.drawdown = null;
+    }
+
+    _currentBacktestResult = null;
+    _lastRenderedBacktestTicker = null;
+    if (typeof window !== 'undefined') {
+        window._btActiveEquityCurve = null;
+        window._btActiveTradesList = [];
+        window._btActiveTradesByDate = null;
+        window._btActiveTradesByTs = null;
+    }
+
+    const eqContainer = document.getElementById('equityChartContainer');
+    const ddContainer = document.getElementById('drawdownChartContainer');
+
+    if (emptyMessage) {
+        const safeMsg = escapeHtml(emptyMessage);
+        if (eqContainer) {
+            eqContainer.innerHTML = `<div style="padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">${safeMsg}</div>`;
+        }
+        if (ddContainer) {
+            ddContainer.innerHTML = `<div style="padding: 32px 20px; text-align: center; color: var(--text-muted); font-size: 0.82rem;">${safeMsg}</div>`;
+        }
+
+        const cleanT = (ticker || state?.backtestTicker || '').toUpperCase().trim();
+        const stock = state?.stocksData?.[cleanT];
+        const assetName = (cleanT && typeof getAssetCompanyName === 'function') ? getAssetCompanyName(cleanT, stock) : cleanT;
+        const subtitleEl = document.getElementById('btStudioSubtitle');
+        if (subtitleEl) {
+            subtitleEl.textContent = cleanT ? `${assetName} (${cleanT}) — Insufficient History` : 'Insufficient History';
+        }
+
+        const returnEl = document.getElementById('btReturnVal');
+        if (returnEl) {
+            returnEl.textContent = '--';
+            returnEl.style.color = 'var(--text-muted)';
+        }
+        setText('btBenchVal', 'Buy & Hold: -- (Alpha: --)');
+        setText('btCapitalVal', '--');
+        setText('btHoldingStatus', '⚪ Position: N/A');
+        setText('btWinRateVal', '--');
+        setText('btTradesCount', '0 Closed Trades');
+        setText('btProfitFactor', '--');
+        setText('btMaxDrawdown', 'Max Drawdown: --');
+        setText('btSharpeVal', '--');
+        setText('btSortinoVal', 'Sortino Ratio: --');
+
+        const tbody = document.getElementById('btBenchmarkMatrixBody');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.82rem;">${safeMsg}</td></tr>`;
+        }
+    } else {
+        if (eqContainer) eqContainer.innerHTML = '';
+        if (ddContainer) ddContainer.innerHTML = '';
+    }
+}
+window.clearBacktestStudioViews = clearBacktestStudioViews;
+
 /**
  * Ensure market history and technical signals are downloaded for backtesting
  */
@@ -211,8 +265,8 @@ async function loadBacktestStockData(ticker, targetTf = null) {
     };
     const requiredBars = TF_BARS_MAP[activeTf] || 252;
 
-    // If timeseries has sufficient depth for the requested timeframe, or if already attempted for this timeframe and has data, no network fetch needed
-    if (stock && stock.timeseries && (stock.timeseries.length >= requiredBars || (stock._backtestFetchedTf === activeTf && stock.timeseries.length >= 5))) {
+    // If timeseries has sufficient depth for the requested timeframe, or if already attempted for this timeframe, no network fetch needed
+    if (stock && stock.timeseries && (stock.timeseries.length >= requiredBars || stock._backtestFetchedTf === activeTf)) {
         return;
     }
 
@@ -726,7 +780,8 @@ function getBacktestCacheKey(ticker, tf, strategy, options) {
         options?.stopLossPct ?? state.backtestStopLoss ?? 5.0,
         options?.takeProfitPct ?? state.backtestTakeProfit ?? 12.0,
         options?.slippagePct ?? state.backtestSlippage ?? 0.10,
-        options?.mode ?? state.backtestMode ?? 'long_only'
+        options?.mode ?? state.backtestMode ?? 'long_only',
+        options?.dataSig || ''
     ].join('::');
 }
 
@@ -799,27 +854,31 @@ async function recalculateCurrentBacktest(expectedReqId = null) {
         try {
             await loadBacktestStockData(ticker, activeTf);
             if (expectedReqId !== null && expectedReqId !== _backtestCurrentRequestId) return;
-            if (state.stocksData[ticker] && state.stocksData[ticker].timeseries && state.stocksData[ticker].timeseries.length >= 5) {
+            const loaded = state.stocksData[ticker];
+            const loadedLen = loaded && Array.isArray(loaded.timeseries) ? loaded.timeseries.length : 0;
+            if (loadedLen >= 2) {
                 await recalculateCurrentBacktest(expectedReqId);
             } else {
                 hideBacktestLoading();
-                const eqContainer = document.getElementById('equityChartContainer');
-                if (eqContainer) {
-                    eqContainer.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No historical market data returned for ${escapeHtml(ticker)}. Please verify symbol.</div>`;
-                }
+                const msg = loadedLen === 1
+                    ? `Only 1 trading session available for ${ticker} — at least 2 sessions are required to plot return curves.`
+                    : `No historical market data returned for ${ticker}. Please verify symbol.`;
+                clearBacktestStudioViews(ticker, msg);
             }
         } catch (e) {
             hideBacktestLoading();
+            clearBacktestStudioViews(ticker, `Unable to load market history for ${ticker}.`);
         }
         return;
     }
 
-    if (!stock || !stock.timeseries || stock.timeseries.length < 5) {
+    if (!stock || !stock.timeseries || stock.timeseries.length < 2) {
         hideBacktestLoading();
-        const eqContainer = document.getElementById('equityChartContainer');
-        if (eqContainer) {
-            eqContainer.innerHTML = `<div style="padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Insufficient historical market data returned for ${escapeHtml(ticker)} (minimum 5 daily bars required).</div>`;
-        }
+        const len = stock && Array.isArray(stock.timeseries) ? stock.timeseries.length : 0;
+        const msg = len === 1
+            ? `Only 1 trading session available for ${ticker} — at least 2 sessions are required to plot return curves.`
+            : `Insufficient historical market data returned for ${ticker} (minimum 2 daily bars required).`;
+        clearBacktestStudioViews(ticker, msg);
         return;
     }
 
@@ -848,16 +907,28 @@ async function recalculateCurrentBacktest(expectedReqId = null) {
 
     if (!bt) {
         hideBacktestLoading();
+        clearBacktestStudioViews(ticker, `Insufficient historical market data returned for ${ticker} (minimum 2 daily bars required).`);
         return;
     }
+
+    _lastRenderedBacktestTicker = ticker;
 
     // 2. Populate Header & Subtitle Context
     const instCurr = stock.profile?.currency || 'USD';
     const baseCurr = getUserBaseCurrency();
     const assetName = getAssetCompanyName(ticker, stock);
+    const firstDate = bt.equityCurve[0]?.date || '';
+    const lastDate = bt.equityCurve[bt.equityCurve.length - 1]?.date || '';
+    const rangeLabel = (firstDate && lastDate) ? `${firstDate} to ${lastDate}` : '';
+    const modeLabel = state.backtestMode === 'long_short' ? 'Long & Short (Derivatives)' : 'Long-Only (Spot Equity)';
     const subtitleEl = document.getElementById('btStudioSubtitle');
     if (subtitleEl) {
-        subtitleEl.textContent = `${assetName} (${ticker}) — ${bt.totalBars} Bars Analyzed (${state.backtestTimeframe.toUpperCase()} Slice) — Mode: ${state.backtestMode === 'long_short' ? 'Long & Short (Derivatives)' : 'Long-Only (Spot Equity)'}`;
+        if (bt.totalBars < minRequiredBars && activeTf !== 'max') {
+            subtitleEl.textContent = `${assetName} (${ticker}) — ${bt.totalBars} Bars Analyzed (Max Available: ${rangeLabel}; shorter than ${activeTf.toUpperCase()}) — Mode: ${modeLabel}`;
+        } else {
+            const spanSuffix = rangeLabel ? `, ${rangeLabel}` : '';
+            subtitleEl.textContent = `${assetName} (${ticker}) — ${bt.totalBars} Bars Analyzed (${state.backtestTimeframe.toUpperCase()} Slice${spanSuffix}) — Mode: ${modeLabel}`;
+        }
     }
 
     // 3. Populate Scorecards Ribbon
@@ -926,7 +997,7 @@ async function recalculateCurrentBacktest(expectedReqId = null) {
  * 0ms Slicing & Algorithmic Strategy Backtesting Simulation Engine
  */
 function calculateClientBacktest(rawTimeseries, strategy, options = {}) {
-    if (!rawTimeseries || rawTimeseries.length < 5) return null;
+    if (!rawTimeseries || rawTimeseries.length < 2) return null;
 
     const ticker = options.ticker || state.backtestTicker || 'NVDA';
     const tf = options.timeframe || state.backtestTimeframe || '1y';
@@ -935,9 +1006,10 @@ function calculateClientBacktest(rawTimeseries, strategy, options = {}) {
     const takeProfitPct = Number(options.takeProfitPct ?? state.backtestTakeProfit ?? 12.0);
     const slippagePct = Number(options.slippagePct ?? state.backtestSlippage ?? 0.10);
     const mode = options.mode || state.backtestMode || 'long_only';
+    const dataSig = `${rawTimeseries.length}:${rawTimeseries[rawTimeseries.length - 1]?.time || ''}`;
 
     const cacheKey = getBacktestCacheKey(ticker, tf, strategy, {
-        initialCapital, stopLossPct, takeProfitPct, slippagePct, mode
+        initialCapital, stopLossPct, takeProfitPct, slippagePct, mode, dataSig
     });
 
     if (!options.bypassCache && _backtestCache.has(cacheKey)) {
@@ -958,7 +1030,7 @@ function calculateClientBacktest(rawTimeseries, strategy, options = {}) {
     const barsCount = TF_BARS[tf.toLowerCase()] || 252;
     const timeseries = rawTimeseries.slice(-barsCount);
 
-    if (timeseries.length < 5) return null;
+    if (timeseries.length < 2) return null;
 
     let capital = initialCapital;
     let position = 0; // shares: >0 for Long, <0 for Short, 0 for Cash
@@ -1668,6 +1740,11 @@ async function renderEquityChart(equityCurve, trades = []) {
     }
     container.innerHTML = '';
 
+    const minTs = stratSeries.length > 0 ? stratSeries[0].x : undefined;
+    const maxTs = stratSeries.length > 0 ? stratSeries[stratSeries.length - 1].x : undefined;
+    const hasSpan = typeof minTs === 'number' && typeof maxTs === 'number' && maxTs > minTs;
+    const isShortSeries = equityCurve.length <= 5;
+
     const options = {
         series: [
             { name: 'Strategy Portfolio ($)', data: stratSeries },
@@ -1687,9 +1764,11 @@ async function renderEquityChart(equityCurve, trades = []) {
         },
         theme: { mode: themeOpts.themeMode },
         colors: [stratColor, '#64748b'],
-        stroke: { width: [3.5, 2.0], dashArray: [0, 4], curve: 'smooth' },
+        stroke: { width: [3.5, 2.0], dashArray: [0, 4], curve: isShortSeries ? 'straight' : 'smooth' },
+        markers: isShortSeries ? { size: [4, 4] } : { size: 0 },
         xaxis: {
             type: 'datetime',
+            ...(hasSpan ? { min: minTs, max: maxTs } : {}),
             labels: { style: { colors: themeOpts.labelColor, fontSize: '11px', fontFamily: 'JetBrains Mono' }, datetimeFormatter: { month: 'MMM \'yy', day: 'dd MMM' } },
             axisBorder: { color: themeOpts.axisBorderColor }
         },
@@ -1789,9 +1868,13 @@ async function renderEquityChart(equityCurve, trades = []) {
         }
     };
 
-    state.charts.equity = new ApexCharts(container, options);
-    await state.charts.equity.render();
-    attachAnnotationTitles(container, pointAnnotations);
+    try {
+        state.charts.equity = new ApexCharts(container, options);
+        await state.charts.equity.render();
+        attachAnnotationTitles(container, pointAnnotations);
+    } catch (chartErr) {
+        console.warn('[renderEquityChart] ApexCharts render error:', chartErr);
+    }
 }
 
 /**
@@ -1923,6 +2006,11 @@ async function renderDrawdownChart(equityCurve, trades = []) {
     }
     container.innerHTML = '';
 
+    const minTs = stratSeries.length > 0 ? stratSeries[0].x : undefined;
+    const maxTs = stratSeries.length > 0 ? stratSeries[stratSeries.length - 1].x : undefined;
+    const hasSpan = typeof minTs === 'number' && typeof maxTs === 'number' && maxTs > minTs;
+    const isShortSeries = equityCurve.length <= 5;
+
     const options = {
         series: [
             { name: 'Strategy (% vs Initial)', data: stratSeries },
@@ -1957,11 +2045,17 @@ async function renderDrawdownChart(equityCurve, trades = []) {
                 stops: [0, 100]
             }
         },
-        stroke: { width: [2.5, 1.8], dashArray: [0, 4], curve: 'smooth' },
+        stroke: { width: [2.5, 1.8], dashArray: [0, 4], curve: isShortSeries ? 'straight' : 'smooth' },
+        markers: isShortSeries ? { size: [4, 4] } : { size: 0 },
         annotations: annotationsConfig,
         xaxis: {
             type: 'datetime',
-            labels: { show: false },
+            ...(hasSpan ? { min: minTs, max: maxTs } : {}),
+            labels: {
+                show: true,
+                style: { colors: themeOpts.labelColor, fontSize: '10px', fontFamily: 'JetBrains Mono' },
+                datetimeFormatter: { year: 'yyyy', month: 'MMM \'yy', day: 'dd MMM' }
+            },
             axisBorder: { color: themeOpts.axisBorderColor }
         },
         yaxis: yaxisConfig,
@@ -1976,9 +2070,13 @@ async function renderDrawdownChart(equityCurve, trades = []) {
         }
     };
 
-    state.charts.drawdown = new ApexCharts(container, options);
-    await state.charts.drawdown.render();
-    attachAnnotationTitles(container, pointAnnotations);
+    try {
+        state.charts.drawdown = new ApexCharts(container, options);
+        await state.charts.drawdown.render();
+        attachAnnotationTitles(container, pointAnnotations);
+    } catch (chartErr) {
+        console.warn('[renderDrawdownChart] ApexCharts render error:', chartErr);
+    }
 }
 
 function toggleBacktestTradeMarkers() {
@@ -2005,7 +2103,6 @@ const renderRelativeReturnChart = renderDrawdownChart;
 // WEB WORKER & DEFERRED BENCHMARK MATRIX ENGINE (PHASES 2 & 3)
 // -------------------------------------------------------------
 let _backtestWorker = null;
-let _backtestWorkerRequestId = 0;
 
 function getBacktestWorker() {
     if (_backtestWorker !== null) return _backtestWorker;
@@ -2135,7 +2232,10 @@ function scheduleMultiStrategyComparison(timeseries, options) {
  * Render Side-by-Side Multi-Strategy Comparative Matrix Grid (Synchronous or Fallback)
  */
 function renderMultiStrategyComparison(timeseries, options) {
-    if (!timeseries || timeseries.length < 5) return;
+    if (!timeseries || timeseries.length < 2) {
+        renderBenchmarkMatrixFromResults([]);
+        return;
+    }
 
     const STRATEGIES = [
         { key: 'omni_consensus', name: '👑 Omni-Consensus Master Ensemble', desc: 'All 9 Indicators Unified' },
@@ -2165,7 +2265,11 @@ function renderMultiStrategyComparison(timeseries, options) {
  */
 function renderBenchmarkMatrixFromResults(results) {
     const tbody = document.getElementById('btBenchmarkMatrixBody');
-    if (!tbody || !results || results.length === 0) return;
+    if (!tbody) return;
+    if (!results || results.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 0.82rem;">Insufficient data to run multi-strategy comparison.</td></tr>`;
+        return;
+    }
 
     const fragment = document.createDocumentFragment();
 
@@ -2219,7 +2323,9 @@ function renderBenchmarkMatrixFromResults(results) {
  */
 function exportBacktestTradesCSV() {
     if (!_currentBacktestResult || !_currentBacktestResult.trades || _currentBacktestResult.trades.length === 0) {
-        alert('No trades available to export. Run a backtest simulation first.');
+        if (typeof showToast === 'function') {
+            showToast('No trades available to export. Run a backtest simulation first.', 'warning');
+        }
         return;
     }
 
@@ -2261,4 +2367,4 @@ function exportBacktestTradesCSV() {
 
 /**
  * Get user-isolated localStorage key for paper trades
- */
+ */

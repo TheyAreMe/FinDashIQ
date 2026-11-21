@@ -13,7 +13,13 @@ import urllib.parse
 import urllib.error
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import datetime
+from datetime import datetime, timezone
+
+import requests
+from services.security_service import (
+    DEFAULT_ALLOWED_DISCORD_HOSTS,
+    validate_outbound_webhook_url,
+)
 
 
 class NotificationService:
@@ -95,7 +101,7 @@ class NotificationService:
         elif channel == 'Custom API Webhook':
             result = self.send_custom_webhook(target, {
                 "event": "QUANT_SIGNAL_TRIGGER",
-                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
                 "ticker": ticker,
                 "signalName": signal_name,
                 "signalType": alert_data.get('signalType', ''),
@@ -153,12 +159,13 @@ class NotificationService:
 
     def send_discord_webhook(self, webhook_url: str, data: dict) -> dict:
         """Dispatches rich formatted embed cards to Discord trading channel webhooks."""
-        if not webhook_url or not webhook_url.startswith(('http://', 'https://')):
+        ok_url, url_err = validate_outbound_webhook_url(webhook_url, allowed_hosts=DEFAULT_ALLOWED_DISCORD_HOSTS)
+        if not ok_url:
             return {
                 "delivered": False,
                 "statusCode": 400,
                 "status": "Invalid Discord Webhook URL",
-                "details": "URL must start with https://discord.com/api/webhooks/..."
+                "details": url_err
             }
 
         # Color coding: Bullish=Green (0x10B981), Bearish=Red (0xEF4444), News/Neutral=Purple (0x8B5CF6)
@@ -195,43 +202,35 @@ class NotificationService:
                     "footer": {
                         "text": "FinDashIQ Quantitative Intelligence Engine • Live Multi-Factor Alert"
                     },
-                    "timestamp": datetime.utcnow().isoformat() + "Z"
+                    "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
                 }
             ]
         }
 
         try:
-            req = urllib.request.Request(
+            resp = requests.post(
                 webhook_url,
-                data=json.dumps(discord_payload).encode('utf-8'),
+                json=discord_payload,
                 headers={
                     'Content-Type': 'application/json',
                     'User-Agent': 'FinDashIQ-Quant-Engine/4.20'
                 },
-                method='POST'
+                timeout=self.timeout,
+                allow_redirects=False,
             )
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                status_code = resp.getcode()
-                if 200 <= status_code < 300:
-                    return {
-                        "delivered": True,
-                        "statusCode": status_code,
-                        "status": f"Delivered (HTTP {status_code} OK)",
-                        "details": "Discord webhook embed accepted by server."
-                    }
+            status_code = resp.status_code
+            if 200 <= status_code < 300:
                 return {
-                    "delivered": False,
+                    "delivered": True,
                     "statusCode": status_code,
-                    "status": f"Discord Error (HTTP {status_code})",
-                    "details": resp.read().decode('utf-8', errors='ignore')
+                    "status": f"Delivered (HTTP {status_code} OK)",
+                    "details": "Discord webhook embed accepted by server."
                 }
-        except urllib.error.HTTPError as e:
-            err_body = e.read().decode('utf-8', errors='ignore') if hasattr(e, 'read') else str(e)
             return {
                 "delivered": False,
-                "statusCode": e.code,
-                "status": f"Discord Error (HTTP {e.code})",
-                "details": err_body[:200]
+                "statusCode": status_code,
+                "status": f"Discord Error (HTTP {status_code})",
+                "details": (resp.text or "")[:200]
             }
         except Exception as e:
             return {
@@ -242,17 +241,18 @@ class NotificationService:
             }
 
     def send_custom_webhook(self, endpoint_url: str, payload: dict) -> dict:
-        """Dispatches structured JSON payloads to any HTTP REST API endpoint."""
-        if not endpoint_url or not endpoint_url.startswith(('http://', 'https://')):
+        """Dispatches structured JSON payloads to any validated external HTTP REST endpoint."""
+        ok_url, url_err = validate_outbound_webhook_url(endpoint_url)
+        if not ok_url:
             return {
                 "delivered": False,
                 "statusCode": 400,
                 "status": "Invalid Webhook Endpoint URL",
-                "details": "Endpoint URL must start with http:// or https://"
+                "details": url_err
             }
 
         try:
-            req = urllib.request.Request(
+            resp = requests.post(
                 endpoint_url,
                 data=json.dumps(payload, indent=2).encode('utf-8'),
                 headers={
@@ -261,30 +261,22 @@ class NotificationService:
                     'User-Agent': 'FinDashIQ-Webhook-Dispatcher/4.20',
                     'X-FinDashIQ-Event': 'QUANT_SIGNAL_TRIGGER'
                 },
-                method='POST'
+                timeout=self.timeout,
+                allow_redirects=False,
             )
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                status_code = resp.getcode()
-                if 200 <= status_code < 300:
-                    return {
-                        "delivered": True,
-                        "statusCode": status_code,
-                        "status": f"Delivered (HTTP {status_code} OK)",
-                        "details": f"JSON payload acknowledged by {urllib.parse.urlparse(endpoint_url).netloc}."
-                    }
+            status_code = resp.status_code
+            if 200 <= status_code < 300:
                 return {
-                    "delivered": False,
+                    "delivered": True,
                     "statusCode": status_code,
-                    "status": f"Endpoint Error (HTTP {status_code})",
-                    "details": resp.read().decode('utf-8', errors='ignore')
+                    "status": f"Delivered (HTTP {status_code} OK)",
+                    "details": f"JSON payload acknowledged by {urllib.parse.urlparse(endpoint_url).netloc}."
                 }
-        except urllib.error.HTTPError as e:
-            err_body = e.read().decode('utf-8', errors='ignore') if hasattr(e, 'read') else str(e)
             return {
                 "delivered": False,
-                "statusCode": e.code,
-                "status": f"Webhook Error (HTTP {e.code})",
-                "details": err_body[:200]
+                "statusCode": status_code,
+                "status": f"Endpoint Error (HTTP {status_code})",
+                "details": (resp.text or "")[:200]
             }
         except Exception as e:
             return {
@@ -462,7 +454,7 @@ class NotificationService:
                 "subject": title,
                 "body": message,
                 "url": news_url,
-                "timestamp": datetime.utcnow().isoformat() + "Z"
+                "timestamp": datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
             })
 
         # Basic email validation

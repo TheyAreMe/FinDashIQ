@@ -1,4 +1,4 @@
-function switchTopTab(tabKey) {
+function switchTopTab(tabKey, options = {}) {
     state.activeTopTab = tabKey;
 
     document.querySelectorAll('.top-nav-btn').forEach(btn => {
@@ -14,7 +14,7 @@ function switchTopTab(tabKey) {
 
         // Parse current input tickers or fallback to active ticker / default
         const inputVal = document.getElementById('tickerInput')?.value.trim();
-        let inputTickers = inputVal ? inputVal.split(',').map(t => t.trim().toUpperCase()).filter(Boolean) : [];
+        let inputTickers = inputVal ? inputVal.split(',').map(t => normalizeTicker(t.trim().toUpperCase())).filter(Boolean) : [];
         if (inputTickers.length === 0) {
             inputTickers = [state.activeTicker || 'AAPL'];
             const inputEl = document.getElementById('tickerInput');
@@ -28,20 +28,26 @@ function switchTopTab(tabKey) {
         // Render stock selector tabs immediately so active tab is visible right away
         renderStockSelector(inputTickers);
 
-        const currentStock = state.stocksData[state.activeTicker];
-        const hasTimeseries = currentStock && !currentStock.error && currentStock.timeseries && currentStock.timeseries.length > 0;
+        if (!state.stocksData[state.activeTicker] && state.watchlistData && state.watchlistData[state.activeTicker] && !state.watchlistData[state.activeTicker].error) {
+            state.stocksData[state.activeTicker] = { ...state.watchlistData[state.activeTicker] };
+        }
 
-        if (hasTimeseries) {
+        const currentStock = state.stocksData[state.activeTicker];
+        const hasCandles = typeof hasValidCandleTimeseries === 'function'
+            ? hasValidCandleTimeseries(currentStock, state.currentPeriod)
+            : Boolean(currentStock && !currentStock.error && currentStock.timeseries && currentStock.timeseries.length > 0);
+        const hasFullAI = Boolean(currentStock && currentStock.aiAnalysis && currentStock.isFastHydration !== true);
+
+        if (currentStock && currentStock.profile && !currentStock.error) {
             renderActiveStock();
-            if (!currentStock.aiAnalysis && !_isAnalyzing) {
-                handleAnalyze();
-            }
-        } else {
-            if (currentStock && currentStock.profile) {
-                renderActiveStock();
-            }
-            if (!_isAnalyzing) {
-                handleAnalyze();
+        }
+
+        if (!options.skipAutoAnalyze && (!hasCandles || !hasFullAI)) {
+            const alreadyFetchingActive = (typeof _analyzingTickersSet !== 'undefined')
+                ? (_isAnalyzing && _analyzingTickersSet.has(state.activeTicker) && _analyzingPeriod === state.currentPeriod)
+                : _isAnalyzing;
+            if (!alreadyFetchingActive) {
+                handleAnalyze({ forceRefresh: false, cancelInFlight: Boolean(_isAnalyzing) });
             }
         }
 
@@ -84,7 +90,9 @@ function switchTopTab(tabKey) {
         renderAlerts();
     }
 
-    lucide.createIcons();
+    if (typeof refreshIcons === 'function') {
+        refreshIcons(document.getElementById(`topView-${tabKey}`) || document.body);
+    }
 }
 
 // =============================================================
@@ -193,6 +201,7 @@ async function initWatchlist() {
 
 async function saveWatchlistServer() {
     saveWatchlistTickersLocal(state.watchlistTickers);
+    if (state.isDemoMode || !state.user) return;
     try {
         await fetch('/api/watchlist', {
             method: 'POST',
@@ -250,6 +259,10 @@ async function fetchWatchlistAnalysis(forceRefresh = false) {
         // =========================================================
         setWatchlistSyncStatus('syncing', 'Calculating full indicators & AI scenarios...');
 
+        const aiCfg = (typeof getActiveAIRequestConfig === 'function')
+            ? getActiveAIRequestConfig()
+            : { provider: 'gemini', apiKey: state.aiSettings?.apiKey || '', model: state.aiSettings?.model || 'gemini-4-hydrogen' };
+
         const fullResponse = await fetch('/api/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -259,19 +272,21 @@ async function fetchWatchlistAnalysis(forceRefresh = false) {
                 interval: '1d',
                 forceRefresh: forceRefresh,
                 phase: 'full',
-                apiKey: state.aiSettings.apiKey,
-                model: state.aiSettings.model
+                provider: aiCfg.provider,
+                apiKey: aiCfg.apiKey,
+                model: aiCfg.model
             })
         });
 
         if (fullResponse.ok) {
             const fullData = await fullResponse.json();
             if (fullData && fullData.stocks) {
-                // Merge full-path data into state
+                // Merge full-path data into state and clear fast-hydration flag
                 Object.keys(fullData.stocks).forEach(tk => {
                     state.watchlistData[tk] = {
                         ...(state.watchlistData[tk] || {}),
-                        ...fullData.stocks[tk]
+                        ...fullData.stocks[tk],
+                        isFastHydration: false
                     };
                 });
                 saveWatchlistLocalCache(state.watchlistData);
@@ -280,6 +295,10 @@ async function fetchWatchlistAnalysis(forceRefresh = false) {
                 setWatchlistSyncStatus('synced', 'Live & Synced (Just now)');
             }
         } else {
+            Object.keys(state.watchlistData || {}).forEach(tk => {
+                if (state.watchlistData[tk]) state.watchlistData[tk].isFastHydration = false;
+            });
+            renderWatchlist();
             setWatchlistSyncStatus('partial', 'Live Quotes Active (Full metrics cached)');
         }
 
@@ -617,7 +636,8 @@ function renderWatchlistCards() {
         setupCardDragAndDrop(card, ticker);
 
         if (!stock) {
-            const compName = getAssetCompanyName(ticker, null);
+            const compName = escapeHtml(getAssetCompanyName(ticker, null));
+            const safeTicker = escapeHtml(ticker);
             card.innerHTML = `
                 <div class="watchlist-card-header">
                     <div class="watchlist-card-title-col">
@@ -625,19 +645,20 @@ function renderWatchlistCards() {
                             <div class="card-drag-handle" title="Drag to reorder" aria-label="Drag to reorder">
                                 <i data-lucide="grip-vertical" style="width: 14px; height: 14px;"></i>
                             </div>
-                            <span class="watchlist-card-symbol">${ticker}</span>
+                            <span class="watchlist-card-symbol">${safeTicker}</span>
                         </div>
                         <div class="watchlist-card-name" title="${compName}">${compName}</div>
                     </div>
                     <div class="watchlist-card-price-col">
-                        <span class="badge-pill badge-neutral" style="font-size: 0.72rem;">Loading...</span>
+                        <div class="skeleton skeleton-line short" style="width: 68px; height: 18px;"></div>
                     </div>
                 </div>
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 160px; color: var(--text-muted); font-size: 0.8rem; gap: 8px;">
-                    <div class="spinner" style="width: 20px; height: 20px;"></div>
-                    <span>Hydrating live quotes & AI thesis...</span>
+                <div style="display: flex; flex-direction: column; gap: 10px; padding: 10px 0;">
+                    <div class="skeleton skeleton-chart"></div>
+                    <div class="skeleton skeleton-line"></div>
+                    <div class="skeleton skeleton-line short"></div>
                 </div>
-                <button type="button" class="btn-deep-dive" onclick="openStockDeepDive('${ticker}')">
+                <button type="button" class="btn-deep-dive" onclick="openStockDeepDive('${safeTicker}')">
                     <span>Open Deep-Dive</span>
                 </button>
             `;
@@ -693,7 +714,11 @@ function renderWatchlistCards() {
         const vwapVal = profile.vwap ? formatPrice(profile.vwap, instCurr, baseCurr) : '--';
 
         const sparklineHtml = generateSvgSparkline(timeseries, isBullish);
-        const synthText = ai.newsSynthesis?.summary || ai.executiveThesis || (stock.isFastHydration ? '⚡ Live quotes, sparklines & indicators loaded. Synthesizing AI catalysts & backtests in background...' : `Technical indicators and quantitative momentum signals are actively tracked for ${ticker}.`);
+        const synthText = ai.newsSynthesis?.summary || ai.executiveThesis || (ai.error
+            ? `Live quotes active for ${ticker}. Limited historical bars available for full technical modeling.`
+            : (stock.isFastHydration
+                ? '⚡ Live quotes, sparklines & indicators loaded. Synthesizing AI catalysts & backtests in background...'
+                : `Technical indicators and quantitative momentum signals are actively tracked for ${ticker}.`));
 
         const compName = getAssetCompanyName(ticker, stock);
         const catalyst = detectWatchlistCatalyst(ticker, stock);
@@ -762,6 +787,8 @@ function renderWatchlistCards() {
                 </span>
             </div>
 
+            ${typeof renderConfluenceGauge === 'function' && ai.confluence ? renderConfluenceGauge(ai.confluence) : ''}
+
             <!-- Key Indicators Bar -->
             <div class="card-indicators-bar">
                 <div class="card-ind-item">
@@ -804,7 +831,7 @@ function renderWatchlistCards() {
         grid.appendChild(card);
     });
 
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof refreshIcons === 'function') refreshIcons(grid);
 }
 
 function formatTableSynthesis(ai, stock) {
@@ -1146,34 +1173,47 @@ async function reorderWatchlistTickers(draggedTicker, targetTicker, isAfter) {
 
 async function openStockDeepDive(ticker, targetSubtab = null) {
     if (!ticker) return;
-    ticker = ticker.trim().toUpperCase();
+    ticker = normalizeTicker(ticker.trim().toUpperCase());
+
+    if (state.activeTicker !== ticker) {
+        state._renderedChartsTicker = null;
+        state._renderedChartsKey = null;
+        if (typeof clearDeepDiveCharts === 'function') {
+            clearDeepDiveCharts();
+        }
+    }
     state.activeTicker = ticker;
 
     const tickerInput = document.getElementById('tickerInput');
     if (tickerInput) tickerInput.value = ticker;
 
+    // Seed from watchlist cache prior to switching views
+    if (!state.stocksData[ticker] && state.watchlistData && state.watchlistData[ticker] && !state.watchlistData[ticker].error) {
+        state.stocksData[ticker] = { ...state.watchlistData[ticker] };
+    }
+
     // Render stock selector immediately with the requested ticker tab active
     renderStockSelector([ticker]);
 
-    // Switch to Terminal top tab
-    switchTopTab('terminal');
+    // Switch to Terminal top tab without redundant auto-analyze
+    switchTopTab('terminal', { skipAutoAnalyze: true });
     if (targetSubtab) {
         switchMainTab(targetSubtab);
     }
 
     const currentStock = state.stocksData[ticker];
-    const hasFullData = currentStock && !currentStock.error && currentStock.timeseries && currentStock.timeseries.length > 0 && currentStock.aiAnalysis;
+    const hasCandles = typeof hasValidCandleTimeseries === 'function'
+        ? hasValidCandleTimeseries(currentStock, state.currentPeriod)
+        : Boolean(currentStock && !currentStock.error && currentStock.timeseries && currentStock.timeseries.length > 0);
+    const hasFullData = Boolean(currentStock && !currentStock.error && hasCandles && currentStock.aiAnalysis && currentStock.isFastHydration !== true);
 
     if (hasFullData) {
         renderActiveStock();
     } else {
-        if (state.watchlistData && state.watchlistData[ticker] && !state.watchlistData[ticker].error) {
-            if (!state.stocksData[ticker]) {
-                state.stocksData[ticker] = { ...state.watchlistData[ticker] };
-            }
+        if (currentStock && currentStock.profile && !currentStock.error) {
             renderActiveStock();
         }
-        await handleAnalyze();
+        await handleAnalyze({ forceRefresh: false, cancelInFlight: true });
     }
 
     // Scroll to dashboard content
@@ -1247,7 +1287,7 @@ async function resetWatchlistDefaults() {
 }
 
 function escapeHtml(str) {
-    if (!str) return '';
+    if (str === null || str === undefined) return '';
     return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -1255,4 +1295,167 @@ function escapeHtml(str) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
-
+
+function openImportExportModal(target = 'watchlist') {
+    const modal = document.getElementById('importExportModal');
+    if (!modal) return;
+    const targetInput = document.getElementById('importExportTarget');
+    const titleEl = document.getElementById('importExportTitleText');
+    const rawTa = document.getElementById('importRawTextarea');
+    const fileInput = document.getElementById('importFileInput');
+    const fileNameEl = document.getElementById('importFileNameDisplay');
+    const defaultFileLabel = 'No file selected (.csv, .json, .txt)';
+    const cleanTarget = (target === 'scanner' || target === 'universe') ? 'scanner' : 'watchlist';
+    if (targetInput) targetInput.value = cleanTarget;
+    if (titleEl) {
+        titleEl.textContent = cleanTarget === 'scanner'
+            ? 'Scanner Universe — Export & Import'
+            : 'Watchlist — Export & Import';
+    }
+    if (rawTa) rawTa.value = '';
+    if (fileNameEl) {
+        fileNameEl.textContent = defaultFileLabel;
+        fileNameEl.classList.remove('has-file');
+        fileNameEl.removeAttribute('title');
+    }
+    if (fileInput) {
+        fileInput.value = '';
+        fileInput.onchange = () => {
+            const f = fileInput.files && fileInput.files[0];
+            if (!f) {
+                if (fileNameEl) {
+                    fileNameEl.textContent = defaultFileLabel;
+                    fileNameEl.classList.remove('has-file');
+                    fileNameEl.removeAttribute('title');
+                }
+                return;
+            }
+            if (fileNameEl) {
+                fileNameEl.textContent = f.name;
+                fileNameEl.classList.add('has-file');
+                fileNameEl.title = f.name;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (rawTa) rawTa.value = String(reader.result || '');
+            };
+            reader.readAsText(f);
+        };
+    }
+    if (typeof openAccessibleModal === 'function') {
+        openAccessibleModal(modal, 'flex');
+    } else {
+        modal.style.display = 'flex';
+    }
+    if (typeof refreshIcons === 'function') refreshIcons(modal);
+}
+
+function closeImportExportModal() {
+    const modal = document.getElementById('importExportModal');
+    if (!modal) return;
+    if (typeof closeAccessibleModal === 'function') {
+        closeAccessibleModal(modal);
+    } else {
+        modal.style.display = 'none';
+    }
+}
+
+async function handleExportData(format = 'json') {
+    if (state.isDemoMode || !state.user) {
+        if (typeof showToast === 'function') showToast('Sign in to export synced Watchlist or Scanner files.', 'warning');
+        return;
+    }
+    const target = document.getElementById('importExportTarget')?.value || 'watchlist';
+    const fmt = format === 'csv' ? 'csv' : 'json';
+    const endpoint = target === 'scanner'
+        ? `/api/scanner/universe/export?format=${fmt}`
+        : `/api/watchlist/export?format=${fmt}`;
+
+    try {
+        const res = await fetch(endpoint);
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `Export failed (${res.status})`);
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `findashiq_${target}.${fmt}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        if (typeof showToast === 'function') showToast(`Downloaded ${target}.${fmt}`, 'success');
+    } catch (err) {
+        if (typeof showToast === 'function') showToast(err.message || 'Export error.', 'error');
+    }
+}
+
+async function handleImportData() {
+    if (state.isDemoMode || !state.user) {
+        if (typeof showToast === 'function') showToast('Sign in to import tickers to your account.', 'warning');
+        return;
+    }
+    const target = document.getElementById('importExportTarget')?.value || 'watchlist';
+    const mode = document.getElementById('importModeSelect')?.value || 'merge';
+    const rawText = document.getElementById('importRawTextarea')?.value.trim() || '';
+    if (!rawText) {
+        if (typeof showToast === 'function') showToast('Paste tickers or select a CSV/JSON file first.', 'warning');
+        return;
+    }
+
+    let payload = { mode };
+    try {
+        const parsed = JSON.parse(rawText);
+        if (Array.isArray(parsed)) {
+            payload.tickers = parsed;
+        } else if (parsed && Array.isArray(parsed.tickers)) {
+            payload.tickers = parsed.tickers;
+        } else {
+            payload.text = rawText;
+            payload.rawText = rawText;
+        }
+    } catch (_err) {
+        payload.text = rawText;
+        payload.rawText = rawText;
+    }
+
+    const endpoint = target === 'scanner' ? '/api/scanner/universe/import' : '/api/watchlist/import';
+    try {
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Import failed.');
+        }
+
+        if (target === 'watchlist' && Array.isArray(data.tickers)) {
+            state.watchlistTickers = data.tickers;
+            saveWatchlistTickersLocal(state.watchlistTickers);
+            renderWatchlist();
+            fetchWatchlistAnalysis(false);
+        } else if (target === 'scanner' && typeof initScanner === 'function') {
+            initScanner(true);
+        }
+
+        const importedCount = data.importedCount ?? (Array.isArray(data.added) ? data.added.length : 0);
+        closeImportExportModal();
+        if (typeof showToast === 'function') {
+            showToast(`Imported ${importedCount} ticker(s) into ${target}.`, 'success');
+        }
+    } catch (err) {
+        if (typeof showToast === 'function') showToast(err.message || 'Import error.', 'error');
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.openImportExportModal = openImportExportModal;
+    window.closeImportExportModal = closeImportExportModal;
+    window.handleExportData = handleExportData;
+    window.handleImportData = handleImportData;
+}
+

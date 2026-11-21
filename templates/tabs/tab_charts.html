@@ -2,8 +2,14 @@
 <!-- TAB 2: CHARTS & TECHNICAL OSCILLATORS -->
 <!-- ========================================================= -->
 <div id="tabPane-charts" class="tab-pane">
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+        <button type="button" id="btnMobileChartControls" class="mobile-sheet-toggle" aria-expanded="false" onclick="toggleChartControlsDrawer()">
+            <i data-lucide="sliders-horizontal" style="width: 14px; height: 14px;"></i>
+            <span>Chart Controls &amp; Overlays</span>
+        </button>
+    </div>
     <!-- Chart Controls Tooling Bar -->
-    <div class="glass-card chart-controls-bar">
+    <div id="chartControlsDrawer" class="glass-card chart-controls-bar chart-controls-drawer">
         <!-- Timeframe Selector -->
         <div class="control-group">
             <span class="control-label">Period:</span>

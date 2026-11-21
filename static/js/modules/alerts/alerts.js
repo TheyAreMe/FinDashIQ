@@ -127,7 +127,9 @@ function handleChannelChange() {
 
 async function requestBrowserNotificationPermission() {
     if (!('Notification' in window)) {
-        alert('This browser does not support desktop notifications.');
+        if (typeof showToast === 'function') {
+            showToast('This browser does not support desktop notifications.', 'warning');
+        }
         return;
     }
     const perm = await Notification.requestPermission();
@@ -141,7 +143,7 @@ async function requestBrowserNotificationPermission() {
             btn.innerHTML = '<i data-lucide="bell-off" style="width: 11px;"></i><span>Permission Denied</span>';
             btn.style.color = 'var(--accent-red)';
         }
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        if (typeof refreshIcons === 'function') refreshIcons(btn);
     }
 }
 

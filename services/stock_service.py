@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import time
 import re
@@ -13,6 +14,7 @@ import urllib.request
 import urllib.parse
 import yfinance as yf
 from services.cache_utils import BoundedTTLCache, CacheRegistry, collect_garbage, ProcessLock, get_yf_session
+from services.news_service import news_service
 
 logger = logging.getLogger(__name__)
 logging.getLogger('yfinance').setLevel(logging.CRITICAL)
@@ -162,6 +164,7 @@ class StockService:
         self._analysis_cache = BoundedTTLCache(max_size=30, default_ttl=1800, name="StockAnalysisCache")
         self._profile_cache = BoundedTTLCache(max_size=50, default_ttl=900, name="StockProfileCache")
         self._news_cache = BoundedTTLCache(max_size=30, default_ttl=1800, name="StockNewsCache")
+        self._history_depth_checked = BoundedTTLCache(max_size=200, default_ttl=3600, name="StockHistoryDepthCache")
         self._lock = threading.RLock()
         self._warmup_thread = None
         self._stop_warmup = threading.Event()
@@ -365,7 +368,30 @@ class StockService:
             return pd.DataFrame() if df is None else df
 
         df = df[df.index.notna()].copy()
+        if df.empty:
+            return df
         if len(df) < 5:
+            high_low = (df['High'] - df['Low']).abs()
+            atr_series = high_low.rolling(window=len(df), min_periods=1).mean()
+            fallback_atr = df['Close'].abs() * 0.04
+            df['ATR'] = atr_series.where(atr_series > 0, fallback_atr)
+
+            typical_price = (df['High'] + df['Low'] + df['Close']) / 3.0
+            if 'Volume' in df.columns and df['Volume'].fillna(0).sum() > 0:
+                vol = df['Volume'].fillna(0).astype(float)
+                cum_vol = vol.cumsum().replace(0, np.nan)
+                df['VWAP'] = (typical_price * vol).cumsum() / cum_vol
+                df['VWAP'] = df['VWAP'].fillna(df['Close'])
+
+                hl_range = (df['High'] - df['Low']).replace(0, np.nan)
+                mf_mult = (((df['Close'] - df['Low']) - (df['High'] - df['Close'])) / hl_range).fillna(0.0)
+                df['CMF'] = ((mf_mult * vol).cumsum() / cum_vol).fillna(0.0).clip(-1.0, 1.0)
+            else:
+                df['VWAP'] = df['Close']
+                df['CMF'] = 0.0
+
+            df['AI_Conviction'] = 50.0
+            df['AI_Conviction_EMA'] = 50.0
             return df
 
         # 1. Moving Averages
@@ -508,7 +534,7 @@ class StockService:
         """
         Synthesizes technical indicator signals and real-time news catalysts into a composite quantitative rating.
         """
-        if df.empty or len(df) < 5:
+        if df.empty:
             return {
                 'overall': 'Neutral',
                 'score': 0,
@@ -516,6 +542,48 @@ class StockService:
                 'bearishCount': 0,
                 'neutralCount': 0,
                 'indicators': {}
+            }
+
+        if len(df) < 5:
+            latest = df.iloc[-1]
+            close = float(latest.get('Close', 0) or 0)
+            vwap_raw = latest.get('VWAP')
+            cmf_raw = latest.get('CMF')
+            indicators = {}
+            bull = 0
+            bear = 0
+            neutral = 0
+
+            if vwap_raw is not None and not pd.isna(vwap_raw) and close > 0:
+                vwap_val = round(float(vwap_raw), 2)
+                if close >= vwap_val:
+                    indicators['VWAP'] = {'signal': 'Above VWAP (Bullish)', 'value': vwap_val, 'status': 'bullish', 'desc': 'Initial IPO flow above cumulative VWAP'}
+                    bull += 1
+                else:
+                    indicators['VWAP'] = {'signal': 'Below VWAP (Bearish)', 'value': vwap_val, 'status': 'bearish', 'desc': 'Trading below cumulative IPO VWAP'}
+                    bear += 1
+
+            if cmf_raw is not None and not pd.isna(cmf_raw):
+                cmf_val = round(float(cmf_raw), 3)
+                if cmf_val > 0.03:
+                    indicators['CMF'] = {'signal': 'Inflow (+Accumulation)', 'value': cmf_val, 'status': 'bullish', 'desc': 'Positive early money flow'}
+                    bull += 1
+                elif cmf_val < -0.03:
+                    indicators['CMF'] = {'signal': 'Outflow (-Distribution)', 'value': cmf_val, 'status': 'bearish', 'desc': 'Negative early money flow'}
+                    bear += 1
+                else:
+                    indicators['CMF'] = {'signal': 'Balanced Flow', 'value': cmf_val, 'status': 'neutral', 'desc': 'Neutral initial session volume flow'}
+                    neutral += 1
+
+            score = bull - bear
+            overall = 'Buy' if score > 0 else ('Sell' if score < 0 else 'Neutral')
+            return {
+                'overall': overall,
+                'score': score,
+                'bullishCount': bull,
+                'bearishCount': bear,
+                'neutralCount': neutral,
+                'indicators': indicators
             }
 
         latest = df.iloc[-1]
@@ -995,8 +1063,10 @@ class StockService:
             'max': 2350
         }
         required_rows = PERIOD_ROW_REQUIREMENTS.get(period, 118)
+        depth_key = f"{actual_ticker}_{period}_{interval}"
         
         cached_df = None
+        needs_deeper_history = False
         if os.path.exists(cache_file):
             try:
                 cached_df = pd.read_csv(cache_file, index_col=0, parse_dates=True)
@@ -1004,14 +1074,25 @@ class StockService:
                     cached_df.columns = [col[0] for col in cached_df.columns]
                 cached_df = cached_df[cached_df.index.notna()]
                 file_age = now - os.path.getmtime(cache_file)
-                # If cache is fresh (< 1800 seconds / 30 mins), not forced, and non-empty
-                if not force_refresh and file_age < 1800 and not cached_df.empty:
+                needs_deeper_history = (
+                    (period in ('5y', 'max'))
+                    and (cached_df is not None)
+                    and (not cached_df.empty)
+                    and (len(cached_df) < required_rows)
+                    and (self._history_depth_checked.get(depth_key) is None)
+                )
+                # If cache is fresh (< 1800 seconds / 30 mins), not forced, non-empty, and deep enough
+                if not force_refresh and file_age < 1800 and not cached_df.empty and not needs_deeper_history:
                     return cached_df
             except Exception:
                 cached_df = None
+                needs_deeper_history = False
 
-        # If we have existing cached data, perform a lightweight DELTA download
-        if cached_df is not None and not cached_df.empty and 'Close' in cached_df.columns:
+        if needs_deeper_history:
+            self._history_depth_checked.set(depth_key, True, ttl=3600)
+
+        # If we have existing cached data and don't need deeper history, perform a lightweight DELTA download
+        if not needs_deeper_history and cached_df is not None and not cached_df.empty and 'Close' in cached_df.columns:
             try:
                 valid_index = cached_df.index[cached_df.index.notna()]
                 if len(valid_index) == 0:
@@ -1055,7 +1136,7 @@ class StockService:
             except Exception:
                 return cached_df
 
-        # If no cache exists, download full history
+        # If no cache exists or deeper history is requested, download full history
         try:
             download_period = period if period in ('2y', '5y', 'max') else '2y'
             full_df = yf.download(actual_ticker, period=download_period, interval=interval, session=get_yf_session(), progress=False)
@@ -1064,6 +1145,12 @@ class StockService:
 
             if not full_df.empty and 'Close' in full_df.columns:
                 full_df = full_df[full_df.index.notna()]
+                if cached_df is not None and not cached_df.empty and 'Close' in cached_df.columns:
+                    combined_df = pd.concat([cached_df, full_df])
+                    combined_df = combined_df[combined_df.index.notna()]
+                    combined_df = combined_df.loc[~combined_df.index.duplicated(keep='last')]
+                    combined_df = combined_df.sort_index()
+                    full_df = combined_df
                 full_df = self._patch_latest_bar_if_nan(actual_ticker, full_df)
                 full_df = full_df.dropna(subset=['Close'])
                 full_df.to_csv(cache_file)
@@ -1174,82 +1261,7 @@ class StockService:
 
             signals = self.generate_technical_summary(enriched_df)
 
-            timeseries = []
-            for row in enriched_df.reset_index().to_dict('records'):
-                idx = row.get('Date') or row.get('index') or row.get('Datetime')
-                if idx is None or pd.isna(idx) or str(idx).strip().lower() in ('nat', 'nan', 'none', ''):
-                    continue
-                if isinstance(idx, (pd.Timestamp, datetime)) and not pd.isna(idx):
-                    try:
-                        time_str = idx.strftime('%Y-%m-%d')
-                        timestamp_ms = int(idx.timestamp() * 1000)
-                    except Exception:
-                        time_str = str(idx)[:10]
-                        timestamp_ms = 0
-                else:
-                    time_str = str(idx)[:10] if idx is not None else ''
-                    timestamp_ms = 0
-
-                def safe_val(val, decimals=2):
-                    if val is None or pd.isna(val) or np.isinf(val):
-                        return None
-                    return round(float(val), decimals)
-
-                point = {
-                    'time': time_str,
-                    'timestamp': timestamp_ms,
-                    'open': safe_val(row.get('Open')),
-                    'high': safe_val(row.get('High')),
-                    'low': safe_val(row.get('Low')),
-                    'close': safe_val(row.get('Close')),
-                    'volume': int(row.get('Volume', 0)) if not pd.isna(row.get('Volume', 0)) else 0,
-                    # Frontend camelCase keys (ApexCharts & oscillators)
-                    'sma20': safe_val(row.get('SMA_20')),
-                    'sma50': safe_val(row.get('SMA_50')),
-                    'sma200': safe_val(row.get('SMA_200')),
-                    'ema9': safe_val(row.get('EMA_9')),
-                    'ema20': safe_val(row.get('EMA_20')),
-                    'ema21': safe_val(row.get('EMA_21')),
-                    'ema50': safe_val(row.get('EMA_50')),
-                    'ema200': safe_val(row.get('EMA_200')),
-                    'bbUpper': safe_val(row.get('BB_Upper')),
-                    'bbMiddle': safe_val(row.get('BB_Middle')),
-                    'bbLower': safe_val(row.get('BB_Lower')),
-                    'kcUpper': safe_val(row.get('KC_Upper')),
-                    'kcMiddle': safe_val(row.get('KC_Middle')),
-                    'kcLower': safe_val(row.get('KC_Lower')),
-                    'superTrend': safe_val(row.get('SuperTrend')),
-                    'superTrendDir': int(row.get('SuperTrend_Dir', row.get('SuperTrend_Direction', 1))),
-                    'vwap': safe_val(row.get('VWAP')),
-                    'ttmSqueeze': bool(row.get('TTM_Squeeze', False)),
-                    'rsi': safe_val(row.get('RSI'), 1),
-                    'macd': safe_val(row.get('MACD')),
-                    'macdSignal': safe_val(row.get('MACD_Signal') or row.get('Signal')),
-                    'macdHist': safe_val(row.get('MACD_Hist') or row.get('Hist')),
-                    'stochK': safe_val(row.get('Stoch_K') or row.get('Stochastic_K'), 1),
-                    'stochD': safe_val(row.get('Stoch_D') or row.get('Stochastic_D'), 1),
-                    'cmf': safe_val(row.get('CMF'), 3),
-                    'cci': safe_val(row.get('CCI')),
-                    'williamsR': safe_val(row.get('Williams_R')),
-                    'atr': safe_val(row.get('ATR')),
-                    'volumeSma': safe_val(row.get('Volume_SMA20'), 0),
-                    'aiConviction': safe_val(row.get('AI_Conviction'), 1),
-                    'aiConvictionEma': safe_val(row.get('AI_Conviction_EMA'), 1)
-                }
-                timeseries.append(point)
-
-            # Slice timeseries to match the requested timeframe period
-            PERIOD_DAYS_MAP = {
-                '1mo': 22,
-                '3mo': 65,
-                '6mo': 130,
-                '1y': 252,
-                '2y': 504,
-                '5y': 1260,
-                'max': None
-            }
-            slice_limit = PERIOD_DAYS_MAP.get(period)
-            display_timeseries = timeseries[-slice_limit:] if (slice_limit and len(timeseries) > slice_limit) else timeseries
+            display_timeseries = self._build_timeseries_from_enriched_df(enriched_df, period=period)
 
             # Calculate Historical AI Conviction Stats across display slice
             conv_scores = [p['aiConviction'] for p in display_timeseries if p.get('aiConviction') is not None]
@@ -1320,7 +1332,8 @@ class StockService:
                 'convictionHistoryStats': conviction_history_stats,
                 'backtests': backtests,
                 'news': news,
-                'dataPointsCount': len(display_timeseries)
+                'dataPointsCount': len(display_timeseries),
+                'isFastHydration': False,
             })
 
             self._analysis_cache.set(cache_key, stock_entry, ttl=1800)
@@ -1329,11 +1342,90 @@ class StockService:
         except Exception as e:
             return ticker, {'error': f'Error analyzing {ticker}: {str(e)}'}
 
-    def _process_single_ticker_fast(self, ticker: str, force_refresh: bool = False) -> tuple[str, dict]:
-        """Rapidly processes an individual ticker for Stage 1 Fast Hydration (quotes, sparklines, core signals) in <5ms."""
+    @staticmethod
+    def _build_timeseries_from_enriched_df(enriched_df: pd.DataFrame, period: str = '6mo') -> list[dict]:
+        """Serializes indicator-enriched DataFrame rows into frontend timeseries dicts sliced by period."""
+        timeseries = []
+        for row in enriched_df.reset_index().to_dict('records'):
+            idx = row.get('Date') or row.get('index') or row.get('Datetime')
+            if idx is None or pd.isna(idx) or str(idx).strip().lower() in ('nat', 'nan', 'none', ''):
+                continue
+            if isinstance(idx, (pd.Timestamp, datetime)) and not pd.isna(idx):
+                try:
+                    time_str = idx.strftime('%Y-%m-%d')
+                    timestamp_ms = int(idx.timestamp() * 1000)
+                except Exception:
+                    time_str = str(idx)[:10]
+                    timestamp_ms = 0
+            else:
+                time_str = str(idx)[:10] if idx is not None else ''
+                timestamp_ms = 0
+
+            def safe_val(val, decimals=2):
+                if val is None or pd.isna(val) or np.isinf(val):
+                    return None
+                return round(float(val), decimals)
+
+            point = {
+                'time': time_str,
+                'timestamp': timestamp_ms,
+                'open': safe_val(row.get('Open')),
+                'high': safe_val(row.get('High')),
+                'low': safe_val(row.get('Low')),
+                'close': safe_val(row.get('Close')),
+                'volume': int(row.get('Volume', 0)) if not pd.isna(row.get('Volume', 0)) else 0,
+                # Frontend camelCase keys (ApexCharts & oscillators)
+                'sma20': safe_val(row.get('SMA_20')),
+                'sma50': safe_val(row.get('SMA_50')),
+                'sma200': safe_val(row.get('SMA_200')),
+                'ema9': safe_val(row.get('EMA_9')),
+                'ema20': safe_val(row.get('EMA_20')),
+                'ema21': safe_val(row.get('EMA_21')),
+                'ema50': safe_val(row.get('EMA_50')),
+                'ema200': safe_val(row.get('EMA_200')),
+                'bbUpper': safe_val(row.get('BB_Upper')),
+                'bbMiddle': safe_val(row.get('BB_Middle')),
+                'bbLower': safe_val(row.get('BB_Lower')),
+                'kcUpper': safe_val(row.get('KC_Upper')),
+                'kcMiddle': safe_val(row.get('KC_Middle')),
+                'kcLower': safe_val(row.get('KC_Lower')),
+                'superTrend': safe_val(row.get('SuperTrend')),
+                'superTrendDir': int(row.get('SuperTrend_Dir', row.get('SuperTrend_Direction', 1))),
+                'vwap': safe_val(row.get('VWAP')),
+                'ttmSqueeze': bool(row.get('TTM_Squeeze', False)),
+                'rsi': safe_val(row.get('RSI'), 1),
+                'macd': safe_val(row.get('MACD')),
+                'macdSignal': safe_val(row.get('MACD_Signal') or row.get('Signal')),
+                'macdHist': safe_val(row.get('MACD_Hist') or row.get('Hist')),
+                'stochK': safe_val(row.get('Stoch_K') or row.get('Stochastic_K'), 1),
+                'stochD': safe_val(row.get('Stoch_D') or row.get('Stochastic_D'), 1),
+                'cmf': safe_val(row.get('CMF'), 3),
+                'cci': safe_val(row.get('CCI')),
+                'williamsR': safe_val(row.get('Williams_R')),
+                'atr': safe_val(row.get('ATR')),
+                'volumeSma': safe_val(row.get('Volume_SMA20'), 0),
+                'aiConviction': safe_val(row.get('AI_Conviction'), 1),
+                'aiConvictionEma': safe_val(row.get('AI_Conviction_EMA'), 1)
+            }
+            timeseries.append(point)
+
+        PERIOD_DAYS_MAP = {
+            '1mo': 22,
+            '3mo': 65,
+            '6mo': 130,
+            '1y': 252,
+            '2y': 504,
+            '5y': 1260,
+            'max': None
+        }
+        slice_limit = PERIOD_DAYS_MAP.get(period)
+        return timeseries[-slice_limit:] if (slice_limit and len(timeseries) > slice_limit) else timeseries
+
+    def _process_single_ticker_fast(self, ticker: str, force_refresh: bool = False, period: str = '1mo', include_timeseries: bool = False) -> tuple[str, dict]:
+        """Rapidly processes an individual ticker for Stage 1 Fast Hydration (quotes, sparklines, and optional chart timeseries)."""
         actual_ticker = normalize_ticker(ticker)
         now = time.time()
-        fast_cache_key = f"{actual_ticker}_fast"
+        fast_cache_key = f"{actual_ticker}_fast_{period}_ts" if include_timeseries else f"{actual_ticker}_fast"
         
         if not force_refresh:
             cached_data = self._analysis_cache.get(fast_cache_key)
@@ -1345,18 +1437,21 @@ class StockService:
             cache_file = os.path.join(self.cache_dir, f"{safe_ticker}_1d.csv")
             
             ticker_df = None
-            if os.path.exists(cache_file) and not force_refresh:
-                try:
-                    ticker_df = pd.read_csv(cache_file, index_col=0, parse_dates=True)
-                    if isinstance(ticker_df.columns, pd.MultiIndex):
-                        ticker_df.columns = [col[0] for col in ticker_df.columns]
-                    ticker_df = ticker_df[ticker_df.index.notna()]
-                    ticker_df = self._patch_latest_bar_if_nan(actual_ticker, ticker_df)
-                except Exception:
-                    ticker_df = None
+            if include_timeseries:
+                ticker_df = self.get_historical_dataframe(actual_ticker, period=period, interval='1d', force_refresh=force_refresh)
+            else:
+                if os.path.exists(cache_file) and not force_refresh:
+                    try:
+                        ticker_df = pd.read_csv(cache_file, index_col=0, parse_dates=True)
+                        if isinstance(ticker_df.columns, pd.MultiIndex):
+                            ticker_df.columns = [col[0] for col in ticker_df.columns]
+                        ticker_df = ticker_df[ticker_df.index.notna()]
+                        ticker_df = self._patch_latest_bar_if_nan(actual_ticker, ticker_df)
+                    except Exception:
+                        ticker_df = None
 
-            if ticker_df is None or ticker_df.empty or 'Close' not in ticker_df.columns:
-                ticker_df = self.get_historical_dataframe(actual_ticker, period='1mo', interval='1d', force_refresh=force_refresh)
+                if ticker_df is None or ticker_df.empty or 'Close' not in ticker_df.columns:
+                    ticker_df = self.get_historical_dataframe(actual_ticker, period='1mo', interval='1d', force_refresh=force_refresh)
 
             if ticker_df.empty or 'Close' not in ticker_df.columns:
                 return ticker, {'error': f'No historical data found for {ticker}.'}
@@ -1365,8 +1460,21 @@ class StockService:
             ticker_df = self._patch_latest_bar_if_nan(actual_ticker, ticker_df)
             ticker_df = ticker_df.dropna(subset=['Close'])
 
-            # Use last 60 bars for instantaneous local indicator computation
-            calc_df = ticker_df.tail(60).copy()
+            if include_timeseries:
+                PERIOD_DAYS_MAP = {
+                    '1mo': 22,
+                    '3mo': 65,
+                    '6mo': 130,
+                    '1y': 252,
+                    '2y': 504,
+                    '5y': 1260,
+                    'max': None
+                }
+                slice_limit = PERIOD_DAYS_MAP.get(period)
+                calc_df = ticker_df.tail(slice_limit + 220).copy() if slice_limit else ticker_df.copy()
+            else:
+                # Use last 60 bars for instantaneous local indicator computation
+                calc_df = ticker_df.tail(60).copy()
             enriched_df = self.calculate_technical_indicators(calc_df)
 
             last_row = enriched_df.iloc[-1]
@@ -1376,6 +1484,14 @@ class StockService:
             prev_price = _safe_float(prev_row.get('Close'), curr_price)
             change = _safe_float(curr_price - prev_price, 0.0) if (curr_price is not None and prev_price is not None) else 0.0
             change_percent = _safe_float((change / prev_price * 100) if (prev_price and prev_price > 0) else 0.0, 0.0)
+
+            high_52 = _safe_float(enriched_df['High'].tail(252).max() if 'High' in enriched_df.columns else curr_price, curr_price)
+            low_52 = _safe_float(enriched_df['Low'].tail(252).min() if 'Low' in enriched_df.columns else curr_price, curr_price)
+            day_high = _safe_float(last_row.get('High'), curr_price)
+            day_low = _safe_float(last_row.get('Low'), curr_price)
+            day_open = _safe_float(last_row.get('Open'), curr_price)
+            volume = _safe_int(last_row.get('Volume'))
+            avg_volume = _safe_int(enriched_df['Volume'].tail(30).mean() if 'Volume' in enriched_df.columns and not enriched_df['Volume'].empty else volume)
 
             # Query real-time fast_info on force_refresh for live tick updates
             if force_refresh:
@@ -1403,6 +1519,13 @@ class StockService:
                 'change': change,
                 'changePercent': change_percent,
                 'currency': currency,
+                'open': day_open,
+                'dayHigh': day_high,
+                'dayLow': day_low,
+                'fiftyTwoWeekHigh': high_52,
+                'fiftyTwoWeekLow': low_52,
+                'volume': volume,
+                'avgVolume': avg_volume,
                 'atr': _safe_float(last_row.get('ATR')),
                 'vwap': _safe_float(last_row.get('VWAP')),
                 'superTrend': _safe_float(last_row.get('SuperTrend')),
@@ -1430,13 +1553,20 @@ class StockService:
                         'close': close_val
                     })
 
-            fast_entry = sanitize_for_json({
+            fast_entry_payload = {
                 'profile': profile,
                 'signals': signals,
                 'sparkline': sparkline,
                 'dataPointsCount': len(sparkline),
                 'isFastHydration': True
-            })
+            }
+            if include_timeseries:
+                display_timeseries = self._build_timeseries_from_enriched_df(enriched_df, period=period)
+                fast_entry_payload['timeseries'] = display_timeseries
+                fast_entry_payload['period'] = period
+                fast_entry_payload['dataPointsCount'] = len(display_timeseries)
+
+            fast_entry = sanitize_for_json(fast_entry_payload)
 
             self._analysis_cache.set(fast_cache_key, fast_entry, ttl=900)
             return ticker, fast_entry
@@ -1444,8 +1574,8 @@ class StockService:
         except Exception as e:
             return ticker, {'error': f'Error in fast analysis for {ticker}: {str(e)}'}
 
-    def fetch_fast_stock_analysis(self, tickers: list[str], force_refresh: bool = False) -> dict:
-        """Fetches lightweight market quotes, sparklines, and directional stance in parallel for sub-100ms response."""
+    def fetch_fast_stock_analysis(self, tickers: list[str], force_refresh: bool = False, period: str = '1mo', include_timeseries: bool = False) -> dict:
+        """Fetches lightweight market quotes, sparklines, and optional chart timeseries in parallel."""
         if not tickers:
             return {'error': 'No tickers provided'}
 
@@ -1458,7 +1588,7 @@ class StockService:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_ticker = {
-                executor.submit(self._process_single_ticker_fast, ticker, force_refresh): ticker
+                executor.submit(self._process_single_ticker_fast, ticker, force_refresh, period, include_timeseries): ticker
                 for ticker in cleaned_tickers
             }
             for future in concurrent.futures.as_completed(future_to_ticker):
@@ -1475,6 +1605,7 @@ class StockService:
         return sanitize_for_json({
             'stocks': results,
             'tickers': cleaned_tickers,
+            'period': period,
             'isFastHydration': True,
             'timestamp': datetime.now().isoformat()
         })
@@ -1595,13 +1726,13 @@ class StockService:
         except Exception:
             return [], {}, {}
 
-    def fetch_full_stock_analysis(self, tickers: list[str], period: str = '6mo', interval: str = '1d', force_refresh: bool = False, phase: str = 'full', include_backtests: bool = True) -> dict:
+    def fetch_full_stock_analysis(self, tickers: list[str], period: str = '6mo', interval: str = '1d', force_refresh: bool = False, phase: str = 'full', include_backtests: bool = True, include_timeseries: bool = False) -> dict:
         """
         Downloads historical market data using parallel asynchronous worker threads,
         persistent disk caching & delta updates, generates full indicator time-series, and runs backtests.
         """
         if phase == 'fast':
-            return self.fetch_fast_stock_analysis(tickers, force_refresh=force_refresh)
+            return self.fetch_fast_stock_analysis(tickers, force_refresh=force_refresh, period=period, include_timeseries=include_timeseries)
 
         if not tickers:
             return {'error': 'No tickers provided'}
@@ -1943,6 +2074,18 @@ class StockService:
         # Reclaim intermediate memory allocations from batch pre-hydration
         self.purge_expired_caches()
 
+        if sys.platform.startswith('linux'):
+            try:
+                from services.maintenance_service import maintenance_service
+                if maintenance_service.is_gunicorn_running():
+                    rss = maintenance_service.get_process_rss_mb()
+                    if rss > 250.0:
+                        logger.info(f"[StockService] Worker PID {os.getpid()} RSS reached {rss} MB after pre-hydration. Initiating graceful worker retirement.")
+                        import signal
+                        os.kill(os.getpid(), signal.SIGTERM)
+            except Exception:
+                pass
+
         return {
             "warmed_count": len(tickers),
             "duration": duration,
@@ -1994,6 +2137,8 @@ class StockService:
 
     def start_background_warmup(self):
         """Starts the background pre-hydration daemon thread if not already running."""
+        if 'pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST'):
+            return
         with self._lock:
             if self._warmup_thread is None or not self._warmup_thread.is_alive():
                 self._stop_warmup.clear()

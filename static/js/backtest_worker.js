@@ -8,7 +8,7 @@ self.onmessage = function (e) {
     const { action, timeseries, strategies, options, requestId } = data;
 
     if (action === 'simulate_matrix') {
-        if (!timeseries || !Array.isArray(timeseries) || timeseries.length < 5) {
+        if (!timeseries || !Array.isArray(timeseries) || timeseries.length < 2) {
             self.postMessage({ action: 'matrix_result', requestId, results: [] });
             return;
         }
@@ -63,7 +63,7 @@ self.onmessage = function (e) {
  * Algorithmic Strategy Backtesting Simulation
  */
 function runSimulation(rawTimeseries, strategy, options) {
-    if (!rawTimeseries || rawTimeseries.length < 5) return null;
+    if (!rawTimeseries || rawTimeseries.length < 2) return null;
 
     const tf = options.timeframe || '1y';
     const initialCapital = Number(options.initialCapital || 10000);
@@ -85,7 +85,7 @@ function runSimulation(rawTimeseries, strategy, options) {
     const barsCount = TF_BARS[tf.toLowerCase()] || 252;
     const timeseries = rawTimeseries.slice(-barsCount);
 
-    if (timeseries.length < 5) return null;
+    if (timeseries.length < 2) return null;
 
     let capital = initialCapital;
     let position = 0; // shares: >0 for Long, <0 for Short, 0 for Cash

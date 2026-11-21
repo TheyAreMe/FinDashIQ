@@ -3,10 +3,16 @@ from flask import Blueprint, jsonify, request, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from routes.helpers import (
     load_users, save_users, get_current_user_data_from_session,
-    sanitize_user, DEFAULT_WATCHLIST
+    sanitize_user, normalize_ai_settings, DEFAULT_WATCHLIST
+)
+from services.security_service import (
+    ensure_csrf_token,
+    login_protector,
+    verify_turnstile_token,
 )
 
 auth_bp = Blueprint('auth', __name__)
+MIN_PASSWORD_LENGTH = 12
 
 
 def get_current_user_data():
@@ -15,25 +21,54 @@ def get_current_user_data():
 
 @auth_bp.route('/api/auth/login', methods=['POST'])
 def api_auth_login():
-    """Authenticates user credentials and initializes session."""
+    """Authenticates user credentials with progressive backoff, optional Turnstile, and session CSRF init."""
     data = request.get_json(silent=True) or {}
     username = str(data.get('username', '')).strip().lower()
     password = str(data.get('password', ''))
+    client_ip = (request.remote_addr or 'unknown').strip()
 
     if not username or not password:
         return jsonify({"success": False, "error": "Username and password are required."}), 400
+
+    allowed, retry_after, failures = login_protector.check_allowed(client_ip, username)
+    if not allowed:
+        resp = jsonify({
+            "success": False,
+            "error": f"Too many failed login attempts. Try again in {retry_after}s.",
+            "retryAfter": retry_after,
+            "requiresChallenge": failures >= 3,
+        })
+        resp.status_code = 429
+        resp.headers["Retry-After"] = str(retry_after)
+        return resp
+
+    turnstile_ok, turnstile_err = verify_turnstile_token(data.get('turnstileToken', ''), client_ip)
+    if not turnstile_ok:
+        return jsonify({"success": False, "error": turnstile_err, "requiresChallenge": True}), 400
 
     users = load_users()
     user = users.get(username)
 
     if not user or not check_password_hash(user.get('passwordHash', ''), password):
-        return jsonify({"success": False, "error": "Invalid username or password."}), 401
+        fail_count, cooldown = login_protector.record_failure(client_ip, username)
+        err_msg = "Invalid username or password."
+        if cooldown > 0:
+            err_msg = f"Invalid username or password. Cooldown active for {cooldown}s."
+        return jsonify({
+            "success": False,
+            "error": err_msg,
+            "requiresChallenge": fail_count >= 3,
+            "retryAfter": cooldown,
+        }), 401
 
+    login_protector.record_success(client_ip, username)
     session.permanent = True
     session['username'] = username
+    csrf_token = ensure_csrf_token(session)
     return jsonify({
         "success": True,
         "message": f"Welcome back, {user.get('displayName', username)}!",
+        "csrfToken": csrf_token,
         "user": sanitize_user(user)
     }), 200
 
@@ -48,10 +83,11 @@ def api_auth_logout():
 @auth_bp.route('/api/auth/user', methods=['GET'])
 def api_auth_current_user():
     """Retrieves current session user state."""
+    csrf_token = ensure_csrf_token(session)
     user, username = get_current_user_data()
     if not user:
-        return jsonify({"authenticated": False, "user": None}), 200
-    return jsonify({"authenticated": True, "user": sanitize_user(user)}), 200
+        return jsonify({"authenticated": False, "user": None, "csrfToken": csrf_token}), 200
+    return jsonify({"authenticated": True, "user": sanitize_user(user), "csrfToken": csrf_token}), 200
 
 
 @auth_bp.route('/api/auth/update-profile', methods=['POST'])
@@ -121,23 +157,22 @@ def api_auth_update_theme():
 
 @auth_bp.route('/api/auth/update-ai-settings', methods=['POST'])
 def api_auth_update_ai_settings():
-    """Updates AI provider API key and model preference for the active authenticated user."""
+    """Updates AI provider, model, custom model override, and BYOK API keys for the active user."""
     user, username = get_current_user_data()
     if not user:
         return jsonify({"success": False, "error": "Authentication required."}), 401
 
     data = request.get_json(silent=True) or {}
-    api_key = str(data.get('apiKey', '')).strip()
-    model = str(data.get('model', 'gemini-3.7-flash')).strip() or 'gemini-3.7-flash'
-
     users = load_users()
     if username not in users:
         return jsonify({"success": False, "error": "User record not found."}), 404
 
-    users[username]['aiSettings'] = {
-        "apiKey": api_key,
-        "model": model
-    }
+    existing_ai = users[username].get('aiSettings')
+    users[username]['aiSettings'] = normalize_ai_settings(
+        data,
+        existing=existing_ai,
+        encrypt_keys=True,
+    )
     save_users(users)
     return jsonify({
         "success": True,
@@ -160,8 +195,11 @@ def api_auth_change_password():
     if not current_pass or not new_pass:
         return jsonify({"success": False, "error": "Current and new passwords are required."}), 400
 
-    if len(new_pass) < 4:
-        return jsonify({"success": False, "error": "New password must be at least 4 characters long."}), 400
+    if len(new_pass) < MIN_PASSWORD_LENGTH:
+        return jsonify({
+            "success": False,
+            "error": f"New password must be at least {MIN_PASSWORD_LENGTH} characters long."
+        }), 400
 
     users = load_users()
     target_user = users.get(username)
@@ -208,6 +246,12 @@ def api_auth_create_user():
     if len(new_username) < 3:
         return jsonify({"success": False, "error": "Username must be at least 3 characters."}), 400
 
+    if len(new_password) < MIN_PASSWORD_LENGTH:
+        return jsonify({
+            "success": False,
+            "error": f"Password must be at least {MIN_PASSWORD_LENGTH} characters long."
+        }), 400
+
     users = load_users()
     if new_username in users:
         return jsonify({"success": False, "error": f"Username '{new_username}' already exists."}), 400
@@ -228,10 +272,7 @@ def api_auth_create_user():
         "createdAt": datetime.now().isoformat(),
         "watchlist": starter_watchlist,
         "alerts": [],
-        "aiSettings": {
-            "apiKey": "",
-            "model": "gemini-3.7-flash"
-        }
+        "aiSettings": normalize_ai_settings(None)
     }
     save_users(users)
     return jsonify({

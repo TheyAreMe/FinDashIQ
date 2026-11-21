@@ -18,11 +18,16 @@ function setPreset(tickerString) {
 
     if (newTickers.length > 0) {
         state.activeTicker = newTickers[0];
+        state._renderedChartsTicker = null;
+        state._renderedChartsKey = null;
+        if (!hasValidCandleTimeseries(state.stocksData[state.activeTicker], state.currentPeriod) && typeof clearDeepDiveCharts === 'function') {
+            clearDeepDiveCharts();
+        }
         // Render immediate skeleton/cached tabs so active stock selector updates at 0ms
         renderStockSelector(newTickers);
     }
 
-    handleAnalyze(true);
+    handleAnalyze({ forceRefresh: false, cancelInFlight: true });
 }
 
 function showChartLoading(period) {
@@ -65,9 +70,10 @@ function setTimeframe(period) {
     });
 
     state._renderedChartsTicker = null;
+    state._renderedChartsKey = null;
     showChartLoading(period);
 
-    handleAnalyze(true);
+    handleAnalyze({ forceRefresh: false, cancelInFlight: true });
 }
 
 function setChartType(type) {
@@ -114,9 +120,10 @@ function setBacktestStrategy(strategyKey) {
 
 async function switchActiveStock(ticker) {
     if (!ticker) return;
-    ticker = ticker.trim().toUpperCase();
+    ticker = normalizeTicker(ticker.trim().toUpperCase());
     if (state.activeTicker !== ticker) {
         state._renderedChartsTicker = null;
+        state._renderedChartsKey = null;
     }
     state.activeTicker = ticker;
 
@@ -125,27 +132,47 @@ async function switchActiveStock(ticker) {
     });
 
     const stock = state.stocksData[ticker] || state.watchlistData?.[ticker];
+    const alreadyFetchingBatch = _isAnalyzing && _analyzingTickersSet.has(ticker) && _analyzingPeriod === state.currentPeriod;
+
     if (stock && stock.profile && !stock.error) {
         if (!state.stocksData[ticker]) {
             state.stocksData[ticker] = { ...stock };
         }
+        const activeStock = state.stocksData[ticker];
+        const hasCandles = hasValidCandleTimeseries(activeStock, state.currentPeriod);
+        if (!hasCandles && typeof clearDeepDiveCharts === 'function') {
+            clearDeepDiveCharts();
+        }
         renderActiveStock();
-        // If timeseries data not loaded yet, fetch analysis immediately
-        if (!stock.timeseries || stock.timeseries.length === 0) {
-            handleAnalyze(true);
+        const needsFullAI = !activeStock.aiAnalysis || activeStock.isFastHydration === true;
+        if ((!hasCandles || needsFullAI) && !alreadyFetchingBatch) {
+            handleAnalyze({ forceRefresh: false, cancelInFlight: true });
         }
     } else {
-        handleAnalyze(true);
+        if (typeof clearDeepDiveCharts === 'function') {
+            clearDeepDiveCharts();
+        }
+        if (!alreadyFetchingBatch) {
+            handleAnalyze({ forceRefresh: false, cancelInFlight: true });
+        }
     }
 }
 
-function hasValidCandleTimeseries(stock) {
-    if (!stock || !stock.timeseries || !Array.isArray(stock.timeseries) || stock.timeseries.length < 5) {
+function hasValidCandleTimeseries(stock, expectedPeriod = null) {
+    if (!stock || !Array.isArray(stock.timeseries) || stock.timeseries.length === 0) {
+        return false;
+    }
+    if (expectedPeriod && stock.period && String(stock.period).toLowerCase() !== String(expectedPeriod).toLowerCase()) {
         return false;
     }
     const first = stock.timeseries[0];
     const last = stock.timeseries[stock.timeseries.length - 1];
-    return typeof first?.close === 'number' && typeof first?.open === 'number' && typeof last?.close === 'number';
+    return (
+        typeof first?.open === 'number' && Number.isFinite(first.open) &&
+        typeof first?.close === 'number' && Number.isFinite(first.close) &&
+        typeof last?.open === 'number' && Number.isFinite(last.open) &&
+        typeof last?.close === 'number' && Number.isFinite(last.close)
+    );
 }
 
 function switchMainTab(tabKey) {
@@ -165,30 +192,46 @@ function switchMainTab(tabKey) {
 
     // Re-render subtab content strictly client-side without re-triggering network analysis
     if (tabKey === 'charts') {
-        const hasCandles = hasValidCandleTimeseries(stock);
+        const hasCandles = hasValidCandleTimeseries(stock, state.currentPeriod);
         if (hasCandles) {
-            // Only re-render if charts haven't been rendered yet for this ticker
-            if (!(state.charts.primary && state._renderedChartsTicker === state.activeTicker)) {
-                try {
-                    renderPrimaryChart(stock.timeseries);
-                    renderConvictionChart(stock.timeseries);
-                    renderStochChart(stock.timeseries);
-                    renderRSIChart(stock.timeseries);
-                    renderMACDChart(stock.timeseries);
-                    renderCMFChart(stock.timeseries);
-                    state._renderedChartsTicker = state.activeTicker;
-                } catch (e) {
-                    console.warn('Charts render warning:', e);
+            const activePeriod = stock.period || state.currentPeriod;
+            const expectedKey = (typeof buildChartRenderKey === 'function')
+                ? buildChartRenderKey(state.activeTicker, stock.timeseries, activePeriod)
+                : `${state.activeTicker}|${activePeriod}|${stock.timeseries.length}`;
+
+            // Only re-render if charts haven't been rendered yet for this ticker/period/dataset
+            if (!(state.charts.primary && state._renderedChartsTicker === state.activeTicker && state._renderedChartsKey === expectedKey)) {
+                if (typeof renderAllDeepDiveCharts === 'function') {
+                    renderAllDeepDiveCharts(state.activeTicker, stock.timeseries, activePeriod);
                 }
-            }
-            if (!_isAnalyzing) {
-                hideChartLoading();
+            } else {
+                if (!_isAnalyzing) {
+                    hideChartLoading();
+                }
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        window.dispatchEvent(new Event('resize'));
+                    }, 60);
+                });
             }
         } else {
-            // Full candle timeseries is still calculating in background; show spinner overlay
-            showChartLoading(state.currentPeriod);
-            if (!_isAnalyzing) {
-                handleAnalyze();
+            if (state._renderedChartsTicker && state._renderedChartsTicker !== state.activeTicker) {
+                if (typeof clearDeepDiveCharts === 'function') {
+                    clearDeepDiveCharts();
+                }
+            }
+            if (stock && (stock.error || (stock.isFastHydration === false && Array.isArray(stock.timeseries) && stock.timeseries.length === 0))) {
+                hideChartLoading();
+                const primaryContainer = document.querySelector('#primaryChartContainer');
+                if (primaryContainer) {
+                    primaryContainer.innerHTML = '<div style="padding: 36px 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">No historical chart bars available for this asset.</div>';
+                }
+            } else {
+                // Full candle timeseries is still calculating in background; show spinner overlay
+                showChartLoading(state.currentPeriod);
+                if (!_isAnalyzing) {
+                    handleAnalyze({ forceRefresh: false, cancelInFlight: false });
+                }
             }
         }
     } else if (tabKey === 'ai') {
@@ -202,16 +245,7 @@ function switchMainTab(tabKey) {
         }
     }
 
-    // Trigger resize for ApexCharts strictly after charts tab is shown and charts exist
-    if (tabKey === 'charts' && state.charts.primary) {
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                window.dispatchEvent(new Event('resize'));
-            }, 100);
-        });
-    }
-
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 function toggleMobileSubtabMenu(event) {
@@ -274,9 +308,17 @@ function updateMobileTabState(tabKey) {
 let _isAnalyzing = false;
 let _analyzeRequestId = 0;
 let _analyzeAbortController = null;
+let _analyzingTickersSet = new Set();
+let _analyzingPeriod = null;
 
-async function handleAnalyze(forceRefresh = false) {
-    if (_isAnalyzing && !forceRefresh) {
+async function handleAnalyze(optionsOrForce = false) {
+    const opts = (typeof optionsOrForce === 'object' && optionsOrForce !== null)
+        ? optionsOrForce
+        : { forceRefresh: Boolean(optionsOrForce), cancelInFlight: Boolean(optionsOrForce) };
+    const forceRefresh = Boolean(opts.forceRefresh);
+    const cancelInFlight = Boolean(opts.cancelInFlight || opts.forceRefresh);
+
+    if (_isAnalyzing && !cancelInFlight && !forceRefresh) {
         return;
     }
 
@@ -328,8 +370,8 @@ async function handleAnalyze(forceRefresh = false) {
         // Fast sanitize tickers
         let cleanedTickers = tickers.map(t => normalizeTicker(t.toUpperCase()));
 
-        // Check if any entered token is a company name (needs server resolution)
-        const needsResolution = tickers.some(t => t.includes(' ') || (t.length > 6 && !t.includes('.') && !t.includes('-')));
+        // Check if any entered token is a company name (matches backend len > 5 resolution)
+        const needsResolution = tickers.some(t => t.includes(' ') || (t.length > 5 && !t.includes('.') && !t.includes('-')));
         if (needsResolution) {
             try {
                 const resolveResp = await fetch('/api/stocks/resolve', {
@@ -362,6 +404,9 @@ async function handleAnalyze(forceRefresh = false) {
             input.value = normalizedInput;
         }
 
+        _analyzingTickersSet = new Set(tickers);
+        _analyzingPeriod = state.currentPeriod;
+
         // Ensure activeTicker is valid and points to one of the current tickers
         if (!state.activeTicker || !tickers.includes(state.activeTicker)) {
             state.activeTicker = tickers[0];
@@ -376,7 +421,17 @@ async function handleAnalyze(forceRefresh = false) {
             }
         });
 
-        if (state.stocksData[state.activeTicker]) {
+        const initialActiveStock = state.stocksData[state.activeTicker];
+        if (!hasValidCandleTimeseries(initialActiveStock, state.currentPeriod)) {
+            if (typeof clearDeepDiveCharts === 'function') {
+                clearDeepDiveCharts();
+            }
+            if (state.activeMainTab === 'charts') {
+                showChartLoading(state.currentPeriod);
+            }
+        }
+
+        if (initialActiveStock && !initialActiveStock.error) {
             renderActiveStock();
         } else {
             if (loadingOverlay) loadingOverlay.style.display = 'block';
@@ -384,16 +439,18 @@ async function handleAnalyze(forceRefresh = false) {
         }
 
         // =========================================================
-        // STAGE 1: Fast-Path Hydration (Quotes, Price Banner, Delta in <100ms)
+        // STAGE 1: Fast-Path Hydration (Quotes, Price Banner, Chart Timeseries in <200ms)
         // =========================================================
         const fastResponse = await fetch('/api/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 tickers: tickers,
-                period: '1mo',
+                period: state.currentPeriod,
                 interval: '1d',
-                phase: 'fast'
+                forceRefresh: forceRefresh,
+                phase: 'fast',
+                includeTimeseries: true
             }),
             signal: abortSignal
         });
@@ -404,16 +461,36 @@ async function handleAnalyze(forceRefresh = false) {
             const fastData = await fastResponse.json();
             if (myRequestId !== _analyzeRequestId) return;
 
+            if (Array.isArray(fastData?.tickers) && fastData.tickers.length > 0) {
+                const serverTickers = fastData.tickers.map(t => normalizeTicker(String(t || '').trim().toUpperCase())).filter(Boolean);
+                if (serverTickers.length > 0) {
+                    const changed = serverTickers.join(',') !== tickers.join(',');
+                    tickers = [...new Set(serverTickers)];
+                    _analyzingTickersSet = new Set(tickers);
+                    const inputEl = document.getElementById('tickerInput');
+                    if (changed && inputEl) {
+                        inputEl.value = tickers.join(', ');
+                    }
+                }
+            }
+
             if (fastData && fastData.stocks) {
                 Object.keys(fastData.stocks).forEach(tk => {
                     const existing = state.stocksData[tk] || {};
                     const fastStock = fastData.stocks[tk] || {};
+                    const fastHasTs = Array.isArray(fastStock.timeseries) && fastStock.timeseries.length > 0 && typeof fastStock.timeseries[0]?.open === 'number';
+                    const existingMatchesPeriod = !existing.period || existing.period === state.currentPeriod;
+                    const existingHasTs = existingMatchesPeriod && Array.isArray(existing.timeseries) && existing.timeseries.length > 0 && typeof existing.timeseries[0]?.open === 'number';
+                    const resolvedTs = fastHasTs ? fastStock.timeseries : (existingHasTs ? existing.timeseries : []);
+                    const resolvedPeriod = fastStock.period || fastData.period || (fastHasTs ? state.currentPeriod : existing.period);
+
                     state.stocksData[tk] = {
                         ...existing,
                         ...fastStock,
+                        period: resolvedPeriod,
                         sparkline: fastStock.sparkline || existing.sparkline || [],
-                        timeseries: (existing.timeseries && existing.timeseries.length > 0 && typeof existing.timeseries[0]?.open === 'number') ? existing.timeseries : [],
-                        aiAnalysis: existing.aiAnalysis || null
+                        timeseries: resolvedTs,
+                        aiAnalysis: existing.aiAnalysis || fastStock.aiAnalysis || null
                     };
                 });
 
@@ -432,6 +509,10 @@ async function handleAnalyze(forceRefresh = false) {
         // =========================================================
         // STAGE 2: Full Deep Hydration (Candlesticks, Backtests, Oscillators, AI Copilot)
         // =========================================================
+        const aiCfg = (typeof getActiveAIRequestConfig === 'function')
+            ? getActiveAIRequestConfig()
+            : { provider: 'gemini', apiKey: state.aiSettings?.apiKey || '', model: state.aiSettings?.model || 'gemini-4-hydrogen' };
+
         const fullResponse = await fetch('/api/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -441,39 +522,79 @@ async function handleAnalyze(forceRefresh = false) {
                 interval: '1d',
                 forceRefresh: forceRefresh,
                 phase: 'full',
-                apiKey: state.aiSettings.apiKey,
-                model: state.aiSettings.model
+                provider: aiCfg.provider,
+                apiKey: aiCfg.apiKey,
+                model: aiCfg.model
             }),
             signal: abortSignal
         });
 
         if (myRequestId !== _analyzeRequestId) return;
 
-        const fullData = await fullResponse.json();
+        let fullData = null;
+        try {
+            fullData = await fullResponse.json();
+        } catch (_parseErr) {
+            fullData = null;
+        }
         if (myRequestId !== _analyzeRequestId) return;
 
         if (fullResponse.ok && fullData && fullData.stocks) {
+            if (Array.isArray(fullData.tickers) && fullData.tickers.length > 0) {
+                const serverFullTickers = fullData.tickers.map(t => normalizeTicker(String(t || '').trim().toUpperCase())).filter(Boolean);
+                if (serverFullTickers.length > 0) {
+                    const changed = serverFullTickers.join(',') !== tickers.join(',');
+                    tickers = [...new Set(serverFullTickers)];
+                    _analyzingTickersSet = new Set(tickers);
+                    const inputEl = document.getElementById('tickerInput');
+                    if (changed && inputEl) {
+                        inputEl.value = tickers.join(', ');
+                    }
+                }
+            }
+
             Object.keys(fullData.stocks).forEach(tk => {
-                const stockObj = fullData.stocks[tk];
+                const existing = state.stocksData[tk] || {};
+                const stockObj = fullData.stocks[tk] || {};
                 if (stockObj && stockObj.fullTimeseries && stockObj.timeseries) {
                     delete stockObj.fullTimeseries;
                 }
+                const fullHasTs = Array.isArray(stockObj.timeseries) && stockObj.timeseries.length > 0 && typeof stockObj.timeseries[0]?.open === 'number';
+                const existingMatchesPeriod = !existing.period || existing.period === state.currentPeriod;
+                const existingHasTs = existingMatchesPeriod && Array.isArray(existing.timeseries) && existing.timeseries.length > 0 && typeof existing.timeseries[0]?.open === 'number';
+                if (!fullHasTs && existingHasTs && !stockObj.error) {
+                    stockObj.timeseries = existing.timeseries;
+                }
+                stockObj.period = stockObj.period || fullData.period || state.currentPeriod;
                 state.stocksData[tk] = stockObj;
             });
-            trimClientStockCache();
 
             if (!tickers.includes(state.activeTicker)) {
                 state.activeTicker = tickers[0] || 'AAPL';
             }
+            trimClientStockCache();
 
-            // Invalidate chart ticker cache so full candle dataset renders immediately
-            state._renderedChartsTicker = null;
+            const updatedActive = state.stocksData[state.activeTicker];
+            const nextKey = (updatedActive && typeof buildChartRenderKey === 'function')
+                ? buildChartRenderKey(state.activeTicker, updatedActive.timeseries, updatedActive.period || state.currentPeriod)
+                : null;
+            if (!nextKey || nextKey !== state._renderedChartsKey) {
+                state._renderedChartsTicker = null;
+                state._renderedChartsKey = null;
+            }
 
             renderStockSelector(tickers);
             renderActiveStock();
             evaluateAlertRules(state.stocksData);
-        } else if (!fastResponse.ok && fullData?.error) {
-            throw new Error(fullData.error || 'Failed to analyze requested stocks.');
+        } else {
+            const activeStockNow = state.stocksData[state.activeTicker];
+            if (hasValidCandleTimeseries(activeStockNow, state.currentPeriod)) {
+                if (typeof showToast === 'function') {
+                    showToast(fullData?.error || 'Full AI analysis unavailable; live chart data loaded.', 'warning');
+                }
+            } else {
+                throw new Error(fullData?.error || `Failed to analyze requested stocks (HTTP ${fullResponse.status}).`);
+            }
         }
 
     } catch (err) {
@@ -487,6 +608,8 @@ async function handleAnalyze(forceRefresh = false) {
     } finally {
         if (myRequestId === _analyzeRequestId) {
             _isAnalyzing = false;
+            _analyzingTickersSet.clear();
+            _analyzingPeriod = null;
             if (loadingOverlay) loadingOverlay.style.display = 'none';
             if (dashboardContent) dashboardContent.style.opacity = '1';
             hideChartLoading();
@@ -1014,6 +1137,20 @@ function renderAIIntelligence(ai) {
         });
     }
 
+    const confluenceEl = document.getElementById('aiConfluenceContainer');
+    if (confluenceEl && typeof renderConfluenceGauge === 'function') {
+        confluenceEl.innerHTML = ai.confluence ? renderConfluenceGauge(ai.confluence) : '';
+    }
+
+    const metaBadge = document.getElementById('aiEngineMetaBadge');
+    if (metaBadge) {
+        const meta = ai.aiMeta || {};
+        const modelLabel = (typeof formatModelName === 'function')
+            ? formatModelName(meta.model || 'builtin-quant', meta.provider)
+            : (meta.model || 'Built-in Quant');
+        metaBadge.textContent = meta.enhanced ? `${modelLabel}` : 'Built-in Quant';
+    }
+
     // 2. Executive Thesis Narrative (HTML Markdown Rendered)
     const thesisEl = document.getElementById('aiThesisText');
     if (thesisEl) {
@@ -1133,6 +1270,9 @@ function askCopilotPrompt(question) {
 }
 
 function clearCopilotChat() {
+    if (state.copilotHistory && state.activeTicker) {
+        state.copilotHistory[state.activeTicker] = [];
+    }
     const container = document.getElementById('copilotMessages');
     if (!container) return;
     container.innerHTML = `
@@ -1142,68 +1282,290 @@ function clearCopilotChat() {
     `;
 }
 
+function formatInlineMarkdown(str) {
+    let out = str;
+    const inlineCodes = [];
+    out = out.replace(/`([^`\n]+)`/g, (_m, code) => {
+        const idx = inlineCodes.length;
+        inlineCodes.push(`<code class="copilot-inline-code">${code}</code>`);
+        return `@@INLINECODE_${idx}@@`;
+    });
+    out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    out = out.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+    inlineCodes.forEach((html, idx) => {
+        out = out.replace(`@@INLINECODE_${idx}@@`, html);
+    });
+    return out;
+}
+
 function formatMarkdownResponse(text) {
     if (!text) return '';
 
-    // Bold **text**
-    let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    const escaped = (typeof escapeHtml === 'function')
+        ? escapeHtml(text)
+        : String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
 
-    // Italic *text*
-    formatted = formatted.replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>');
+    // Protect fenced code blocks first
+    const codeBlocks = [];
+    const withPlaceholders = escaped.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (_m, lang, body) => {
+        const idx = codeBlocks.length;
+        const cleanLang = lang || 'code';
+        codeBlocks.push(
+            `<div class="copilot-code-block">` +
+            `<div class="copilot-code-header"><span class="mono">${cleanLang}</span></div>` +
+            `<pre><code>${body.replace(/\n$/, '')}</code></pre>` +
+            `</div>`
+        );
+        return `\n@@CODEBLOCK_${idx}@@\n`;
+    });
 
-    // Code blocks `code`
-    formatted = formatted.replace(/`([^`]+)`/g, '<code class="mono" style="background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 4px; font-size: 0.85em;">$1</code>');
+    const lines = withPlaceholders.split(/\r?\n/);
+    const htmlParts = [];
+    let i = 0;
 
-    // Line breaks
-    formatted = formatted.replace(/\n/g, '<br>');
+    while (i < lines.length) {
+        const rawLine = lines[i];
+        const trimmed = rawLine.trim();
 
-    return formatted;
+        const blockMatch = trimmed.match(/^@@CODEBLOCK_(\d+)@@$/);
+        if (blockMatch) {
+            htmlParts.push(codeBlocks[Number(blockMatch[1])] || '');
+            i++;
+            continue;
+        }
+
+        // Markdown tables
+        if (
+            trimmed.startsWith('|') &&
+            i + 1 < lines.length &&
+            /^\|?[\s:\-|]+\|?$/.test(lines[i + 1].trim()) &&
+            lines[i + 1].includes('-')
+        ) {
+            const parseRow = (rowStr) => rowStr.replace(/^\||\|$/g, '').split('|').map(c => formatInlineMarkdown(c.trim()));
+            const headers = parseRow(trimmed);
+            i += 2;
+            const bodyRows = [];
+            while (i < lines.length && lines[i].trim().startsWith('|')) {
+                bodyRows.push(parseRow(lines[i].trim()));
+                i++;
+            }
+            const thHtml = headers.map(h => `<th>${h}</th>`).join('');
+            const trHtml = bodyRows.map(cols => `<tr>${cols.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+            htmlParts.push(`<table class="copilot-table"><thead><tr>${thHtml}</tr></thead><tbody>${trHtml}</tbody></table>`);
+            continue;
+        }
+
+        // Headings
+        const hMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
+        if (hMatch) {
+            const level = Math.min(4, Math.max(2, hMatch[1].length));
+            htmlParts.push(`<h${level}>${formatInlineMarkdown(hMatch[2])}</h${level}>`);
+            i++;
+            continue;
+        }
+
+        // Unordered list
+        if (/^(?:[-*•])\s+/.test(trimmed)) {
+            const items = [];
+            while (i < lines.length && /^(?:[-*•])\s+/.test(lines[i].trim())) {
+                items.push(`<li>${formatInlineMarkdown(lines[i].trim().replace(/^(?:[-*•])\s+/, ''))}</li>`);
+                i++;
+            }
+            htmlParts.push(`<ul>${items.join('')}</ul>`);
+            continue;
+        }
+
+        // Ordered list
+        if (/^\d+\.\s+/.test(trimmed)) {
+            const items = [];
+            while (i < lines.length && /^\d+\.\s+/.test(lines[i].trim())) {
+                items.push(`<li>${formatInlineMarkdown(lines[i].trim().replace(/^\d+\.\s+/, ''))}</li>`);
+                i++;
+            }
+            htmlParts.push(`<ol>${items.join('')}</ol>`);
+            continue;
+        }
+
+        if (!trimmed) {
+            i++;
+            continue;
+        }
+
+        const paraLines = [];
+        while (
+            i < lines.length &&
+            lines[i].trim() &&
+            !/^(#{1,4})\s+/.test(lines[i].trim()) &&
+            !/^(?:[-*•])\s+/.test(lines[i].trim()) &&
+            !/^\d+\.\s+/.test(lines[i].trim()) &&
+            !/^@@CODEBLOCK_(\d+)@@$/.test(lines[i].trim())
+        ) {
+            paraLines.push(formatInlineMarkdown(lines[i].trim()));
+            i++;
+        }
+        htmlParts.push(`<p style="margin: 0 0 6px;">${paraLines.join('<br>')}</p>`);
+    }
+
+    return `<div class="copilot-md">${htmlParts.join('')}</div>`;
+}
+
+function attachCopilotToolbar(bubbleEl, rawAnswer, metaLabel = '') {
+    if (!bubbleEl) return;
+    const oldBar = bubbleEl.querySelector('.copilot-msg-toolbar');
+    if (oldBar) oldBar.remove();
+
+    const bar = document.createElement('div');
+    bar.className = 'copilot-msg-toolbar';
+
+    const metaSpan = document.createElement('span');
+    metaSpan.textContent = metaLabel || '';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'copilot-copy-btn';
+    copyBtn.innerHTML = '<i data-lucide="copy" style="width: 11px; height: 11px;"></i><span>Copy</span>';
+    copyBtn.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(rawAnswer || bubbleEl.innerText || '');
+            copyBtn.innerHTML = '<i data-lucide="check" style="width: 11px; height: 11px;"></i><span>Copied</span>';
+            if (typeof showToast === 'function') showToast('Answer copied to clipboard.', 'success', 2200);
+        } catch (_err) {
+            if (typeof showToast === 'function') showToast('Could not access clipboard.', 'warning', 2500);
+        }
+        if (typeof refreshIcons === 'function') refreshIcons(copyBtn);
+    });
+
+    bar.appendChild(metaSpan);
+    bar.appendChild(copyBtn);
+    bubbleEl.appendChild(bar);
+    if (typeof refreshIcons === 'function') refreshIcons(bar);
 }
 
 async function askCopilot(question) {
     const container = document.getElementById('copilotMessages');
     if (!container) return;
 
-    // Append user bubble
+    const ticker = (state.activeTicker || 'STOCK').toUpperCase();
+    if (!state.copilotHistory || Array.isArray(state.copilotHistory)) {
+        state.copilotHistory = {};
+    }
+    const tickerHistory = Array.isArray(state.copilotHistory[ticker]) ? state.copilotHistory[ticker] : [];
+
     const userBubble = document.createElement('div');
     userBubble.className = 'chat-bubble chat-bubble-user';
     userBubble.textContent = question;
     container.appendChild(userBubble);
 
-    // Append AI loading bubble
     const aiBubble = document.createElement('div');
-    aiBubble.className = 'chat-bubble chat-bubble-ai';
-    aiBubble.innerHTML = `<em>Analyzing quantitative metrics...</em>`;
+    aiBubble.className = 'chat-bubble chat-bubble-ai copilot-streaming-cursor';
+    aiBubble.innerHTML = '<em>Streaming quantitative insights...</em>';
     container.appendChild(aiBubble);
     container.scrollTop = container.scrollHeight;
 
+    const stock = state.stocksData[ticker] || {};
+    if (state.isDemoMode || !state.user) {
+        const ai = stock.aiAnalysis || {};
+        const demoReply = ai.executiveThesis
+            ? `${ai.executiveThesis}
+
+*(Live multi-provider streaming requires signing in.)*`
+            : `Demo mode preview loaded for **${ticker}**. Sign in to stream multi-provider AI answers.`;
+        aiBubble.classList.remove('copilot-streaming-cursor');
+        aiBubble.innerHTML = formatMarkdownResponse(demoReply);
+        attachCopilotToolbar(aiBubble, demoReply, 'Demo Mode');
+        return;
+    }
+
+    const aiCfg = (typeof getActiveAIRequestConfig === 'function')
+        ? getActiveAIRequestConfig()
+        : { provider: 'gemini', apiKey: state.aiSettings?.apiKey || '', model: state.aiSettings?.model || 'gemini-4-hydrogen', hasKey: Boolean(state.aiSettings?.hasKey) };
+
+    const reqPayload = {
+        ticker: ticker,
+        question: question,
+        stockData: stock,
+        chatHistory: tickerHistory.slice(-8),
+        provider: aiCfg.provider,
+        apiKey: aiCfg.apiKey,
+        model: aiCfg.model
+    };
+
     try {
-        const stock = state.stocksData[state.activeTicker] || {};
-        const response = await fetch('/api/ai-chat', {
+        let answerRaw = '';
+        let activeMeta = `${aiCfg.provider || 'builtin'} · ${aiCfg.model || 'quant'}`;
+
+        const response = await fetch('/api/ai-chat/stream', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ticker: state.activeTicker,
-                question: question,
-                stockData: stock,
-                apiKey: state.aiSettings.apiKey,
-                model: state.aiSettings.model
-            })
+            body: JSON.stringify(reqPayload)
         });
 
-        const data = await response.json();
-        const answerRaw = data.answer || 'I could not generate an answer.';
-        if (answerRaw.includes('quota') || answerRaw.includes('429') || answerRaw.includes('Quota exceeded')) {
-            if (state.aiSettings.apiKey && state.aiSettings.apiKey.length > 6) {
-                updateAIBadges('quota_exceeded');
+        if (response.ok && response.body && typeof response.body.getReader === 'function') {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let buffer = '';
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const parts = buffer.split('\n\n');
+                buffer = parts.pop() || '';
+
+                for (const block of parts) {
+                    const line = block.trim();
+                    if (!line.startsWith('data:')) continue;
+                    try {
+                        const evt = JSON.parse(line.slice(5).trim());
+                        if (evt.type === 'meta') {
+                            activeMeta = `${evt.provider || aiCfg.provider} · ${evt.model || aiCfg.model}`;
+                        } else if (evt.type === 'delta' && evt.delta) {
+                            answerRaw += evt.delta;
+                            aiBubble.innerHTML = formatMarkdownResponse(answerRaw);
+                            container.scrollTop = container.scrollHeight;
+                        } else if (evt.type === 'done') {
+                            if (evt.answer) answerRaw = evt.answer;
+                            if (evt.model) activeMeta = `${evt.provider || aiCfg.provider} · ${evt.model}`;
+                        } else if (evt.type === 'error' && evt.error) {
+                            answerRaw = answerRaw || `⚠️ ${evt.error}`;
+                        }
+                    } catch (_parseErr) { }
+                }
             }
-        } else if (state.aiSettings.apiKey && state.aiSettings.apiKey.length > 6) {
+        } else {
+            const fallbackRes = await fetch('/api/ai-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reqPayload)
+            });
+            const data = await fallbackRes.json();
+            answerRaw = data.answer || data.error || 'I could not generate an answer.';
+        }
+
+        if (!answerRaw) answerRaw = 'I could not generate an answer.';
+
+        if (answerRaw.includes('quota') || answerRaw.includes('429') || answerRaw.includes('Quota exceeded')) {
+            if (aiCfg.hasKey || (aiCfg.apiKey && aiCfg.apiKey.length > 6)) updateAIBadges('quota_exceeded');
+        } else if (aiCfg.hasKey || (aiCfg.apiKey && aiCfg.apiKey.length > 6)) {
             updateAIBadges('active');
         }
-        aiBubble.innerHTML = formatMarkdownResponse(answerRaw);
 
+        aiBubble.classList.remove('copilot-streaming-cursor');
+        aiBubble.innerHTML = formatMarkdownResponse(answerRaw);
+        attachCopilotToolbar(aiBubble, answerRaw, activeMeta);
+
+        tickerHistory.push({ role: 'user', content: question });
+        tickerHistory.push({ role: 'assistant', content: answerRaw });
+        state.copilotHistory[ticker] = tickerHistory.slice(-12);
     } catch (err) {
-        aiBubble.innerHTML = `<span style="color: var(--accent-red);">Error querying AI: ${err.message}</span>`;
+        aiBubble.classList.remove('copilot-streaming-cursor');
+        const safeErr = (typeof escapeHtml === 'function') ? escapeHtml(err.message) : String(err.message || '');
+        aiBubble.innerHTML = `<span style="color: var(--accent-red);">Error querying AI: ${safeErr}</span>`;
     }
 
     container.scrollTop = container.scrollHeight;
@@ -1523,6 +1885,7 @@ async function performStockSearch(query) {
                 signal: activeSearchAbortController.signal
             });
             if (batchResp.ok) {
+                const batchData = await batchResp.json();
                 const rawResolved = batchData.resolved || [];
                 const seenBatch = new Set();
                 const resolved = [];
@@ -1574,7 +1937,7 @@ async function performStockSearch(query) {
 
                         if (stockSearchModalMode === 'alert') {
                             return `
-                                <div class="stock-search-item" onclick="handleSelectStockForAlert('${ticker}', '${name.replace(/'/g, "\\'")}')" style="cursor: pointer;">
+                                <div class="stock-search-item" data-ticker="${ticker}" data-name="${name}" onclick="handleSelectStockForAlertFromEl(this)" style="cursor: pointer;">
                                     <div class="stock-search-item-left">
                                         <div class="stock-search-ticker-badge" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.4);">${ticker}</div>
                                         <div class="stock-search-details">
@@ -1586,7 +1949,7 @@ async function performStockSearch(query) {
                                         </div>
                                     </div>
                                     <div>
-                                        <button type="button" class="btn-stock-search-add" onclick="event.stopPropagation(); handleSelectStockForAlert('${ticker}', '${name.replace(/'/g, "\\'")}')" style="background: linear-gradient(135deg, #8b5cf6, #2563eb); border-color: transparent; color: #fff;">
+                                        <button type="button" class="btn-stock-search-add" data-ticker="${ticker}" data-name="${name}" onclick="event.stopPropagation(); handleSelectStockForAlertFromEl(this)" style="background: linear-gradient(135deg, #8b5cf6, #2563eb); border-color: transparent; color: #fff;">
                                             <i data-lucide="bell-plus" style="width: 13px; height: 13px;"></i>
                                             <span>Select for Alert</span>
                                         </button>
@@ -1770,7 +2133,7 @@ async function performStockSearch(query) {
 
                 if (stockSearchModalMode === 'alert') {
                     return `
-                        <div class="stock-search-item" onclick="handleSelectStockForAlert('${ticker}', '${name.replace(/'/g, "\\'")}')" style="cursor: pointer;">
+                        <div class="stock-search-item" data-ticker="${ticker}" data-name="${name}" onclick="handleSelectStockForAlertFromEl(this)" style="cursor: pointer;">
                             <div class="stock-search-item-left">
                                 <div class="stock-search-ticker-badge" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(139, 92, 246, 0.4);">${ticker}</div>
                                 <div class="stock-search-details">
@@ -1783,7 +2146,7 @@ async function performStockSearch(query) {
                                 </div>
                             </div>
                             <div>
-                                <button type="button" class="btn-stock-search-add" onclick="event.stopPropagation(); handleSelectStockForAlert('${ticker}', '${name.replace(/'/g, "\\'")}')" style="background: linear-gradient(135deg, #8b5cf6, #2563eb); border-color: transparent; color: #fff;">
+                                <button type="button" class="btn-stock-search-add" data-ticker="${ticker}" data-name="${name}" onclick="event.stopPropagation(); handleSelectStockForAlertFromEl(this)" style="background: linear-gradient(135deg, #8b5cf6, #2563eb); border-color: transparent; color: #fff;">
                                     <i data-lucide="bell-plus" style="width: 13px; height: 13px;"></i>
                                     <span>Select for Alert</span>
                                 </button>
@@ -2111,19 +2474,29 @@ async function handleAddStockToUniverseFromModal(ticker, btnElement) {
 
 async function handleOpenDeepDiveFromModal(ticker) {
     if (!ticker) return;
-    const cleanTicker = ticker.trim().toUpperCase();
+    const cleanTicker = normalizeTicker(ticker.trim().toUpperCase());
     closeAddStockModal();
 
-    // Set input
+    if (state.activeTicker !== cleanTicker) {
+        state._renderedChartsTicker = null;
+        state._renderedChartsKey = null;
+        if (typeof clearDeepDiveCharts === 'function') {
+            clearDeepDiveCharts();
+        }
+    }
+    state.activeTicker = cleanTicker;
+
+    // Set input and immediately render tab selector
     const input = document.getElementById('tickerInput');
     if (input) input.value = cleanTicker;
+    renderStockSelector([cleanTicker]);
 
-    // Switch to deep dive tab if needed
+    // Switch to deep dive tab if needed without redundant auto-analyze
     if (state.activeTopTab !== 'terminal') {
-        switchTopTab('terminal');
+        switchTopTab('terminal', { skipAutoAnalyze: true });
     }
 
-    await handleAnalyze();
+    await handleAnalyze({ forceRefresh: false, cancelInFlight: true });
 }
 
 function handleSelectStockForBacktest(ticker) {
@@ -2387,49 +2760,6 @@ function handleDeepDiveSearchKeyDown(event) {
     }
 }
 
-async function handleAddBatchStocksModal(tickersList) {
-    if (!Array.isArray(tickersList) || tickersList.length === 0) return;
-    let addedAny = false;
-    for (const tk of tickersList) {
-        const cleanTicker = String(tk || '').trim().toUpperCase();
-        if (cleanTicker && !state.watchlistTickers.includes(cleanTicker)) {
-            state.watchlistTickers.push(cleanTicker);
-            addedAny = true;
-        }
-    }
-    if (addedAny) {
-        renderWatchlistTags();
-        await saveWatchlistServer();
-        await fetchWatchlistAnalysis();
-        closeAddStockModal();
-    }
-}
-
-async function handleAddBatchStocksUniverseModal(tickersList) {
-    if (!Array.isArray(tickersList) || tickersList.length === 0) return;
-    let addedCount = 0;
-    for (const tk of tickersList) {
-        const cleanTicker = String(tk || '').trim().toUpperCase();
-        if (!cleanTicker) continue;
-        try {
-            const res = await fetch('/api/scanner/universe/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ticker: cleanTicker })
-            });
-            if (res.ok) {
-                addedCount++;
-                if (state.scannerUniverseTickers) state.scannerUniverseTickers.add(cleanTicker);
-            }
-        } catch (e) { }
-    }
-    if (addedCount > 0) {
-        showAddUniverseAlert(`Added ${addedCount} stocks to monitoring universe.`, 'success');
-        closeAddStockModal();
-        await silentRefreshScannerCache();
-    }
-}
-
 function selectDeepDiveStock(ticker, event) {
     if (event) event.stopPropagation();
     const dropdown = document.getElementById('deepDiveSearchDropdown');
@@ -2445,14 +2775,26 @@ function selectDeepDiveStock(ticker, event) {
 
     if (parts.length <= 1) {
         input.value = cleanTicker;
+        if (state.activeTicker !== cleanTicker) {
+            state._renderedChartsTicker = null;
+            state._renderedChartsKey = null;
+        }
         state.activeTicker = cleanTicker;
         renderStockSelector([cleanTicker]);
     } else {
         parts[parts.length - 1] = cleanTicker;
         const deduplicated = [...new Set(parts.map(p => normalizeTicker(p.toUpperCase())))];
         input.value = deduplicated.join(', ');
+        if (state.activeTicker !== cleanTicker) {
+            state._renderedChartsTicker = null;
+            state._renderedChartsKey = null;
+        }
         state.activeTicker = cleanTicker;
         renderStockSelector(deduplicated);
+    }
+
+    if (!hasValidCandleTimeseries(state.stocksData[cleanTicker], state.currentPeriod) && typeof clearDeepDiveCharts === 'function') {
+        clearDeepDiveCharts();
     }
 
     const clearBtn = document.getElementById('tickerInputClearBtn');
@@ -2461,7 +2803,7 @@ function selectDeepDiveStock(ticker, event) {
     // Clear active preset buttons
     document.querySelectorAll('.preset-chip').forEach(btn => btn.classList.remove('active'));
 
-    handleAnalyze(true);
+    handleAnalyze({ forceRefresh: false, cancelInFlight: true });
 }
 
 function clearDeepDiveSearchInput() {
@@ -2499,4 +2841,4 @@ async function refreshWatchlistData() {
         if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 }
-
+

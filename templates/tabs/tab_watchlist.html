@@ -43,6 +43,12 @@
                         <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
                         <span>Defaults</span>
                     </button>
+
+                    <button type="button" class="btn-watchlist-reset" onclick="openImportExportModal('watchlist')"
+                        title="Export or import watchlist tickers as CSV or JSON">
+                        <i data-lucide="arrow-up-down" style="width: 14px; height: 14px;"></i>
+                        <span>Export / Import</span>
+                    </button>
                 </div>
 
                 <!-- View Switcher (Cards vs Table) located below action buttons -->
@@ -64,15 +70,18 @@
 
     <!-- Recommendation Cards Grid (Active when viewMode is 'cards') -->
     <div id="watchlistCardsGrid" class="watchlist-cards-grid">
-        <!-- Dynamically populated with rich recommendation mini-cards -->
-        <div class="glass-card"
-            style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted);">
-            <div class="spinner" style="margin: 0 auto 16px auto;"></div>
-            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">Loading Watchlist
-                Recommendations &amp; Quantitative Syntheses...</div>
-            <div style="font-size: 0.8rem; margin-top: 4px;">Analyzing multi-factor technical indicators, real-time news
-                catalysts, and AI conviction scores.</div>
+        <!-- Shimmer Skeleton Placeholders while hydrating -->
+        {% for _ in range(4) %}
+        <div class="skeleton-card" aria-hidden="true">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="skeleton skeleton-line tall"></div>
+                <div class="skeleton skeleton-line" style="width: 64px; height: 18px;"></div>
+            </div>
+            <div class="skeleton skeleton-chart"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line short"></div>
         </div>
+        {% endfor %}
     </div>
 
     <!-- Table Data View (Active when viewMode is 'table') -->

@@ -1,38 +1,25 @@
-import json
-import os
 from datetime import datetime
 from flask import Blueprint, jsonify, request, session
 from services.notification_service import notification_service
-from routes.helpers import (
-    load_users, save_users, get_current_user_data_from_session, ALERTS_FILE
-)
+from routes.helpers import load_users, save_users, require_auth_json
 
 alert_bp = Blueprint('alert', __name__)
 
 
-def get_current_user_data():
-    return get_current_user_data_from_session(session)
-
-
 @alert_bp.route('/api/alerts', methods=['GET', 'POST'])
 def api_alerts():
-    """Endpoint for signal change alert configurations with per-user isolation."""
-    user, username = get_current_user_data()
+    """Endpoint for signal change alert configurations with strict per-user auth & isolation."""
+    user, username, err_resp = require_auth_json(session)
+    if err_resp:
+        return err_resp
+
     users = load_users()
+    if username not in users:
+        return jsonify({"success": False, "error": "User record not found."}), 404
 
     if request.method == 'POST':
         data = request.get_json(silent=True) or {}
-        
-        if user and username in users:
-            alerts = users[username].get('alerts', [])
-        else:
-            alerts = []
-            if os.path.exists(ALERTS_FILE):
-                try:
-                    with open(ALERTS_FILE, 'r', encoding='utf-8') as f:
-                        alerts = json.load(f)
-                except Exception:
-                    alerts = []
+        alerts = list(users[username].get('alerts', []))
 
         new_alert = {
             "id": f"alert-{int(datetime.now().timestamp() * 1000)}",
@@ -48,102 +35,66 @@ def api_alerts():
             "createdAt": datetime.now().isoformat()
         }
         alerts.insert(0, new_alert)
-
-        if user and username in users:
-            users[username]['alerts'] = alerts
-            save_users(users)
-        else:
-            with open(ALERTS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(alerts, f, indent=2)
-
+        users[username]['alerts'] = alerts
+        save_users(users)
         return jsonify({"success": True, "alert": new_alert, "alerts": alerts}), 201
 
-    # GET
-    if user and username in users:
-        return jsonify({"success": True, "alerts": users[username].get('alerts', [])}), 200
-
-    if os.path.exists(ALERTS_FILE):
-        try:
-            with open(ALERTS_FILE, 'r', encoding='utf-8') as f:
-                alerts = json.load(f)
-                return jsonify({"success": True, "alerts": alerts}), 200
-        except Exception:
-            pass
-    return jsonify({"success": True, "alerts": []}), 200
+    return jsonify({"success": True, "alerts": users[username].get('alerts', [])}), 200
 
 
 @alert_bp.route('/api/alerts/<alert_id>', methods=['DELETE', 'PATCH'])
 def api_alert_item(alert_id):
-    """Toggle or delete a signal alert rule with per-user isolation."""
-    user, username = get_current_user_data()
+    """Toggle or delete a signal alert rule with strict per-user auth & isolation."""
+    user, username, err_resp = require_auth_json(session)
+    if err_resp:
+        return err_resp
+
     users = load_users()
+    if username not in users:
+        return jsonify({"success": False, "error": "User record not found."}), 404
 
-    if user and username in users:
-        alerts = users[username].get('alerts', [])
-        if request.method == 'DELETE':
-            alerts = [a for a in alerts if a.get('id') != alert_id]
-            users[username]['alerts'] = alerts
-            save_users(users)
-            return jsonify({"success": True, "alerts": alerts}), 200
+    alerts = list(users[username].get('alerts', []))
+    if request.method == 'DELETE':
+        alerts = [a for a in alerts if a.get('id') != alert_id]
+        users[username]['alerts'] = alerts
+        save_users(users)
+        return jsonify({"success": True, "alerts": alerts}), 200
 
-        if request.method == 'PATCH':
-            data = request.get_json(silent=True) or {}
-            for a in alerts:
-                if a.get('id') == alert_id:
-                    if 'active' in data:
-                        a['active'] = bool(data['active'])
-                    break
-            users[username]['alerts'] = alerts
-            save_users(users)
-            return jsonify({"success": True, "alerts": alerts}), 200
-
-    if not os.path.exists(ALERTS_FILE):
-        return jsonify({"error": "Alerts store not found"}), 404
-    try:
-        with open(ALERTS_FILE, 'r', encoding='utf-8') as f:
-            alerts = json.load(f)
-        
-        if request.method == 'DELETE':
-            alerts = [a for a in alerts if a.get('id') != alert_id]
-            with open(ALERTS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(alerts, f, indent=2)
-            return jsonify({"success": True, "alerts": alerts}), 200
-
-        if request.method == 'PATCH':
-            data = request.get_json(silent=True) or {}
-            for a in alerts:
-                if a.get('id') == alert_id:
-                    if 'active' in data:
-                        a['active'] = bool(data['active'])
-                    break
-            with open(ALERTS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(alerts, f, indent=2)
-            return jsonify({"success": True, "alerts": alerts}), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    data = request.get_json(silent=True) or {}
+    for a in alerts:
+        if a.get('id') == alert_id:
+            if 'active' in data:
+                a['active'] = bool(data['active'])
+            break
+    users[username]['alerts'] = alerts
+    save_users(users)
+    return jsonify({"success": True, "alerts": alerts}), 200
 
 
 @alert_bp.route('/api/alerts/test-trigger', methods=['POST'])
 def api_test_trigger_alert():
-    """Executes live or simulated notification dispatch across configured channels."""
+    """Executes live or simulated notification dispatch across validated channels (Auth Required)."""
+    _, _, err_resp = require_auth_json(session)
+    if err_resp:
+        return err_resp
+
     data = request.get_json(silent=True) or {}
     raw_ticker = str(data.get('ticker', 'NVDA')).strip().upper()
     is_global_watchlist = raw_ticker in ('*WATCHLIST*', 'WATCHLIST', 'ALL_WATCHLIST', 'PORTFOLIO')
     ticker = 'NVDA' if is_global_watchlist else raw_ticker
-    
+
     signal_name = data.get('signalName') or data.get('signalType', 'SuperTrend Bullish Flip')
     threshold = data.get('threshold', 'Trigger Level Reached')
     channel = data.get('channel', 'Telegram Bot')
     channel_target = data.get('channelTarget', '@quant_desk')
     category = data.get('category', 'Technical')
-    
+
     is_news = 'news' in str(signal_name).lower() or category == 'News & Catalyst'
     news_headline = data.get('newsHeadline')
     news_summary = data.get('newsSummary')
     news_publisher = data.get('newsPublisher')
     news_url = data.get('newsUrl')
-    
+
     if is_news and not news_headline:
         try:
             from services.stock_service import stock_service

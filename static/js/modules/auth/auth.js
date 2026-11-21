@@ -21,16 +21,25 @@ function closeAuthModal() {
 // =============================================================
 
 function clearUserSessionDOM() {
-    // 1. Reset Watchlist Recommendation Hub DOM immediately
+    state.isDemoMode = false;
+    const demoBanner = document.getElementById('demoModeBanner');
+    if (demoBanner) demoBanner.classList.remove('active');
+
+    // 1. Reset Watchlist Recommendation Hub DOM with shimmer skeletons (DES-2)
     const watchlistGrid = document.getElementById('watchlistCardsGrid');
     if (watchlistGrid) {
-        watchlistGrid.innerHTML = `
-            <div class="glass-card" style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted);">
-                <div class="spinner" style="margin: 0 auto 16px auto;"></div>
-                <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary);">Loading User Watchlist Recommendations...</div>
-                <div style="font-size: 0.8rem; margin-top: 4px; color: var(--text-secondary);">Initializing multi-factor technical indicators, real-time news catalysts, and AI conviction scores...</div>
+        const skeletonCards = Array.from({ length: 4 }, () => `
+            <div class="skeleton-card" aria-hidden="true">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="skeleton skeleton-line tall"></div>
+                    <div class="skeleton skeleton-line" style="width: 64px; height: 18px;"></div>
+                </div>
+                <div class="skeleton skeleton-chart"></div>
+                <div class="skeleton skeleton-line"></div>
+                <div class="skeleton skeleton-line short"></div>
             </div>
-        `;
+        `).join('');
+        watchlistGrid.innerHTML = skeletonCards;
     }
     const watchlistTags = document.getElementById('watchlistTagsList');
     if (watchlistTags) watchlistTags.innerHTML = '';
@@ -52,10 +61,10 @@ function clearUserSessionDOM() {
     if (topAlertsCount) topAlertsCount.textContent = '0 Active';
 
     // 3. Reset AI Copilot Chat Messages
-    const chatContainer = document.getElementById('copilotChatMessages');
+    const chatContainer = document.getElementById('copilotMessages');
     if (chatContainer) {
         chatContainer.innerHTML = `
-            <div class="chat-bubble-ai">
+            <div class="chat-bubble chat-bubble-ai">
                 <i data-lucide="sparkles" style="width: 14px; color: var(--accent-purple); display: inline; vertical-align: middle; margin-right: 4px;"></i>
                 FinDashIQ AI Copilot initialized. Ask anything about strategy, entry/exit levels, momentum indicators, or macro risks.
             </div>
@@ -72,7 +81,7 @@ function clearUserSessionDOM() {
     state.watchlistTickers = [];
     state.watchlistData = {};
     state.alerts = [];
-    state.copilotHistory = [];
+    state.copilotHistory = {};
     state.paperTrades = [];
     const ptBody = document.getElementById('paperTradesTableBody');
     if (ptBody) ptBody.innerHTML = '';
@@ -92,13 +101,16 @@ function setAppAuthState(isAuthenticated) {
     }
     renderUserHeader();
     syncScannerAdminControls(state.scannerResults);
-    lucide.createIcons();
+    if (typeof refreshIcons === 'function') refreshIcons(document.getElementById('topHeader') || document.body);
 }
 
 async function checkSessionUser() {
     try {
         const res = await fetch('/api/auth/user');
         const data = await res.json();
+        if (data.csrfToken && typeof updateCsrfToken === 'function') {
+            updateCsrfToken(data.csrfToken);
+        }
         if (data.authenticated && data.user) {
             state.user = data.user;
             if (data.user.theme) {
@@ -110,15 +122,12 @@ async function checkSessionUser() {
                 if (typeof initI18n === 'function') initI18n(data.user.language);
             }
             if (data.user.aiSettings) {
-                state.aiSettings = {
-                    apiKey: data.user.aiSettings.apiKey || '',
-                    model: data.user.aiSettings.model || 'gemini-3.7-flash'
-                };
+                state.aiSettings = normalizeClientAISettings(data.user.aiSettings);
+            } else {
+                state.aiSettings = normalizeClientAISettings(null);
             }
-            const apiKeyEl = document.getElementById('aiApiKeyInput');
-            const modelEl = document.getElementById('aiModelSelect');
-            if (apiKeyEl) apiKeyEl.value = state.aiSettings.apiKey;
-            if (modelEl) modelEl.value = state.aiSettings.model;
+            syncAISettingsModalUI();
+            updateAIBadges();
             syncCurrencySelects();
             if (state.user && state.user.role === 'admin') {
                 loadSystemUpdatesInfo(false);
@@ -126,13 +135,15 @@ async function checkSessionUser() {
             return true;
         } else {
             state.user = null;
-            state.aiSettings = { apiKey: '', model: 'gemini-3.7-flash' };
+            state.aiSettings = normalizeClientAISettings(null);
+            syncAISettingsModalUI();
             clearUserSessionDOM();
             return false;
         }
     } catch (e) {
         state.user = null;
-        state.aiSettings = { apiKey: '', model: 'gemini-3.7-flash' };
+        state.aiSettings = normalizeClientAISettings(null);
+        syncAISettingsModalUI();
         clearUserSessionDOM();
         return false;
     }
@@ -142,25 +153,38 @@ function renderUserHeader() {
     const container = document.getElementById('headerUserContainer');
     if (!container) return;
 
+    if (state.isDemoMode && !state.user) {
+        container.innerHTML = `
+            <button type="button" class="user-pill-btn" onclick="exitDemoMode()" title="Exit Demo Mode & Sign In">
+                <span class="user-role-badge user">DEMO</span>
+                <span class="user-pill-name">Sign In</span>
+            </button>
+        `;
+        if (typeof refreshIcons === 'function') refreshIcons(container);
+        return;
+    }
+
     if (state.user) {
-        const avatarIcon = state.user.avatar || 'user';
-        const roleLabel = (state.user.role || 'user').toUpperCase();
+        const avatarIcon = _escHtmlSafe(state.user.avatar || 'user');
+        const safeDisplay = _escHtmlSafe(state.user.displayName || state.user.username);
+        const safeUsername = _escHtmlSafe(state.user.username);
+        const roleLabel = _escHtmlSafe((state.user.role || 'user').toUpperCase());
         const roleClass = state.user.role === 'admin' ? 'admin' : 'user';
 
         container.innerHTML = `
-            <div class="user-pill-btn" onclick="toggleUserDropdown(event)" title="Signed in as ${state.user.displayName}">
+            <button type="button" class="user-pill-btn" onclick="toggleUserDropdown(event)" title="Signed in as ${safeDisplay}">
                 <div class="user-avatar-badge">
                     <i data-lucide="${avatarIcon}" style="width: 14px; height: 14px;"></i>
                 </div>
-                <span class="user-pill-name">${state.user.displayName || state.user.username}</span>
+                <span class="user-pill-name">${safeDisplay}</span>
                 <span class="user-role-badge ${roleClass}">${roleLabel}</span>
                 <i data-lucide="chevron-down" style="width: 12px; color: var(--text-muted);"></i>
-            </div>
+            </button>
 
             <div id="headerUserDropdownMenu" class="user-dropdown-menu">
                 <div class="user-dropdown-header">
-                    <div class="user-dropdown-header-name">${state.user.displayName || state.user.username}</div>
-                    <div class="user-dropdown-header-role">@${state.user.username} • ${roleLabel}</div>
+                    <div class="user-dropdown-header-name">${safeDisplay}</div>
+                    <div class="user-dropdown-header-role">@${safeUsername} • ${roleLabel}</div>
                 </div>
 
                 <button type="button" class="user-dropdown-item" onclick="openProfileModal('details')">
@@ -215,7 +239,7 @@ function renderUserHeader() {
     } else {
         container.innerHTML = ``;
     }
-    lucide.createIcons();
+    if (typeof refreshIcons === 'function') refreshIcons(container);
 }
 
 function toggleUserDropdown(e) {
@@ -223,7 +247,7 @@ function toggleUserDropdown(e) {
     const menu = document.getElementById('headerUserDropdownMenu');
     if (menu) {
         menu.classList.toggle('show');
-        lucide.createIcons();
+        if (typeof refreshIcons === 'function') refreshIcons(menu);
     }
 }
 
@@ -247,15 +271,20 @@ async function handleLogin() {
         msg.textContent = 'Authenticating terminal credentials...';
     }
 
+    const turnstileToken = document.querySelector('#authTurnstileContainer [name="cf-turnstile-response"]')?.value || '';
+
     try {
         const res = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({ username, password, turnstileToken })
         });
 
         const data = await res.json();
         if (res.ok && data.success) {
+            if (data.csrfToken && typeof updateCsrfToken === 'function') {
+                updateCsrfToken(data.csrfToken);
+            }
             // Immediately wipe any previous user session DOM & state before revealing UI
             clearUserSessionDOM();
 
@@ -269,17 +298,11 @@ async function handleLogin() {
                 if (typeof initI18n === 'function') initI18n(data.user.language);
             }
             if (data.user.aiSettings) {
-                state.aiSettings = {
-                    apiKey: data.user.aiSettings.apiKey || '',
-                    model: data.user.aiSettings.model || 'gemini-3.7-flash'
-                };
+                state.aiSettings = normalizeClientAISettings(data.user.aiSettings);
             } else {
-                state.aiSettings = { apiKey: '', model: 'gemini-3.7-flash' };
+                state.aiSettings = normalizeClientAISettings(null);
             }
-            const apiKeyEl = document.getElementById('aiApiKeyInput');
-            const modelEl = document.getElementById('aiModelSelect');
-            if (apiKeyEl) apiKeyEl.value = state.aiSettings.apiKey;
-            if (modelEl) modelEl.value = state.aiSettings.model;
+            syncAISettingsModalUI();
             updateAIBadges();
             syncCurrencySelects();
 
@@ -325,14 +348,14 @@ async function handleLogout() {
         console.error('Logout error:', e);
     }
     state.user = null;
-    state.aiSettings = { apiKey: '', model: 'gemini-3.7-flash' };
+    state.aiSettings = normalizeClientAISettings(null);
+    _modalDraftApiKeys = { gemini: '', anthropic: '', openai: '' };
 
     // Completely wipe all user-specific DOM & data immediately
     clearUserSessionDOM();
     loadPaperTrades();
 
-    const apiKeyEl = document.getElementById('aiApiKeyInput');
-    if (apiKeyEl) apiKeyEl.value = '';
+    syncAISettingsModalUI();
     updateAIBadges('none');
     closeProfileModal();
     setAppAuthState(false);
@@ -512,7 +535,7 @@ async function loadSystemUpdatesInfo(force = false) {
 function renderSystemUpdatesUI(data) {
     if (!data) return;
 
-    const currentVer = data.current_version || '0.1.5';
+    const currentVer = data.current_version || '0.1.6';
     const latestVer = data.latest_version || currentVer;
     const isUpdateAvailable = Boolean(data.update_available);
 
@@ -851,6 +874,17 @@ async function handleChangePassword() {
 
     if (!currentPassword || !newPassword) return;
 
+    if (newPassword.length < 12) {
+        if (msg) {
+            msg.style.display = 'block';
+            msg.style.background = 'rgba(239, 68, 68, 0.15)';
+            msg.style.color = '#ef4444';
+            msg.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+            msg.textContent = '❌ New password must be at least 12 characters long.';
+        }
+        return;
+    }
+
     if (newPassword !== confirmPassword) {
         if (msg) {
             msg.style.display = 'block';
@@ -912,7 +946,7 @@ async function loadAdminUsersList() {
         const res = await fetch('/api/auth/users');
         const data = await res.json();
         if (!res.ok || !data.success) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444; padding: 16px;">${data.error || 'Failed to load user directory.'}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444; padding: 16px;">${_escHtmlSafe(data.error || 'Failed to load user directory.')}</td></tr>`;
             return;
         }
 
@@ -921,28 +955,36 @@ async function loadAdminUsersList() {
             const tr = document.createElement('tr');
             const isSelf = state.user && state.user.username === u.username;
             const roleBadgeClass = u.role === 'admin' ? 'user-role-badge admin' : 'user-role-badge user';
-            const createdDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A';
+            const createdDate = _escHtmlSafe(u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A');
+            const safeUsername = _escHtmlSafe(u.username);
+            const safeDisplay = _escHtmlSafe(u.displayName || '-');
+            const safeAvatar = _escHtmlSafe(u.avatar || 'user');
+            const safeRole = _escHtmlSafe((u.role || 'user').toUpperCase());
 
             tr.innerHTML = `
-                <td style="font-weight: 700; color: #fff;">
+                <td style="font-weight: 700; color: var(--text-primary);">
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <i data-lucide="${u.avatar || 'user'}" style="width: 14px; color: ${u.role === 'admin' ? '#c084fc' : '#60a5fa'};"></i>
-                        @${u.username}
+                        <i data-lucide="${safeAvatar}" style="width: 14px; color: ${u.role === 'admin' ? '#c084fc' : '#60a5fa'};"></i>
+                        @${safeUsername}
                         ${isSelf ? '<span style="font-size: 0.65rem; color: var(--accent-cyan);">(You)</span>' : ''}
                     </div>
                 </td>
-                <td>${u.displayName || '-'}</td>
-                <td><span class="${roleBadgeClass}">${(u.role || 'user').toUpperCase()}</span></td>
+                <td>${safeDisplay}</td>
+                <td><span class="${roleBadgeClass}">${safeRole}</span></td>
                 <td style="color: var(--text-muted); font-size: 0.72rem;">${createdDate}</td>
                 <td style="text-align: right;">
-                    <button type="button" class="btn-table-delete" onclick="handleAdminDeleteUser('${u.username}')" ${isSelf ? 'disabled title="Cannot delete own active account"' : ''}>
+                    <button type="button" class="btn-table-delete" data-username="${safeUsername}" ${isSelf ? 'disabled title="Cannot delete own active account"' : ''}>
                         Delete
                     </button>
                 </td>
             `;
+            const delBtn = tr.querySelector('.btn-table-delete');
+            if (delBtn && !isSelf) {
+                delBtn.addEventListener('click', () => handleAdminDeleteUser(u.username));
+            }
             tbody.appendChild(tr);
         });
-        lucide.createIcons();
+        if (typeof refreshIcons === 'function') refreshIcons(tbody);
     } catch (e) {
         tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444; padding: 16px;">Network error loading directory.</td></tr>`;
     }
@@ -999,9 +1041,15 @@ async function handleAdminCreateUser() {
 }
 
 async function handleAdminDeleteUser(targetUsername) {
-    if (!confirm(`Are you sure you want to permanently delete the account @${targetUsername}?`)) {
-        return;
-    }
+    const confirmed = (typeof showConfirmModal === 'function')
+        ? await showConfirmModal({
+            title: 'Delete User Account',
+            message: `Are you sure you want to permanently delete the account @${targetUsername}? This action cannot be undone.`,
+            confirmText: 'Delete Account',
+            danger: true
+        })
+        : false;
+    if (!confirmed) return;
 
     const msg = document.getElementById('profileStatusMessage');
     try {
@@ -1039,43 +1087,213 @@ async function handleAdminDeleteUser(targetUsername) {
     }
 }
 
-function openAISettings() {
-    const modal = document.getElementById('aiSettingsModal');
-    const apiKeyEl = document.getElementById('aiApiKeyInput');
+let _modalDraftProvider = 'gemini';
+let _modalDraftApiKeys = { gemini: '', anthropic: '', openai: '' };
+
+function _escHtmlSafe(str) {
+    if (typeof escapeHtml === 'function') return escapeHtml(str);
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function populateAIModelDropdown(provider, selectedModel = '', liveModels = null) {
     const modelEl = document.getElementById('aiModelSelect');
+    if (!modelEl) return;
+
+    const cleanProvider = inferAIProvider(provider, selectedModel);
+    const cfg = AI_PROVIDER_CATALOG[cleanProvider] || AI_PROVIDER_CATALOG.gemini;
+    const baseModels = Array.isArray(liveModels) && liveModels.length > 0 ? liveModels : (cfg.models || []);
+    const targetModel = selectedModel || cfg.defaultModel;
+
+    modelEl.innerHTML = '';
+    let foundSelected = false;
+
+    baseModels.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.label || m.id;
+        if (m.id === targetModel) {
+            opt.selected = true;
+            foundSelected = true;
+        }
+        modelEl.appendChild(opt);
+    });
+
+    if (!foundSelected && targetModel) {
+        const customOpt = document.createElement('option');
+        customOpt.value = targetModel;
+        customOpt.textContent = `${targetModel} (Saved)`;
+        customOpt.selected = true;
+        modelEl.appendChild(customOpt);
+    }
+}
+
+function syncAISettingsModalUI(providerOverride = null, preferredModel = null) {
+    const norm = normalizeClientAISettings(state.aiSettings);
+    const provider = providerOverride ? inferAIProvider(providerOverride, preferredModel) : norm.provider;
+    const cfg = AI_PROVIDER_CATALOG[provider] || AI_PROVIDER_CATALOG.gemini;
+
+    const providerEl = document.getElementById('aiProviderSelect');
+    const customModelEl = document.getElementById('aiCustomModelInput');
+    const apiKeyEl = document.getElementById('aiApiKeyInput');
+    const apiKeyLabelEl = document.getElementById('aiApiKeyLabel');
+    const docsLinkEl = document.getElementById('aiProviderDocsLink');
+    const hintEl = document.getElementById('aiSavedKeyHint');
+    const clearBtn = document.getElementById('btnClearAIKey');
+
+    _modalDraftProvider = provider;
+    if (providerOverride === null) {
+        _modalDraftApiKeys = { ...norm.apiKeys };
+    }
+
+    const serverConfigured = Boolean(norm.configuredProviders && norm.configuredProviders[provider]);
+    const keyHint = (norm.keyHints && norm.keyHints[provider]) || (provider === norm.provider ? norm.keyHint : '');
+
+    if (providerEl) providerEl.value = provider;
+    populateAIModelDropdown(provider, preferredModel || (provider === norm.provider ? norm.model : cfg.defaultModel));
+    if (customModelEl && providerOverride === null) {
+        customModelEl.value = norm.customModel || '';
+    }
+    if (apiKeyLabelEl) apiKeyLabelEl.textContent = cfg.keyLabel;
+    if (apiKeyEl) {
+        apiKeyEl.placeholder = serverConfigured
+            ? `Saved on server (${keyHint || '••••'}) — leave blank to keep`
+            : cfg.keyPlaceholder;
+        apiKeyEl.value = _modalDraftApiKeys[provider] || '';
+    }
+    if (hintEl) {
+        if (serverConfigured) {
+            hintEl.style.display = 'flex';
+            const txtSpan = hintEl.querySelector('#aiSavedKeyHintText');
+            if (txtSpan) txtSpan.textContent = `Encrypted server key active (${keyHint || '••••'})`;
+        } else {
+            hintEl.style.display = 'none';
+        }
+    }
+    if (clearBtn) {
+        clearBtn.style.display = serverConfigured ? 'inline-flex' : 'none';
+    }
+    if (docsLinkEl) {
+        docsLinkEl.href = cfg.docsUrl;
+        docsLinkEl.textContent = `${cfg.docsLabel} →`;
+    }
+}
+
+function onAIProviderChange() {
+    const providerEl = document.getElementById('aiProviderSelect');
+    const apiKeyEl = document.getElementById('aiApiKeyInput');
+    const customModelEl = document.getElementById('aiCustomModelInput');
     const statusEl = document.getElementById('aiTestStatus');
 
-    // Close user dropdown if open
-    document.getElementById('headerUserDropdownMenu')?.classList.remove('show');
+    if (apiKeyEl && _modalDraftProvider) {
+        _modalDraftApiKeys[_modalDraftProvider] = apiKeyEl.value.trim();
+    }
 
-    if (apiKeyEl) apiKeyEl.value = state.aiSettings.apiKey;
-    if (modelEl) modelEl.value = state.aiSettings.model || 'gemini-3.7-flash';
+    const nextProvider = providerEl?.value || 'gemini';
+    if (customModelEl) customModelEl.value = '';
     if (statusEl) {
         statusEl.style.display = 'none';
         statusEl.textContent = '';
     }
-    if (modal) modal.style.display = 'flex';
+    syncAISettingsModalUI(nextProvider);
+}
+
+async function fetchLiveAIModels() {
+    const provider = document.getElementById('aiProviderSelect')?.value || 'gemini';
+    const apiKey = document.getElementById('aiApiKeyInput')?.value.trim() || '';
+    const btn = document.getElementById('btnFetchAIModels');
+    const statusEl = document.getElementById('aiTestStatus');
+    const currentModel = document.getElementById('aiModelSelect')?.value || '';
+
+    if (btn) btn.disabled = true;
+    try {
+        const res = await fetch('/api/ai/models', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider, apiKey })
+        });
+        const data = await res.json();
+        if (res.ok && data.success && Array.isArray(data.models) && data.models.length > 0) {
+            populateAIModelDropdown(provider, currentModel, data.models);
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.style.background = 'rgba(16, 185, 129, 0.12)';
+                statusEl.style.color = '#10b981';
+                statusEl.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+                statusEl.innerHTML = `✅ Loaded <strong>${data.models.length}</strong> live models from ${_escHtmlSafe(AI_PROVIDER_CATALOG[provider]?.name || provider)}.`;
+            }
+        } else if (statusEl) {
+            statusEl.style.display = 'block';
+            statusEl.style.background = 'rgba(245, 158, 11, 0.12)';
+            statusEl.style.color = '#f59e0b';
+            statusEl.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+            statusEl.innerHTML = `⚠️ ${_escHtmlSafe(data.error || 'Could not fetch live model list; showing curated defaults.')}`;
+        }
+    } catch (err) {
+        if (statusEl) {
+            statusEl.style.display = 'block';
+            statusEl.style.background = 'rgba(239, 68, 68, 0.15)';
+            statusEl.style.color = '#ef4444';
+            statusEl.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+            statusEl.innerHTML = `❌ <strong>Network Error:</strong> ${_escHtmlSafe(err.message)}`;
+        }
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+function openAISettings() {
+    const modal = document.getElementById('aiSettingsModal');
+    const statusEl = document.getElementById('aiTestStatus');
+
+    document.getElementById('headerUserDropdownMenu')?.classList.remove('show');
+
+    syncAISettingsModalUI(null);
+    if (statusEl) {
+        statusEl.style.display = 'none';
+        statusEl.textContent = '';
+    }
+    if (typeof openAccessibleModal === 'function') {
+        openAccessibleModal(modal, 'flex');
+    } else if (modal) {
+        modal.style.display = 'flex';
+    }
+    if (typeof refreshIcons === 'function') refreshIcons(modal);
 }
 
 function closeAISettings() {
     const modal = document.getElementById('aiSettingsModal');
-    if (modal) modal.style.display = 'none';
+    if (typeof closeAccessibleModal === 'function') {
+        closeAccessibleModal(modal);
+    } else if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 async function testAIConnection() {
-    const apiKey = document.getElementById('aiApiKeyInput')?.value.trim();
-    const model = document.getElementById('aiModelSelect')?.value || 'gemini-3.7-flash';
+    const provider = document.getElementById('aiProviderSelect')?.value || 'gemini';
+    const apiKey = document.getElementById('aiApiKeyInput')?.value.trim() || '';
+    const customModel = document.getElementById('aiCustomModelInput')?.value.trim() || '';
+    const selectedModel = document.getElementById('aiModelSelect')?.value || (AI_PROVIDER_CATALOG[provider]?.defaultModel || 'gemini-4-hydrogen');
+    const model = customModel || selectedModel;
+    const providerName = AI_PROVIDER_CATALOG[provider]?.name || provider;
     const statusEl = document.getElementById('aiTestStatus');
     const btn = document.getElementById('btnTestAI');
 
     if (!statusEl) return;
 
-    if (!apiKey) {
+    const norm = normalizeClientAISettings(state.aiSettings);
+    const hasSaved = Boolean(norm.configuredProviders && norm.configuredProviders[provider]);
+    if (!apiKey && !hasSaved) {
         statusEl.style.display = 'block';
         statusEl.style.background = 'rgba(239, 68, 68, 0.15)';
         statusEl.style.color = '#ef4444';
         statusEl.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-        statusEl.innerHTML = '⚠️ Please paste a Google Gemini API Key first.';
+        statusEl.innerHTML = `⚠️ Please paste a ${_escHtmlSafe(providerName)} API Key first.`;
         return;
     }
 
@@ -1084,13 +1302,13 @@ async function testAIConnection() {
     statusEl.style.background = 'rgba(59, 130, 246, 0.15)';
     statusEl.style.color = '#60a5fa';
     statusEl.style.border = '1px solid rgba(59, 130, 246, 0.3)';
-    statusEl.innerHTML = `<em>Testing connection to Google ${model}...</em>`;
+    statusEl.innerHTML = `<em>Testing connection to ${_escHtmlSafe(providerName)} (${_escHtmlSafe(model)})...</em>`;
 
     try {
-        const res = await fetch('/api/test-gemini', {
+        const res = await fetch('/api/test-ai', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ apiKey, model })
+            body: JSON.stringify({ provider, apiKey, model })
         });
 
         let data;
@@ -1102,85 +1320,195 @@ async function testAIConnection() {
         }
 
         if (data.models && data.models.length > 0) {
-            let html = `<div style="font-weight: 700; margin-bottom: 6px; color: #fff;">Diagnostic Results per Model:</div>`;
+            let html = `<div style="font-weight: 700; margin-bottom: 6px; color: var(--text-primary);">Diagnostic Results (${_escHtmlSafe(providerName)}):</div>`;
             data.models.forEach(m => {
                 let row = '';
+                const safeModel = _escHtmlSafe(m.model);
+                const rawMsg = String(m.message || '');
+                const shortMsg = _escHtmlSafe(rawMsg.length > 140 ? `${rawMsg.slice(0, 140)}...` : rawMsg);
                 if (m.status === 'online') {
-                    row = `<span style="color: #10b981;">✅ <strong>${m.model}</strong>: Active &amp; Responding</span>`;
+                    row = `<span style="color: #10b981;">✅ <strong>${safeModel}</strong>: Active &amp; Responding</span>`;
+                } else if (m.status === 'quota_zero') {
+                    row = `<span style="color: #f59e0b;">💳 <strong>${safeModel}</strong>: Paid Tier / Billing Required (Free Tier quota is 0) — switch to Gemini 4 Hydrogen or Gemini 3.8 Flash</span>`;
+                } else if (m.status === 'overloaded') {
+                    row = `<span style="color: #f59e0b;">⏳ <strong>${safeModel}</strong>: Temporary High Demand (503) — traffic spike at provider; fallback model handles queries automatically</span>`;
                 } else if (m.status === 'rate_limited') {
-                    row = `<span style="color: #f59e0b;">⏳ <strong>${m.model}</strong>: Rate Limited / Free Tier Quota Exceeded</span>`;
+                    row = `<span style="color: #f59e0b;">⏳ <strong>${safeModel}</strong>: Rate Limited / Quota Exceeded${shortMsg ? ` — <span style="opacity:0.85;">${shortMsg}</span>` : ''}</span>`;
+                } else if (m.status === 'timeout') {
+                    row = `<span style="color: #ef4444;">⏱️ <strong>${safeModel}</strong>: Request timed out (high latency on reasoning tier — try Gemini 3.8 Flash or Gemini 3.1 Flash-Lite)</span>`;
                 } else {
-                    row = `<span style="color: #ef4444;">❌ <strong>${m.model}</strong>: ${m.message}</span>`;
+                    row = `<span style="color: #ef4444;">❌ <strong>${safeModel}</strong>: ${shortMsg}</span>`;
                 }
                 html += `<div style="padding: 3px 0; font-size: 0.78rem;">${row}</div>`;
             });
 
-            if (data.models && data.models.length > 0) {
-                const currentTested = data.models.find(m => m.model === model) || data.models[0];
-                if (currentTested && currentTested.status === 'rate_limited') {
-                    updateAIBadges('quota_exceeded');
-                } else if (currentTested && currentTested.status === 'online') {
-                    updateAIBadges('active');
-                }
-            } else if (res.ok && data.success) {
-                updateAIBadges('active');
-            }
-
             if (data.success) {
                 statusEl.style.background = 'rgba(16, 185, 129, 0.12)';
-                statusEl.style.color = '#e2e8f0';
+                statusEl.style.color = 'var(--text-primary)';
                 statusEl.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-                html += `<div style="margin-top: 8px; font-size: 0.76rem; color: #10b981; border-top: 1px solid rgba(16,185,129,0.2); padding-top: 6px;"><strong>✨ Auto-Fallback Active:</strong> If your selected model is rate-limited, queries will seamlessly route to an active fallback model.</div>`;
+                html += `<div style="margin-top: 8px; font-size: 0.76rem; color: #10b981; border-top: 1px solid rgba(16,185,129,0.2); padding-top: 6px;"><strong>✨ Auto-Fallback Active:</strong> If your selected model is rate-limited, queries automatically route to the provider's fallback tier.</div>`;
+            } else if (data.keyValid) {
+                const countHint = data.availableModelsCount ? ` (${data.availableModelsCount} live models accessible)` : '';
+                statusEl.style.background = 'rgba(245, 158, 11, 0.12)';
+                statusEl.style.color = 'var(--text-primary)';
+                statusEl.style.border = '1px solid rgba(245, 158, 11, 0.35)';
+                html += `<div style="margin-top: 8px; font-size: 0.76rem; color: #f59e0b; border-top: 1px solid rgba(245,158,11,0.25); padding-top: 6px;"><strong>🔑 API Key Verified${_escHtmlSafe(countHint)}:</strong> Your key is valid, but the tested model hit billing quota or latency limits. Click <strong>Fetch Live Models</strong> or choose <strong>Gemini 3.8 Flash</strong> / <strong>Gemini 3.1 Flash-Lite</strong>.</div>`;
             } else {
                 statusEl.style.background = 'rgba(239, 68, 68, 0.12)';
-                statusEl.style.color = '#e2e8f0';
+                statusEl.style.color = 'var(--text-primary)';
                 statusEl.style.border = '1px solid rgba(239, 68, 68, 0.3)';
             }
             statusEl.innerHTML = html;
         } else if (res.ok && data.success) {
-            updateAIBadges('active');
             statusEl.style.background = 'rgba(16, 185, 129, 0.15)';
             statusEl.style.color = '#10b981';
             statusEl.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-            statusEl.innerHTML = `✅ <strong>Connected!</strong> Google Gemini API verified with ${model}.`;
+            statusEl.innerHTML = `✅ <strong>Connected!</strong> ${_escHtmlSafe(providerName)} verified with ${_escHtmlSafe(model)}.`;
         } else {
             statusEl.style.background = 'rgba(239, 68, 68, 0.15)';
             statusEl.style.color = '#ef4444';
             statusEl.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-            statusEl.innerHTML = `❌ <strong>Error:</strong> ${data.error || 'Connection failed.'}`;
+            statusEl.innerHTML = `❌ <strong>Error:</strong> ${_escHtmlSafe(data.error || 'Connection failed.')}`;
         }
     } catch (err) {
         statusEl.style.background = 'rgba(239, 68, 68, 0.15)';
         statusEl.style.color = '#ef4444';
         statusEl.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-        statusEl.innerHTML = `❌ <strong>Network Error:</strong> ${err.message}`;
+        statusEl.innerHTML = `❌ <strong>Network Error:</strong> ${_escHtmlSafe(err.message)}`;
     } finally {
         if (btn) btn.disabled = false;
     }
 }
 
 async function saveAISettings() {
+    const provider = document.getElementById('aiProviderSelect')?.value || 'gemini';
     const key = document.getElementById('aiApiKeyInput')?.value.trim() || '';
-    const model = document.getElementById('aiModelSelect')?.value || 'gemini-3.7-flash';
-    state.aiSettings.apiKey = key;
-    state.aiSettings.model = model;
+    const model = document.getElementById('aiModelSelect')?.value || (AI_PROVIDER_CATALOG[provider]?.defaultModel || 'gemini-4-hydrogen');
+    const customModel = document.getElementById('aiCustomModelInput')?.value.trim() || '';
+
+    _modalDraftApiKeys[provider] = key;
+    const savePayload = {
+        provider: provider,
+        model: model,
+        customModel: customModel
+    };
+    if (key) savePayload.apiKey = key;
+    const nonEmptyDrafts = {};
+    Object.keys(_modalDraftApiKeys).forEach(k => {
+        if (_modalDraftApiKeys[k]) nonEmptyDrafts[k] = _modalDraftApiKeys[k];
+    });
+    if (Object.keys(nonEmptyDrafts).length > 0) {
+        savePayload.apiKeys = nonEmptyDrafts;
+    }
+
+    try {
+        sessionStorage.removeItem('findashiq_ai_status_cache');
+    } catch (e) { }
 
     if (state.user) {
-        state.user.aiSettings = { apiKey: key, model: model };
         try {
-            await fetch('/api/auth/update-ai-settings', {
+            const res = await fetch('/api/auth/update-ai-settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ apiKey: key, model: model })
+                body: JSON.stringify(savePayload)
             });
+            const data = await res.json();
+            if (res.ok && data.user) {
+                state.user = data.user;
+                state.aiSettings = normalizeClientAISettings(data.user.aiSettings);
+                _modalDraftApiKeys = { gemini: '', anthropic: '', openai: '' };
+            }
         } catch (e) {
             console.error('Error saving AI settings to user account:', e);
         }
+    } else {
+        state.aiSettings = normalizeClientAISettings(savePayload);
     }
 
     closeAISettings();
+    syncAISettingsModalUI(null);
     await checkInitialAIStatus();
-    handleAnalyze();
+    if (typeof showToast === 'function') {
+        showToast('AI provider & model settings saved.', 'success');
+    }
+    if (state.activeTopTab === 'terminal' && state.activeTicker && typeof handleAnalyze === 'function') {
+        handleAnalyze();
+    }
+}
+
+async function clearSavedProviderKey() {
+    const provider = document.getElementById('aiProviderSelect')?.value || 'gemini';
+    const model = document.getElementById('aiModelSelect')?.value || (AI_PROVIDER_CATALOG[provider]?.defaultModel || 'gemini-4-hydrogen');
+    const customModel = document.getElementById('aiCustomModelInput')?.value.trim() || '';
+    const providerName = AI_PROVIDER_CATALOG[provider]?.name || provider;
+
+    _modalDraftApiKeys[provider] = '';
+    const apiKeyEl = document.getElementById('aiApiKeyInput');
+    if (apiKeyEl) apiKeyEl.value = '';
+
+    if (state.user) {
+        try {
+            const res = await fetch('/api/auth/update-ai-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider, model, customModel, clearKey: true })
+            });
+            const data = await res.json();
+            if (res.ok && data.user) {
+                state.user = data.user;
+                state.aiSettings = normalizeClientAISettings(data.user.aiSettings);
+            }
+        } catch (e) {
+            console.error('Error clearing AI key:', e);
+        }
+    }
+    try { sessionStorage.removeItem('findashiq_ai_status_cache'); } catch (_e) { }
+    syncAISettingsModalUI(provider);
+    updateAIBadges();
+    if (typeof showToast === 'function') {
+        showToast(`Cleared saved ${providerName} API key.`, 'info');
+    }
+}
+
+async function enterDemoMode() {
+    try {
+        const res = await fetch('/api/demo/showcase');
+        const data = await res.json();
+        if (!res.ok || !data.success || !data.stocks) {
+            throw new Error(data.error || 'Could not load demo showcase.');
+        }
+
+        state.user = null;
+        state.isDemoMode = true;
+        state.watchlistTickers = Array.isArray(data.tickers) ? data.tickers : Object.keys(data.stocks);
+        state.watchlistData = data.stocks;
+        state.stocksData = { ...data.stocks };
+        state.activeTicker = state.watchlistTickers[0] || 'NVDA';
+
+        const authScreen = document.getElementById('authScreen');
+        const mainApp = document.getElementById('mainAppContainer');
+        const demoBanner = document.getElementById('demoModeBanner');
+        if (authScreen) authScreen.style.display = 'none';
+        if (mainApp) mainApp.style.display = 'block';
+        if (demoBanner) demoBanner.classList.add('active');
+
+        renderUserHeader();
+        updateAIBadges('none');
+        if (typeof renderWatchlist === 'function') renderWatchlist();
+        if (typeof renderActiveStock === 'function') renderActiveStock();
+        if (typeof showToast === 'function') {
+            showToast('Exploring read-only Live Demo showcase. Sign in to run live market updates.', 'info');
+        }
+    } catch (err) {
+        if (typeof showToast === 'function') showToast(err.message || 'Demo showcase unavailable.', 'error');
+    }
+}
+
+function exitDemoMode() {
+    state.isDemoMode = false;
+    const demoBanner = document.getElementById('demoModeBanner');
+    if (demoBanner) demoBanner.classList.remove('active');
+    setAppAuthState(false);
 }
 
 // -------------------------------------------------------------
@@ -1259,14 +1587,33 @@ function renderMaintenanceUI(data) {
         uptimeSub.textContent = `Uptime: ${data.uptime.uptime_formatted || '0m'}${pidStr} • Time: ${data.timestamp || ''}`;
     }
 
-    // Process RSS RAM Card
+    // Process / Cluster RAM Card
+    const ramCardLabel = document.getElementById('maintRamCardLabel');
     const rssVal = document.getElementById('maintProcessRssVal');
-    if (rssVal && typeof data.process_memory_mb === 'number') {
-        rssVal.textContent = `${data.process_memory_mb.toFixed(1)} MB`;
-        if (data.process_memory_mb > 600) {
-            rssVal.style.color = 'var(--accent-amber)';
-        } else {
-            rssVal.style.color = 'var(--text-primary)';
+    const rssSub = document.getElementById('maintProcessRssSub');
+
+    if (data.gunicorn_cluster) {
+        const cluster = data.gunicorn_cluster;
+        if (ramCardLabel) ramCardLabel.textContent = 'Gunicorn Cluster RAM';
+        if (rssVal) {
+            rssVal.textContent = `${cluster.total_cluster_rss_mb.toFixed(0)} MB`;
+            rssVal.style.color = cluster.total_cluster_rss_mb > 700 ? 'var(--accent-amber)' : 'var(--text-primary)';
+        }
+        if (rssSub) {
+            const currentRss = typeof data.process_memory_mb === 'number' ? data.process_memory_mb.toFixed(0) : '--';
+            rssSub.textContent = `${cluster.worker_count} workers (${currentRss} MB current) + master`;
+            if (Array.isArray(cluster.workers)) {
+                rssSub.title = cluster.workers.map(w => `PID ${w.pid}: ${w.rss_mb} MB${w.is_current ? ' [current]' : ''}`).join(', ');
+            }
+        }
+    } else {
+        if (ramCardLabel) ramCardLabel.textContent = 'Server Process RAM';
+        if (rssVal && typeof data.process_memory_mb === 'number') {
+            rssVal.textContent = `${data.process_memory_mb.toFixed(1)} MB`;
+            rssVal.style.color = data.process_memory_mb > 500 ? 'var(--accent-amber)' : 'var(--text-primary)';
+        }
+        if (rssSub) {
+            rssSub.textContent = 'Resident physical memory';
         }
     }
 
@@ -1336,18 +1683,27 @@ async function handle1ClickOptimize() {
             banner.style.background = 'rgba(16, 185, 129, 0.08)';
             banner.style.borderColor = 'rgba(16, 185, 129, 0.25)';
             banner.style.color = '#34d399';
-            bannerMsg.innerHTML = `<i data-lucide="check-circle-2" style="width: 16px; height: 16px; color: #10b981; display: inline-block; vertical-align: middle; margin-right: 6px;"></i> <span>RAM Optimization completed!</span>`;
+            
+            if (data.gunicorn_recycled) {
+                bannerMsg.innerHTML = `<i data-lucide="check-circle-2" style="width: 16px; height: 16px; color: #10b981; display: inline-block; vertical-align: middle; margin-right: 6px;"></i> <span>Memory Optimized &amp; Rolling Worker Recycle Initiated!</span>`;
+            } else {
+                bannerMsg.innerHTML = `<i data-lucide="check-circle-2" style="width: 16px; height: 16px; color: #10b981; display: inline-block; vertical-align: middle; margin-right: 6px;"></i> <span>RAM Optimization completed!</span>`;
+            }
 
             if (statsPills) {
                 const reclaimed = data.reclaimed_mb || 0;
                 const before = data.before_rss_mb || 0;
                 const after = data.after_rss_mb || 0;
                 const pruned = (data.pruned_files?.ai || 0) + (data.pruned_files?.news || 0);
+                const recycleBadge = data.gunicorn_recycled
+                    ? `<span class="badge-pill badge-bullish" style="font-size: 0.72rem;">Rolling Worker Recycle (0s Downtime)</span>`
+                    : '';
 
                 statsPills.innerHTML = `
-                    <span class="badge-pill badge-bullish" style="font-weight: 700; font-size: 0.72rem;">Reclaimed: ${reclaimed} MB</span>
-                    <span class="badge-pill badge-neutral" style="font-size: 0.72rem;">${before} MB ➔ ${after} MB</span>
+                    <span class="badge-pill badge-bullish" style="font-weight: 700; font-size: 0.72rem;">Heap Trimmed: ${reclaimed} MB</span>
+                    <span class="badge-pill badge-neutral" style="font-size: 0.72rem;">Worker: ${before} MB ➔ ${after} MB</span>
                     <span class="badge-pill badge-neutral" style="font-size: 0.72rem;">Pruned: ${pruned} files</span>
+                    ${recycleBadge}
                 `;
             }
 
@@ -1356,8 +1712,10 @@ async function handle1ClickOptimize() {
             }
         }
 
-        // Re-load telemetry to update the stat cards
-        await loadMaintenanceStatus(true);
+        // Wait a brief moment to allow rolling reload to start, then refresh telemetry
+        setTimeout(async () => {
+            await loadMaintenanceStatus(true);
+        }, 1200);
 
     } catch (err) {
         console.error('RAM optimize error:', err);
@@ -1543,4 +1901,10 @@ if (typeof window !== 'undefined') {
     window.loadMaintenanceStatus = loadMaintenanceStatus;
     window.handle1ClickOptimize = handle1ClickOptimize;
     window.handleSoftRestart = handleSoftRestart;
+    window.onAIProviderChange = onAIProviderChange;
+    window.fetchLiveAIModels = fetchLiveAIModels;
+    window.syncAISettingsModalUI = syncAISettingsModalUI;
+    window.clearSavedProviderKey = clearSavedProviderKey;
+    window.enterDemoMode = enterDemoMode;
+    window.exitDemoMode = exitDemoMode;
 }

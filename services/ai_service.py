@@ -3,13 +3,161 @@ import json
 import math
 import os
 import re
-import socket
 import time
-import urllib.error
-import urllib.request
 import numpy as np
 import pandas as pd
+import requests
 from services.cache_utils import BoundedTTLCache
+
+
+DEFAULT_AI_PROVIDER = "gemini"
+DEFAULT_AI_MODEL = "gemini-4-hydrogen"
+
+AI_PROVIDER_CATALOG = {
+    "gemini": {
+        "id": "gemini",
+        "name": "Google Gemini",
+        "shortName": "Gemini",
+        "envVar": "GEMINI_API_KEY",
+        "defaultModel": "gemini-4-hydrogen",
+        "fallbackModels": [
+            "gemini-4-hydrogen",
+            "gemini-3.8-flash",
+            "gemini-3.1-flash-lite",
+            "gemini-2.5-flash",
+        ],
+        "keyPlaceholder": "AIzaSy...",
+        "keyHint": "Saved to your profile & browser session. Sent only to Google Gemini API.",
+        "docsUrl": "https://aistudio.google.com/app/apikey",
+        "docsLabel": "Get Key at Google AI Studio",
+        "models": [
+            {
+                "id": "gemini-4-hydrogen",
+                "label": "Gemini 4 Hydrogen (Fast & Recommended)",
+                "tier": "Fast / Default",
+                "description": "Unified 1M context, fast everyday reasoning & free-tier friendly."
+            },
+            {
+                "id": "gemini-4-neon",
+                "label": "Gemini 4 Neon (Balanced Frontier — Paid Tier)",
+                "tier": "Paid Frontier",
+                "description": "Requires paid billing tier on Google AI Studio; balanced frontier reasoning."
+            },
+            {
+                "id": "gemini-4-carbon",
+                "label": "Gemini 4 Carbon (Flagship Reasoning — Paid Tier)",
+                "tier": "Paid Flagship",
+                "description": "Requires paid billing tier; deepest logical reasoning for complex synthesis."
+            },
+            {
+                "id": "gemini-4-argon",
+                "label": "Gemini 4 Argon (Long-Horizon Frontier — Paid Tier)",
+                "tier": "Paid Long-Horizon",
+                "description": "Requires paid billing tier; general frontier and long-horizon model."
+            },
+            {
+                "id": "gemini-3.8-flash",
+                "label": "Gemini 3.8 Flash (Fast Free-Tier Fallback)",
+                "tier": "Free Tier / Fast",
+                "description": "Active high-speed Flash model with generous Google AI Studio free-tier quota."
+            },
+            {
+                "id": "gemini-3.1-flash-lite",
+                "label": "Gemini 3.1 Flash-Lite (Ultra-Low Latency Free Tier)",
+                "tier": "Free Tier / Ultra-Fast",
+                "description": "Lowest-latency model ideal for instant Copilot Q&A and high-frequency testing."
+            },
+            {
+                "id": "gemini-2.5-flash",
+                "label": "Gemini 2.5 Flash (Stable Legacy Free Tier)",
+                "tier": "Free Tier / Stable",
+                "description": "Previous-generation Flash model retained for free-tier backwards compatibility."
+            },
+        ],
+    },
+    "anthropic": {
+        "id": "anthropic",
+        "name": "Anthropic Claude",
+        "shortName": "Claude",
+        "envVar": "ANTHROPIC_API_KEY",
+        "defaultModel": "claude-sonnet-5-5",
+        "fallbackModels": ["claude-sonnet-5-5", "claude-haiku-5-5"],
+        "keyPlaceholder": "sk-ant-...",
+        "keyHint": "Saved to your profile & browser session. Sent only to Anthropic API.",
+        "docsUrl": "https://console.anthropic.com/settings/keys",
+        "docsLabel": "Get Key at Anthropic Console",
+        "models": [
+            {
+                "id": "claude-sonnet-5-5",
+                "label": "Claude Sonnet 5.5 (Balanced & Recommended)",
+                "tier": "Balanced / Default",
+                "description": "Optimal balance of analytical depth, clarity, and speed."
+            },
+            {
+                "id": "claude-haiku-5-5",
+                "label": "Claude Haiku 5.5 (Fast & Low-Latency)",
+                "tier": "Fast / Low-Latency",
+                "description": "Designed for high-volume, latency-sensitive requests."
+            },
+            {
+                "id": "claude-opus-5-5",
+                "label": "Claude Opus 5.5 (Flagship Agentic)",
+                "tier": "Flagship Agentic",
+                "description": "Complex knowledge work with adaptive thinking enabled."
+            },
+            {
+                "id": "claude-fable-5-2",
+                "label": "Claude Fable 5.2 (Frontier Deep Reasoning)",
+                "tier": "Frontier Deep Reasoning",
+                "description": "Top-tier demanding analytical and long-horizon reasoning."
+            },
+        ],
+    },
+    "openai": {
+        "id": "openai",
+        "name": "OpenAI GPT",
+        "shortName": "OpenAI",
+        "envVar": "OPENAI_API_KEY",
+        "defaultModel": "gpt-6.1-sol",
+        "fallbackModels": ["gpt-6.1-sol", "gpt-6.1-terra", "gpt-6-luna"],
+        "keyPlaceholder": "sk-proj-...",
+        "keyHint": "Saved to your profile & browser session. Sent only to OpenAI API.",
+        "docsUrl": "https://platform.openai.com/api-keys",
+        "docsLabel": "Get Key at OpenAI Platform",
+        "models": [
+            {
+                "id": "gpt-6.1-sol",
+                "label": "GPT-6.1 Sol (Balanced & Recommended)",
+                "tier": "Balanced / Default",
+                "description": "High-performance analysis & coding (1.05M context)."
+            },
+            {
+                "id": "gpt-6-luna",
+                "label": "GPT-6 Luna (Fast & Cost-Effective)",
+                "tier": "Fast / Cost-Effective",
+                "description": "Lightweight model built for high-throughput tasks."
+            },
+            {
+                "id": "gpt-6.1-terra",
+                "label": "GPT-6.1 Terra (Mid-Tier Balanced)",
+                "tier": "Mid-Tier Balanced",
+                "description": "Balanced performance and cost-efficiency for daily workflows."
+            },
+            {
+                "id": "gpt-6-astra",
+                "label": "GPT-6 Astra (Flagship Reasoning)",
+                "tier": "Flagship Reasoning",
+                "description": "Highest-intelligence GPT-6 frontier reasoning model."
+            },
+            {
+                "id": "gpt-6.2-astra",
+                "label": "GPT-6.2 Astra (Latest Flagship)",
+                "tier": "Latest Flagship",
+                "description": "Latest Astra frontier model variant."
+            },
+        ],
+    },
+}
 
 
 class AIService:
@@ -94,126 +242,712 @@ class AIService:
                 pass
 
     @staticmethod
-    def _call_gemini_api(prompt: str, api_key: str, model_name: str = "gemini-3.7-flash", allow_fallback: bool = True, timeout: int = 25) -> tuple[str, str, str]:
+    def normalize_provider(provider: str = None, model: str = None) -> str:
+        """Resolves a canonical provider key ('gemini', 'anthropic', 'openai')."""
+        p = str(provider or "").strip().lower()
+        if p in ("gemini", "google", "google-gemini"):
+            return "gemini"
+        if p in ("anthropic", "claude"):
+            return "anthropic"
+        if p in ("openai", "gpt"):
+            return "openai"
+
+        m = str(model or "").strip().lower()
+        if m.startswith("claude"):
+            return "anthropic"
+        if m.startswith(("gpt-", "o1", "o3", "o4", "chatgpt")):
+            return "openai"
+        return DEFAULT_AI_PROVIDER
+
+    @classmethod
+    def get_default_model(cls, provider: str = DEFAULT_AI_PROVIDER) -> str:
+        clean = cls.normalize_provider(provider)
+        return AI_PROVIDER_CATALOG.get(clean, {}).get("defaultModel", DEFAULT_AI_MODEL)
+
+    @classmethod
+    def get_provider_catalog(cls) -> dict:
+        """Returns supported provider metadata and server env-key availability flags."""
+        server_keys = {}
+        for pid, cfg in AI_PROVIDER_CATALOG.items():
+            env_var = cfg.get("envVar", "")
+            server_keys[pid] = bool(env_var and len(os.environ.get(env_var, "").strip()) > 6)
+        return {
+            "defaultProvider": DEFAULT_AI_PROVIDER,
+            "defaultModel": DEFAULT_AI_MODEL,
+            "providers": AI_PROVIDER_CATALOG,
+            "serverKeysConfigured": server_keys,
+        }
+
+    @classmethod
+    def resolve_api_key(cls, provider: str, api_key: str = None, api_keys: dict = None) -> str:
+        """Resolves API key in priority order: explicit key -> per-provider map -> server env var."""
+        clean = cls.normalize_provider(provider)
+        if api_key and str(api_key).strip():
+            return str(api_key).strip()
+        if isinstance(api_keys, dict):
+            mapped = str(api_keys.get(clean, "") or "").strip()
+            if mapped:
+                return mapped
+        env_var = AI_PROVIDER_CATALOG.get(clean, {}).get("envVar", "")
+        if env_var:
+            return os.environ.get(env_var, "").strip()
+        return ""
+
+    @classmethod
+    def resolve_any_provider_key(
+        cls,
+        preferred_provider: str = DEFAULT_AI_PROVIDER,
+        api_key: str = None,
+        api_keys: dict = None,
+        model: str = None,
+    ) -> tuple[str, str, str]:
+        """Finds an available (provider, api_key, model) tuple starting with the preferred provider."""
+        pref = cls.normalize_provider(preferred_provider, model)
+        target_model = (model or "").strip() or cls.get_default_model(pref)
+
+        key = cls.resolve_api_key(pref, api_key=api_key, api_keys=api_keys)
+        if len(key) > 6:
+            return pref, key, target_model
+
+        for pid in ("gemini", "anthropic", "openai"):
+            if pid == pref:
+                continue
+            cand_key = cls.resolve_api_key(pid, api_keys=api_keys)
+            if len(cand_key) > 6:
+                return pid, cand_key, cls.get_default_model(pid)
+
+        return pref, "", target_model
+
+    @staticmethod
+    def _extract_http_error(resp) -> str:
+        try:
+            err_body = resp.json()
+            err_obj = err_body.get("error")
+            if isinstance(err_obj, dict):
+                return str(err_obj.get("message") or err_obj.get("type") or resp.text[:200])
+            if isinstance(err_obj, str):
+                return err_obj
+            if err_body.get("message"):
+                return str(err_body.get("message"))
+        except Exception:
+            pass
+        return resp.text[:200] if getattr(resp, "text", None) else f"HTTP {resp.status_code}"
+
+    @staticmethod
+    def _sanitize_chat_history(chat_history: list = None, max_turns: int = 8) -> list[dict]:
+        """Normalizes recent conversation turns for multi-provider message payloads."""
+        if not isinstance(chat_history, list) or not chat_history:
+            return []
+        cleaned = []
+        for item in chat_history[-max_turns:]:
+            if not isinstance(item, dict):
+                continue
+            raw_role = str(item.get("role") or "").strip().lower()
+            content = str(item.get("content") or item.get("text") or "").strip()
+            if not content:
+                continue
+            role = "assistant" if raw_role in ("assistant", "model", "ai") else "user"
+            if len(content) > 2000:
+                content = content[:2000] + "..."
+            cleaned.append({"role": role, "content": content})
+        return cleaned
+
+    @staticmethod
+    def _build_provider_request(
+        provider: str,
+        model: str,
+        prompt: str,
+        api_key: str,
+        system_prompt: str = None,
+        max_tokens: int = 2048,
+        thinking_level: str = None,
+        reasoning_effort: str = None,
+        chat_history: list = None,
+        stream: bool = False,
+    ) -> tuple[str, dict, dict]:
+        """Builds (url, headers, payload) for Gemini, Anthropic, or OpenAI REST calls."""
+        clean_key = str(api_key or "").strip()
+        history = AIService._sanitize_chat_history(chat_history)
+
+        if provider == "anthropic":
+            url = "https://api.anthropic.com/v1/messages"
+            headers = {
+                "x-api-key": clean_key,
+                "anthropic-version": "2026-10-21",
+                "Content-Type": "application/json",
+            }
+            messages = []
+            for turn in history:
+                if not messages and turn["role"] != "user":
+                    continue
+                if messages and messages[-1]["role"] == turn["role"]:
+                    messages[-1]["content"] += "\n\n" + turn["content"]
+                else:
+                    messages.append({"role": turn["role"], "content": turn["content"]})
+            if messages and messages[-1]["role"] == "user":
+                messages[-1]["content"] += "\n\n" + prompt
+            else:
+                messages.append({"role": "user", "content": prompt})
+
+            payload = {
+                "model": model,
+                "max_tokens": max_tokens,
+                "messages": messages,
+            }
+            if system_prompt:
+                payload["system"] = system_prompt
+            if stream:
+                payload["stream"] = True
+            return url, headers, payload
+
+        if provider == "openai":
+            url = "https://api.openai.com/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {clean_key}",
+                "Content-Type": "application/json",
+            }
+            messages = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            for turn in history:
+                messages.append({"role": turn["role"], "content": turn["content"]})
+            messages.append({"role": "user", "content": prompt})
+
+            payload = {
+                "model": model,
+                "messages": messages,
+                "max_completion_tokens": max_tokens,
+            }
+            if reasoning_effort:
+                payload["reasoning_effort"] = reasoning_effort
+            if stream:
+                payload["stream"] = True
+            return url, headers, payload
+
+        # Google Gemini
+        api_version = "v1" if model in ("gemini-pro", "gemini-1.0-pro") else "v1beta"
+        action = "streamGenerateContent?alt=sse" if stream else "generateContent"
+        url = f"https://generativelanguage.googleapis.com/{api_version}/models/{model}:{action}"
+        headers = {
+            "Content-Type": "application/json",
+            "x-goog-api-key": clean_key,
+        }
+        gen_config = {"maxOutputTokens": max_tokens}
+        if model.startswith("gemini-4"):
+            if thinking_level:
+                gen_config["thinkingConfig"] = {"thinkingLevel": str(thinking_level).strip().upper()}
+        else:
+            gen_config["temperature"] = 0.2
+
+        contents = []
+        for turn in history:
+            gem_role = "model" if turn["role"] == "assistant" else "user"
+            contents.append({"role": gem_role, "parts": [{"text": turn["content"]}]})
+        contents.append({"role": "user", "parts": [{"text": prompt}]})
+
+        payload = {
+            "contents": contents,
+            "generationConfig": gen_config,
+        }
+        if system_prompt:
+            payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
+        return url, headers, payload
+
+    @classmethod
+    def _call_gemini_api(
+        cls,
+        prompt: str,
+        api_key: str,
+        model_name: str = "gemini-4-hydrogen",
+        system_prompt: str = None,
+        allow_fallback: bool = True,
+        timeout: int = 45,
+        max_tokens: int = 2048,
+        thinking_level: str = None,
+        chat_history: list = None,
+    ) -> tuple[str, str, str]:
         """
-        Invokes Google Gemini REST API.
-        Determines API version (v1beta or v1) dynamically and manages rate-limit cascade.
+        Invokes Google Gemini REST API using x-goog-api-key header authentication.
+        Supports Gemini 4 thinkingConfig and filters internal thought parts from responses.
         Returns tuple: (response_text, actual_model_used, error_message)
         """
-        if not api_key:
+        if not api_key or not str(api_key).strip():
             return "", "", "Missing Google Gemini API key."
 
-        api_key = api_key.strip()
-        preferred_model = (model_name or "gemini-3.7-flash").strip()
-        
+        clean_key = str(api_key).strip()
+        preferred_model = (model_name or "gemini-4-hydrogen").strip()
+
+        candidate_models = [preferred_model]
         if allow_fallback:
-            candidate_models = [preferred_model]
-            for m in ["gemini-3.6-flash"]:
+            for m in AI_PROVIDER_CATALOG["gemini"]["fallbackModels"]:
                 if m not in candidate_models:
                     candidate_models.append(m)
-        else:
-            candidate_models = [preferred_model]
 
         last_error = ""
 
         for model in candidate_models:
-            # Select proper API version for the model
-            api_version = "v1" if model in ["gemini-pro", "gemini-1.0-pro"] else "v1beta"
-            url = f"https://generativelanguage.googleapis.com/{api_version}/models/{model}:generateContent?key={api_key}"
-            
-            payload = {
-                "contents": [{
-                    "parts": [{"text": prompt}]
-                }],
-                "generationConfig": {
-                    "temperature": 0.2,
-                    "maxOutputTokens": 1500
-                }
-            }
-            
-            try:
-                req = urllib.request.Request(
-                    url,
-                    data=json.dumps(payload).encode('utf-8'),
-                    headers={'Content-Type': 'application/json'}
-                )
-                with urllib.request.urlopen(req, timeout=timeout) as response:
-                    res_data = json.loads(response.read().decode('utf-8'))
-                    candidates = res_data.get('candidates', [])
-                    if candidates:
-                        parts = candidates[0].get('content', {}).get('parts', [])
-                        if parts:
-                            text = parts[0].get('text', '').strip()
-                            if text:
-                                return text, model, ""
-                    return "", model, f"Empty response received from {model}."
-            except urllib.error.HTTPError as he:
-                try:
-                    err_body = json.loads(he.read().decode('utf-8'))
-                    err_msg = err_body.get('error', {}).get('message', str(he))
-                except Exception:
-                    err_msg = str(he)
-                last_error = f"Google Gemini API ({he.code}) on {model}: {err_msg}"
-                
-                # If invalid API key (400 or 403), stop immediately
-                if he.code in (400, 403) and ("API_KEY_INVALID" in err_msg or "key not valid" in err_msg.lower()):
-                    return "", model, last_error
-                
-                # If 404 on v1beta, attempt v1 endpoint fallback for this specific model
-                if he.code == 404 and api_version == "v1beta":
-                    try:
-                        v1_url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent?key={api_key}"
-                        req_v1 = urllib.request.Request(v1_url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
-                        with urllib.request.urlopen(req_v1, timeout=timeout) as response:
-                            res_data = json.loads(response.read().decode('utf-8'))
-                            candidates = res_data.get('candidates', [])
-                            if candidates and candidates[0].get('content', {}).get('parts'):
-                                text = candidates[0]['content']['parts'][0].get('text', '').strip()
-                                if text:
-                                    return text, model, ""
-                    except Exception:
-                        pass
+            api_version = "v1" if model in ("gemini-pro", "gemini-1.0-pro") else "v1beta"
+            url, headers, payload = cls._build_provider_request(
+                provider="gemini",
+                model=model,
+                prompt=prompt,
+                api_key=clean_key,
+                system_prompt=system_prompt,
+                max_tokens=max_tokens,
+                thinking_level=thinking_level,
+                chat_history=chat_history,
+                stream=False,
+            )
 
-                # Only cascade to fallback models on genuine rate limit (429) or temporary server error (503)
-                if he.code in (429, 503) and allow_fallback:
-                    continue
-                else:
+            try:
+                resp = requests.post(url, json=payload, headers=headers, timeout=timeout)
+                if resp.status_code == 404 and api_version == "v1beta" and model in ("gemini-pro", "gemini-1.0-pro"):
+                    v1_url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent"
+                    resp = requests.post(v1_url, json=payload, headers=headers, timeout=timeout)
+
+                if resp.status_code == 200:
+                    res_data = resp.json()
+                    candidates = res_data.get("candidates", [])
+                    if candidates:
+                        parts = candidates[0].get("content", {}).get("parts", [])
+                        text_chunks = [
+                            p.get("text", "")
+                            for p in parts
+                            if isinstance(p, dict) and not p.get("thought") and p.get("text")
+                        ]
+                        text = "\n".join(text_chunks).strip()
+                        if text:
+                            return text, model, ""
+                    return "", model, f"Empty response received from {model}."
+
+                err_msg = cls._extract_http_error(resp)
+                last_error = f"Google Gemini API ({resp.status_code}) on {model}: {err_msg}"
+
+                if resp.status_code in (401, 403) or (
+                    resp.status_code == 400 and ("API_KEY_INVALID" in err_msg or "key not valid" in err_msg.lower())
+                ):
                     return "", model, last_error
-            except (TimeoutError, socket.timeout, urllib.error.URLError) as te:
+
+                if resp.status_code in (429, 503) and allow_fallback:
+                    continue
+                return "", model, last_error
+            except requests.exceptions.Timeout:
                 last_error = f"Gemini Connection Timeout on {model} (server latency high)"
                 if allow_fallback:
                     continue
+                return "", model, last_error
             except Exception as e:
                 last_error = f"Gemini Connection Error on {model}: {str(e)}"
                 if allow_fallback:
                     continue
+                return "", model, last_error
 
         return "", preferred_model, last_error or f"Unable to reach Google Gemini API ({preferred_model})."
 
     @classmethod
-    def test_model_cascade(cls, api_key: str, preferred_model: str = "gemini-3.7-flash") -> dict:
+    def _call_anthropic_api(
+        cls,
+        prompt: str,
+        api_key: str,
+        model_name: str = "claude-sonnet-5-5",
+        system_prompt: str = None,
+        allow_fallback: bool = True,
+        timeout: int = 35,
+        max_tokens: int = 2048,
+        chat_history: list = None,
+    ) -> tuple[str, str, str]:
         """
-        Tests the API key against all available models in the cascade.
+        Invokes Anthropic Messages API (anthropic-version: 2026-10-21).
+        Omits unsupported sampling parameters (temperature/top_p/top_k) and extracts text blocks only.
+        Returns tuple: (response_text, actual_model_used, error_message)
+        """
+        if not api_key or not str(api_key).strip():
+            return "", "", "Missing Anthropic API key."
+
+        clean_key = str(api_key).strip()
+        preferred_model = (model_name or "claude-sonnet-5-5").strip()
+
+        candidate_models = [preferred_model]
+        if allow_fallback:
+            for m in AI_PROVIDER_CATALOG["anthropic"]["fallbackModels"]:
+                if m not in candidate_models:
+                    candidate_models.append(m)
+
+        last_error = ""
+
+        for model in candidate_models:
+            url, headers, payload = cls._build_provider_request(
+                provider="anthropic",
+                model=model,
+                prompt=prompt,
+                api_key=clean_key,
+                system_prompt=system_prompt,
+                max_tokens=max_tokens,
+                chat_history=chat_history,
+                stream=False,
+            )
+
+            try:
+                resp = requests.post(url, json=payload, headers=headers, timeout=timeout)
+                if resp.status_code == 200:
+                    res_data = resp.json()
+                    blocks = res_data.get("content", [])
+                    text_chunks = [
+                        b.get("text", "")
+                        for b in blocks
+                        if isinstance(b, dict) and b.get("type") == "text" and b.get("text")
+                    ]
+                    text = "\n".join(text_chunks).strip()
+                    if text:
+                        return text, model, ""
+                    return "", model, f"Empty response received from {model}."
+
+                err_msg = cls._extract_http_error(resp)
+                last_error = f"Anthropic API ({resp.status_code}) on {model}: {err_msg}"
+
+                if resp.status_code in (401, 403):
+                    return "", model, last_error
+
+                if resp.status_code in (429, 529, 503) and allow_fallback:
+                    continue
+                return "", model, last_error
+            except requests.exceptions.Timeout:
+                last_error = f"Anthropic Connection Timeout on {model} (server latency high)"
+                if allow_fallback:
+                    continue
+                return "", model, last_error
+            except Exception as e:
+                last_error = f"Anthropic Connection Error on {model}: {str(e)}"
+                if allow_fallback:
+                    continue
+                return "", model, last_error
+
+        return "", preferred_model, last_error or f"Unable to reach Anthropic API ({preferred_model})."
+
+    @classmethod
+    def _call_openai_api(
+        cls,
+        prompt: str,
+        api_key: str,
+        model_name: str = "gpt-6.1-sol",
+        system_prompt: str = None,
+        allow_fallback: bool = True,
+        timeout: int = 35,
+        max_tokens: int = 2048,
+        reasoning_effort: str = None,
+        chat_history: list = None,
+    ) -> tuple[str, str, str]:
+        """
+        Invokes OpenAI Chat Completions API using max_completion_tokens and omitting temperature
+        for GPT-6 reasoning compatibility.
+        Returns tuple: (response_text, actual_model_used, error_message)
+        """
+        if not api_key or not str(api_key).strip():
+            return "", "", "Missing OpenAI API key."
+
+        clean_key = str(api_key).strip()
+        preferred_model = (model_name or "gpt-6.1-sol").strip()
+
+        candidate_models = [preferred_model]
+        if allow_fallback:
+            for m in AI_PROVIDER_CATALOG["openai"]["fallbackModels"]:
+                if m not in candidate_models:
+                    candidate_models.append(m)
+
+        last_error = ""
+
+        for model in candidate_models:
+            url, headers, payload = cls._build_provider_request(
+                provider="openai",
+                model=model,
+                prompt=prompt,
+                api_key=clean_key,
+                system_prompt=system_prompt,
+                max_tokens=max_tokens,
+                reasoning_effort=reasoning_effort,
+                chat_history=chat_history,
+                stream=False,
+            )
+
+            try:
+                resp = requests.post(url, json=payload, headers=headers, timeout=timeout)
+                if resp.status_code == 200:
+                    res_data = resp.json()
+                    choices = res_data.get("choices", [])
+                    if choices:
+                        msg = choices[0].get("message", {})
+                        content = msg.get("content", "")
+                        if isinstance(content, str):
+                            text = content.strip()
+                        elif isinstance(content, list):
+                            text = "\n".join(
+                                p.get("text", "")
+                                for p in content
+                                if isinstance(p, dict)
+                                and p.get("type") in ("text", "output_text", None)
+                                and p.get("text")
+                            ).strip()
+                        else:
+                            text = ""
+                        if text:
+                            return text, model, ""
+                    return "", model, f"Empty response received from {model}."
+
+                err_msg = cls._extract_http_error(resp)
+                last_error = f"OpenAI API ({resp.status_code}) on {model}: {err_msg}"
+
+                if resp.status_code in (401, 403):
+                    return "", model, last_error
+
+                if resp.status_code in (429, 503) and allow_fallback:
+                    continue
+                return "", model, last_error
+            except requests.exceptions.Timeout:
+                last_error = f"OpenAI Connection Timeout on {model} (server latency high)"
+                if allow_fallback:
+                    continue
+                return "", model, last_error
+            except Exception as e:
+                last_error = f"OpenAI Connection Error on {model}: {str(e)}"
+                if allow_fallback:
+                    continue
+                return "", model, last_error
+
+        return "", preferred_model, last_error or f"Unable to reach OpenAI API ({preferred_model})."
+
+    @classmethod
+    def call_llm(
+        cls,
+        prompt: str,
+        api_key: str,
+        provider: str = DEFAULT_AI_PROVIDER,
+        model_name: str = None,
+        system_prompt: str = None,
+        allow_fallback: bool = True,
+        timeout: int = 45,
+        max_tokens: int = 2048,
+        thinking_level: str = None,
+        reasoning_effort: str = None,
+        chat_history: list = None,
+    ) -> tuple[str, str, str]:
+        """Unified multi-provider LLM invocation router."""
+        clean_provider = cls.normalize_provider(provider, model_name)
+        target_model = (model_name or "").strip() or cls.get_default_model(clean_provider)
+
+        if clean_provider == "anthropic":
+            return cls._call_anthropic_api(
+                prompt=prompt,
+                api_key=api_key,
+                model_name=target_model,
+                system_prompt=system_prompt,
+                allow_fallback=allow_fallback,
+                timeout=timeout,
+                max_tokens=max_tokens,
+                chat_history=chat_history,
+            )
+        if clean_provider == "openai":
+            return cls._call_openai_api(
+                prompt=prompt,
+                api_key=api_key,
+                model_name=target_model,
+                system_prompt=system_prompt,
+                allow_fallback=allow_fallback,
+                timeout=timeout,
+                max_tokens=max_tokens,
+                reasoning_effort=reasoning_effort,
+                chat_history=chat_history,
+            )
+        return cls._call_gemini_api(
+            prompt=prompt,
+            api_key=api_key,
+            model_name=target_model,
+            system_prompt=system_prompt,
+            allow_fallback=allow_fallback,
+            timeout=timeout,
+            max_tokens=max_tokens,
+            thinking_level=thinking_level,
+            chat_history=chat_history,
+        )
+
+    @staticmethod
+    def _extract_sse_text_delta(provider: str, data_str: str) -> str:
+        """Extracts incremental text delta from a single parsed SSE payload per provider."""
+        if not data_str or data_str == "[DONE]":
+            return ""
+        try:
+            evt = json.loads(data_str)
+        except Exception:
+            return ""
+
+        if provider == "gemini":
+            candidates = evt.get("candidates") or []
+            if not candidates:
+                return ""
+            parts = (candidates[0].get("content") or {}).get("parts") or []
+            chunks = [
+                p.get("text", "")
+                for p in parts
+                if isinstance(p, dict) and not p.get("thought") and p.get("text")
+            ]
+            return "".join(chunks)
+
+        if provider == "anthropic":
+            if evt.get("type") == "content_block_delta":
+                delta = evt.get("delta") or {}
+                if delta.get("type") == "text_delta":
+                    return str(delta.get("text") or "")
+            return ""
+
+        if provider == "openai":
+            choices = evt.get("choices") or []
+            if choices:
+                delta = choices[0].get("delta") or {}
+                content = delta.get("content")
+                if isinstance(content, str):
+                    return content
+            return ""
+
+        return ""
+
+    @classmethod
+    def stream_llm(
+        cls,
+        prompt: str,
+        api_key: str,
+        provider: str = DEFAULT_AI_PROVIDER,
+        model_name: str = None,
+        system_prompt: str = None,
+        allow_fallback: bool = True,
+        timeout: int = 45,
+        max_tokens: int = 2048,
+        thinking_level: str = None,
+        reasoning_effort: str = None,
+        chat_history: list = None,
+    ):
+        """
+        Streams text deltas from Gemini, Anthropic, or OpenAI via SSE.
+        Yields dict events: {'type': 'delta', 'delta': str, 'model': str} or {'type': 'error', 'error': str, 'model': str}.
+        """
+        if not api_key or not str(api_key).strip():
+            yield {"type": "error", "error": "Missing API key.", "model": ""}
+            return
+
+        clean_provider = cls.normalize_provider(provider, model_name)
+        preferred_model = (model_name or "").strip() or cls.get_default_model(clean_provider)
+
+        candidate_models = [preferred_model]
+        if allow_fallback:
+            for m in AI_PROVIDER_CATALOG.get(clean_provider, {}).get("fallbackModels", []):
+                if m not in candidate_models:
+                    candidate_models.append(m)
+
+        last_error = ""
+        for model in candidate_models:
+            url, headers, payload = cls._build_provider_request(
+                provider=clean_provider,
+                model=model,
+                prompt=prompt,
+                api_key=api_key,
+                system_prompt=system_prompt,
+                max_tokens=max_tokens,
+                thinking_level=thinking_level,
+                reasoning_effort=reasoning_effort,
+                chat_history=chat_history,
+                stream=True,
+            )
+            emitted_any = False
+            try:
+                with requests.post(url, json=payload, headers=headers, timeout=timeout, stream=True) as resp:
+                    if resp.status_code == 200:
+                        for raw_line in resp.iter_lines(decode_unicode=True):
+                            if not raw_line:
+                                continue
+                            line = raw_line.strip() if isinstance(raw_line, str) else raw_line.decode("utf-8", errors="ignore").strip()
+                            if not line.startswith("data:"):
+                                continue
+                            payload_str = line[5:].strip()
+                            delta_txt = cls._extract_sse_text_delta(clean_provider, payload_str)
+                            if delta_txt:
+                                emitted_any = True
+                                yield {"type": "delta", "delta": delta_txt, "model": model}
+                        if emitted_any:
+                            return
+                        last_error = f"Empty stream received from {model}."
+                        if allow_fallback:
+                            continue
+                        break
+
+                    err_msg = cls._extract_http_error(resp)
+                    last_error = f"{AI_PROVIDER_CATALOG.get(clean_provider, {}).get('name', clean_provider)} ({resp.status_code}) on {model}: {err_msg}"
+                    if resp.status_code in (401, 403):
+                        yield {"type": "error", "error": last_error, "model": model}
+                        return
+                    if resp.status_code in (429, 503, 529) and allow_fallback and not emitted_any:
+                        continue
+                    yield {"type": "error", "error": last_error, "model": model}
+                    return
+            except requests.exceptions.Timeout:
+                last_error = f"Stream timeout on {model}"
+                if allow_fallback and not emitted_any:
+                    continue
+                yield {"type": "error", "error": last_error, "model": model}
+                return
+            except Exception as exc:
+                last_error = f"Stream error on {model}: {str(exc)}"
+                if allow_fallback and not emitted_any:
+                    continue
+                yield {"type": "error", "error": last_error, "model": model}
+                return
+
+        yield {"type": "error", "error": last_error or "Streaming failed.", "model": preferred_model}
+
+    @classmethod
+    def test_provider_connection(
+        cls,
+        api_key: str,
+        provider: str = DEFAULT_AI_PROVIDER,
+        preferred_model: str = None,
+    ) -> dict:
+        """
+        Tests the provider API key against the preferred model and its primary fallback.
         Returns a detailed per-model diagnostic report.
         """
-        if not api_key:
-            return {"success": False, "error": "Missing API Key", "models": []}
+        clean_provider = cls.normalize_provider(provider, preferred_model)
+        provider_meta = AI_PROVIDER_CATALOG.get(clean_provider, AI_PROVIDER_CATALOG[DEFAULT_AI_PROVIDER])
+        target_model = (preferred_model or "").strip() or provider_meta["defaultModel"]
 
-        models_to_test = [preferred_model]
-        for m in ["gemini-3.6-flash"]:
+        if not api_key or not str(api_key).strip():
+            return {
+                "success": False,
+                "provider": clean_provider,
+                "error": f"Missing {provider_meta['name']} API Key",
+                "models": [],
+                "preferredModel": target_model,
+                "keyValid": False,
+            }
+
+        models_to_test = [target_model]
+        for m in provider_meta.get("fallbackModels", []):
             if m not in models_to_test:
                 models_to_test.append(m)
+                if len(models_to_test) >= 3:
+                    break
 
         report = []
         any_success = False
+        saw_invalid_key = False
 
         for m in models_to_test:
-            res_text, used_model, err = cls._call_gemini_api(
+            res_text, _, err = cls.call_llm(
                 "Respond with 'OK'",
                 api_key,
+                provider=clean_provider,
                 model_name=m,
                 allow_fallback=False,
-                timeout=12
+                timeout=30,
+                max_tokens=256,
+                thinking_level="low",
+                reasoning_effort="low",
             )
             if res_text:
                 any_success = True
@@ -222,14 +956,31 @@ class AIService:
                     "status": "online",
                     "message": f"Connected successfully ({res_text[:30]})"
                 })
+                break
             else:
-                if "429" in err or "quota" in err.lower() or "rate" in err.lower():
-                    status = "rate_limited"
-                elif "400" in err or "403" in err or "key not valid" in err.lower():
+                err_lower = err.lower()
+                if (
+                    "401" in err
+                    or "403" in err
+                    or "key not valid" in err_lower
+                    or "api_key_invalid" in err_lower
+                    or "invalid x-api-key" in err_lower
+                    or "incorrect api key" in err_lower
+                    or "authentication" in err_lower
+                ):
                     status = "invalid_key"
-                elif "timeout" in err.lower():
+                    saw_invalid_key = True
+                elif "limit: 0" in err_lower or "free_tier" in err_lower or (
+                    ("billing" in err_lower or "quota" in err_lower) and "429" in err and "0" in err_lower
+                ):
+                    status = "quota_zero"
+                elif "429" in err or "529" in err or "quota" in err_lower or "rate" in err_lower:
+                    status = "rate_limited"
+                elif "503" in err or "high demand" in err_lower or "overloaded" in err_lower or "unavailable" in err_lower:
+                    status = "overloaded"
+                elif "timeout" in err_lower:
                     status = "timeout"
-                elif "404" in err:
+                elif "404" in err or "not_found" in err_lower or "does not exist" in err_lower:
                     status = "not_found"
                 else:
                     status = "error"
@@ -241,17 +992,168 @@ class AIService:
                 if status == "invalid_key":
                     break
 
+        key_valid = any_success
+        available_models_count = None
+        if not any_success and not saw_invalid_key:
+            try:
+                models_probe = cls.list_provider_models(
+                    api_key=api_key,
+                    provider=clean_provider,
+                    timeout=8,
+                )
+                if models_probe.get("success"):
+                    key_valid = True
+                    available_models_count = len(models_probe.get("models") or [])
+            except Exception:
+                pass
+
         return {
             "success": any_success,
+            "provider": clean_provider,
             "models": report,
-            "preferredModel": preferred_model
+            "preferredModel": target_model,
+            "keyValid": key_valid,
+            "availableModelsCount": available_models_count,
         }
 
-    def synthesize_news_sentiment(self, ticker: str, company_name: str, current_price: float, news_items: list[dict], api_key: str = None, model: str = 'gemini-3.7-flash') -> dict:
+    @classmethod
+    def test_model_cascade(cls, api_key: str, preferred_model: str = "gemini-4-hydrogen") -> dict:
+        """Backwards-compatible Gemini diagnostic entrypoint."""
+        return cls.test_provider_connection(api_key, provider="gemini", preferred_model=preferred_model)
+
+    @classmethod
+    def list_provider_models(cls, api_key: str = None, provider: str = DEFAULT_AI_PROVIDER, timeout: int = 12) -> dict:
+        """Fetches live available model IDs from the selected provider's Models endpoint."""
+        clean_provider = cls.normalize_provider(provider)
+        provider_meta = AI_PROVIDER_CATALOG.get(clean_provider, AI_PROVIDER_CATALOG[DEFAULT_AI_PROVIDER])
+        resolved_key = cls.resolve_api_key(clean_provider, api_key=api_key)
+
+        if not resolved_key:
+            return {
+                "success": False,
+                "provider": clean_provider,
+                "models": [],
+                "error": f"Provide a {provider_meta['name']} API key first to fetch live models.",
+            }
+
+        try:
+            models = []
+            if clean_provider == "gemini":
+                resp = requests.get(
+                    "https://generativelanguage.googleapis.com/v1beta/models",
+                    headers={"x-goog-api-key": resolved_key},
+                    timeout=timeout,
+                )
+                if resp.status_code != 200:
+                    return {
+                        "success": False,
+                        "provider": clean_provider,
+                        "models": [],
+                        "error": f"Gemini API ({resp.status_code}): {cls._extract_http_error(resp)}",
+                    }
+                for item in resp.json().get("models", []):
+                    methods = item.get("supportedGenerationMethods") or []
+                    if "generateContent" not in methods:
+                        continue
+                    mid = str(item.get("name", "")).replace("models/", "").strip()
+                    if not mid or any(x in mid.lower() for x in ("embedding", "imagen", "veo", "aqa", "tts", "robotics")):
+                        continue
+                    models.append({
+                        "id": mid,
+                        "label": item.get("displayName") or mid,
+                    })
+            elif clean_provider == "anthropic":
+                resp = requests.get(
+                    "https://api.anthropic.com/v1/models",
+                    headers={
+                        "x-api-key": resolved_key,
+                        "anthropic-version": "2026-10-21",
+                    },
+                    timeout=timeout,
+                )
+                if resp.status_code != 200:
+                    return {
+                        "success": False,
+                        "provider": clean_provider,
+                        "models": [],
+                        "error": f"Anthropic API ({resp.status_code}): {cls._extract_http_error(resp)}",
+                    }
+                for item in resp.json().get("data", []):
+                    mid = str(item.get("id", "")).strip()
+                    if mid:
+                        models.append({
+                            "id": mid,
+                            "label": item.get("display_name") or mid,
+                        })
+            elif clean_provider == "openai":
+                resp = requests.get(
+                    "https://api.openai.com/v1/models",
+                    headers={"Authorization": f"Bearer {resolved_key}"},
+                    timeout=timeout,
+                )
+                if resp.status_code != 200:
+                    return {
+                        "success": False,
+                        "provider": clean_provider,
+                        "models": [],
+                        "error": f"OpenAI API ({resp.status_code}): {cls._extract_http_error(resp)}",
+                    }
+                for item in resp.json().get("data", []):
+                    mid = str(item.get("id", "")).strip()
+                    ml = mid.lower()
+                    if not mid:
+                        continue
+                    if not ml.startswith(("gpt-", "o1", "o3", "o4", "chatgpt-")):
+                        continue
+                    if any(x in ml for x in ("image", "realtime", "transcribe", "audio", "tts", "whisper", "embedding", "moderation")):
+                        continue
+                    models.append({"id": mid, "label": mid})
+
+            # Deduplicate preserving curated order at the top
+            curated_ids = [m["id"] for m in provider_meta.get("models", [])]
+            by_id = {m["id"]: m for m in models}
+            ordered = []
+            for cid in curated_ids:
+                if cid in by_id:
+                    ordered.append(by_id.pop(cid))
+            for mid in sorted(by_id.keys(), reverse=True):
+                ordered.append(by_id[mid])
+
+            return {
+                "success": True,
+                "provider": clean_provider,
+                "models": ordered,
+            }
+        except requests.exceptions.Timeout:
+            return {
+                "success": False,
+                "provider": clean_provider,
+                "models": [],
+                "error": f"Connection timeout listing {provider_meta['name']} models.",
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "provider": clean_provider,
+                "models": [],
+                "error": str(e),
+            }
+
+    def synthesize_news_sentiment(
+        self,
+        ticker: str,
+        company_name: str,
+        current_price: float,
+        news_items: list[dict],
+        api_key: str = None,
+        provider: str = None,
+        model: str = None,
+        api_keys: dict = None,
+        allow_llm: bool = True,
+    ) -> dict:
         """
         Synthesizes recent news items into an institutional-grade Market Catalyst & Sentiment Summary.
-        Uses Google Gemini with caching and automatic fallback, with a smart deterministic quant fallback.
-        Generates structured English catalyst takeaways, country flag attributions, and exact conviction delta.
+        Supports Gemini, Anthropic, and OpenAI with caching and deterministic quant fallback.
         """
         if not news_items:
             return {
@@ -288,15 +1190,19 @@ class AIService:
 
         news_text = "\n".join(news_lines)
 
-        cache_key = f"news_summary:{ticker}:{hash(news_text)}:{model}"
+        clean_provider = self.normalize_provider(provider, model)
+        clean_model = (model or "").strip() or self.get_default_model(clean_provider)
+        news_hash = hashlib.sha256(news_text.encode('utf-8')).hexdigest()[:16]
+
+        cache_key = f"news_summary:{ticker}:{news_hash}:{clean_provider}:{clean_model}"
         cached_summary = self._get_cached(cache_key)
         if cached_summary:
             return cached_summary
 
-        env_key = api_key or os.environ.get('GEMINI_API_KEY') or ''
-        
+        resolved_key = self.resolve_api_key(clean_provider, api_key=api_key, api_keys=api_keys) if allow_llm else ""
+
         # 1. LLM synthesis if key available
-        if env_key and len(env_key.strip()) > 6:
+        if allow_llm and resolved_key and len(resolved_key.strip()) > 6:
             prompt = f"""
             You are a chief market analyst at a quantitative hedge fund.
             Analyze the following multi-source global financial news headlines and catalyst reports for {company_name} ({ticker}, Current Price: ${current_price:.2f}):
@@ -312,7 +1218,13 @@ class AIService:
             Keep the tone strictly objective, institutional, and insightful.
             """
             try:
-                llm_text, used_model, _ = self._call_gemini_api(prompt, env_key, model_name=model, allow_fallback=True)
+                llm_text, _, _ = self.call_llm(
+                    prompt,
+                    resolved_key,
+                    provider=clean_provider,
+                    model_name=clean_model,
+                    allow_fallback=True,
+                )
                 if llm_text and len(llm_text) > 40:
                     lower_text = llm_text.lower()
                     if "strongly bullish" in lower_text or "strong bull" in lower_text:
@@ -996,6 +1908,83 @@ class AIService:
 
         return pd.Series(scores, index=df.index)
 
+    @staticmethod
+    def compute_technical_confluence(signals: dict, profile: dict = None) -> dict:
+        """
+        Computes a normalized multi-oscillator & trend confluence gauge across technical indicators.
+        """
+        indicators = (signals or {}).get('indicators', {}) or {}
+        osc_keys = ('RSI', 'MACD', 'Stochastic', 'SuperTrend', 'SMA_50', 'CCI')
+        bull = 0
+        bear = 0
+        neutral = 0
+        present = 0
+
+        for key in osc_keys:
+            ind = indicators.get(key)
+            if not isinstance(ind, dict):
+                continue
+            present += 1
+            status_str = f"{ind.get('status', '')} {ind.get('signal', '')}".lower()
+            if 'bull' in status_str or 'buy' in status_str or 'oversold' in status_str or 'accum' in status_str:
+                bull += 1
+            elif 'bear' in status_str or 'sell' in status_str or 'overbought' in status_str or 'distrib' in status_str:
+                bear += 1
+            else:
+                neutral += 1
+
+        if profile:
+            cmf = profile.get('cmf')
+            if isinstance(cmf, (int, float)):
+                present += 1
+                if cmf > 0.03:
+                    bull += 1
+                elif cmf < -0.03:
+                    bear += 1
+                else:
+                    neutral += 1
+
+        if present == 0:
+            bull = int((signals or {}).get('bullishCount', 0) or 0)
+            bear = int((signals or {}).get('bearishCount', 0) or 0)
+            neutral = int((signals or {}).get('neutralCount', 0) or 0)
+            present = bull + bear + neutral
+
+        total = max(1, present)
+        if bull > bear:
+            direction = 'Bullish'
+            dominant = bull
+        elif bear > bull:
+            direction = 'Bearish'
+            dominant = bear
+        else:
+            direction = 'Mixed'
+            dominant = max(bull, bear)
+
+        agreement_ratio = dominant / total
+        score = round(min(100.0, max(0.0, agreement_ratio * 100.0)), 1)
+
+        if present == 0:
+            tier = 'Insufficient Data'
+        elif agreement_ratio >= 0.72 and dominant >= 3:
+            tier = 'High Confluence'
+        elif agreement_ratio >= 0.45 and dominant >= 2:
+            tier = 'Moderate Confluence'
+        else:
+            tier = 'Divergent / Split'
+
+        return {
+            'score': score,
+            'direction': direction,
+            'tier': tier,
+            'alignedCount': dominant,
+            'totalOscillators': present,
+            'bullCount': bull,
+            'bearCount': bear,
+            'neutralCount': neutral,
+            'badgeLabel': f"{dominant}/{present} {direction}" if present else 'Neutral',
+        }
+
     def generate_ai_analysis(
         self,
         profile: dict,
@@ -1004,8 +1993,9 @@ class AIService:
         backtest_data: dict = None,
         news: list[dict] = None,
         api_key: str = None,
-        provider: str = 'gemini',
-        model: str = 'gemini-3.7-flash',
+        provider: str = None,
+        model: str = None,
+        api_keys: dict = None,
         allow_llm: bool = True,
         force_refresh: bool = False
     ) -> dict:
@@ -1013,23 +2003,36 @@ class AIService:
         Synthesizes a comprehensive multi-paragraph AI Investment Thesis,
         Tactical Execution Matrix, Risk/Reward profile, 30-day probabilistic scenarios,
         and News Sentiment for an individual stock.
-        Uses advanced statistical models out-of-the-box, enhanced by Google Gemini with dual-tier persistent caching.
+        Uses advanced statistical models out-of-the-box, enhanced by Gemini, Anthropic Claude,
+        or OpenAI GPT with dual-tier persistent caching.
         Consolidates news catalysts and executive memo into at most 1 single API call per stock.
         """
-        if not timeseries or len(timeseries) < 5:
-            return {'error': 'Insufficient timeseries data for AI analysis.'}
+        if not timeseries and not (profile and profile.get('currentPrice')):
+            return {'error': 'Insufficient market data for AI analysis.'}
 
-        current_price = profile.get('currentPrice') or timeseries[-1].get('close') or 100.0
+        bar_count = len(timeseries or [])
+        is_limited_history = bar_count < 5
+        current_price = profile.get('currentPrice') or (timeseries[-1].get('close') if timeseries else None) or 100.0
         ticker = profile.get('ticker', 'STOCK')
         company_name = profile.get('name', ticker)
 
-        full_analysis_cache_key = f"full_ai_analysis:{ticker}:{model}"
+        clean_provider = self.normalize_provider(provider, model)
+        clean_model = (model or "").strip() or self.get_default_model(clean_provider)
+
+        full_analysis_cache_key = f"full_ai_analysis:{ticker}:{clean_provider}:{clean_model}"
         if not force_refresh:
             cached_full = self._get_cached(full_analysis_cache_key)
             if cached_full and isinstance(cached_full, dict) and not cached_full.get('error'):
                 return cached_full
 
-        atr = profile.get('atr') or 5.0
+        atr = profile.get('atr')
+        if not atr or atr <= 0:
+            spreads = [
+                abs(float(b.get('high', 0) or 0) - float(b.get('low', 0) or 0))
+                for b in (timeseries or [])
+                if b.get('high') is not None and b.get('low') is not None
+            ]
+            atr = round(sum(spreads) / len(spreads), 2) if spreads and sum(spreads) > 0 else round(float(current_price) * 0.04, 2)
         vwap = profile.get('vwap') or current_price
         cmf = profile.get('cmf') or 0.0
 
@@ -1039,7 +2042,16 @@ class AIService:
         overall_rating = signals.get('overall', 'Neutral')
 
         # 1. AI News Sentiment & Market Catalyst Synthesis (Deterministic Multi-Factor Scorer, 0 API calls)
-        news_synthesis = self.synthesize_news_sentiment(ticker, company_name, current_price, news or [], api_key=None, model=model)
+        news_synthesis = self.synthesize_news_sentiment(
+            ticker,
+            company_name,
+            current_price,
+            news or [],
+            api_key=None,
+            provider=clean_provider,
+            model=clean_model,
+            allow_llm=False,
+        )
 
         # 2. Compute Canonical Recalibrated AI Quantitative Conviction Score (0 to 100%)
         conviction_score, bias, stance_color, badge_class, factor_breakdown = self.compute_conviction_score(
@@ -1119,6 +2131,14 @@ class AIService:
             r_item = top_bear_news[0]
             risks.insert(0, f"Headline Risk ({r_item.get('publisher', 'Financial Wire')}): {r_item.get('title', '')}")
 
+        if is_limited_history:
+            catalysts.append(
+                f"Recent listing ({bar_count} session{'s' if bar_count != 1 else ''} recorded): analysis prioritizes live news catalysts, VWAP, and early order flow."
+            )
+            risks.append(
+                f"Early post-listing volatility: longer-horizon oscillators (RSI 14, MACD, SuperTrend) require more sessions to mature."
+            )
+
         if not catalysts:
             catalysts.append("Consolidation setup with technical breakout potential upon volume confirmation.")
         if not risks:
@@ -1138,22 +2158,32 @@ class AIService:
             b_pub = top_bull_news[0].get('publisher', 'Financial Wire')
             news_mention = f" Live headlines from **{b_pub}** reflect active catalyst positioning ({news_delta:+.1f}% delta)."
 
+        limited_note = (
+            f" *(Newly listed asset with {bar_count} session{'s' if bar_count != 1 else ''} of trading history — weighted toward live news catalysts and session VWAP/CMF flow.)*"
+            if is_limited_history else ""
+        )
         thesis = (
             f"Quantitative AI synthesis assigns **{company_name} ({ticker})** an AI Conviction Score of **{conviction_score}% ({bias})** at **${current_price:.2f}**. "
             f"{'Positive institutional accumulation and technical alignment favor upside continuation toward $' + str(target_1) if conviction_score >= 50 else 'Bearish momentum and distribution pressure suggest caution with critical support at $' + str(stop_loss)}."
-            f"{news_mention} "
+            f"{news_mention}{limited_note} "
             f"Optimal risk-managed execution offers an asymmetric **{rr_ratio}:1 Risk/Reward** profile with stop-loss invalidation at **${stop_loss:.2f}**."
         )
 
-        # 5. Persistent Disk Caching & Single-Call Gemini LLM Narrative Enhancement
-        cache_key = f"memo:{ticker}:{model}"
+        # 5. Persistent Disk Caching & Single-Call Multi-Provider LLM Narrative Enhancement
+        cache_key = f"memo:{ticker}:{clean_provider}:{clean_model}"
         cached_memo = self._get_cached(cache_key) if not force_refresh else None
-        
+        used_llm_model = ""
+
         if cached_memo:
-            thesis = cached_memo
+            if isinstance(cached_memo, dict):
+                thesis = cached_memo.get("text", thesis)
+                used_llm_model = cached_memo.get("model", clean_model)
+            else:
+                thesis = cached_memo
+                used_llm_model = clean_model
         elif allow_llm:
-            env_key = api_key or os.environ.get('GEMINI_API_KEY')
-            if env_key and len(env_key.strip()) > 6:
+            resolved_key = self.resolve_api_key(clean_provider, api_key=api_key, api_keys=api_keys)
+            if resolved_key and len(resolved_key.strip()) > 6:
                 headline_brief = "\n".join([f"- {n.get('publisher')}: {n.get('title')}" for n in (top_bull_news + top_bear_news)[:4]])
                 llm_prompt = f"""
                 You are a senior quantitative hedge fund analyst.
@@ -1179,23 +2209,41 @@ class AIService:
                 Keep it strictly institutional, analytical, and structured.
                 """
                 try:
-                    llm_text, used_model, _ = self._call_gemini_api(llm_prompt, env_key, model_name=model, allow_fallback=True)
+                    llm_text, used_model, _ = self.call_llm(
+                        llm_prompt,
+                        resolved_key,
+                        provider=clean_provider,
+                        model_name=clean_model,
+                        allow_fallback=True,
+                        thinking_level="low",
+                    )
                     if llm_text and len(llm_text) > 40:
                         thesis = llm_text
-                        self._set_cached(cache_key, thesis, ttl_seconds=14400)
+                        used_llm_model = used_model
+                        self._set_cached(cache_key, {"text": thesis, "model": used_model}, ttl_seconds=14400)
                 except Exception:
                     pass
-        return {
+
+        confluence = self.compute_technical_confluence(signals, profile)
+
+        res = {
             'ticker': ticker,
             'companyName': company_name,
+            'isLimitedHistory': is_limited_history,
             'convictionScore': conviction_score,
             'directionalBias': bias,
             'stanceColor': stance_color,
+            'confluence': confluence,
             'convictionBreakdown': factor_breakdown,
             'executiveThesis': thesis,
             'catalysts': catalysts[:3],
             'risks': risks[:3],
             'newsSynthesis': news_synthesis,
+            'aiMeta': {
+                'provider': clean_provider,
+                'model': used_llm_model or 'builtin-quant',
+                'enhanced': bool(used_llm_model),
+            },
             'tradeLevels': {
                 'entryZone': f"${entry_low} - ${entry_high}",
                 'entryLow': entry_low,
@@ -1423,16 +2471,50 @@ class AIService:
                 f"*Tip: You can ask specific questions like 'Is this a good time to buy?', 'What is the stop loss?', 'Explain why conviction is {conviction_score}%', or 'What was the closing price 20 days ago?'*"
             )
 
-    def ask_copilot(self, ticker: str, question: str, stock_data: dict, chat_history: list = None, api_key: str = None, provider: str = 'gemini', model: str = 'gemini-3.7-flash') -> str:
+    @staticmethod
+    def _compress_timeseries_context(timeseries: list) -> str:
         """
-        Answers user questions regarding the current stock with contextual quantitative data.
-        Delivers direct, highly specific answers tailored to the exact question.
-        Uses Google Gemini 3.7 Flash AI when an API key is present, with in-memory caching
-        and graceful fallback to other Gemini models if rate-limited.
+        Builds a token-compact historical price summary that retains exact close values for recent
+        30 sessions while reducing LLM context overhead by >65%.
         """
-        if not stock_data:
-            return f"I don't have current quantitative market data loaded for {ticker}. Please analyze the stock first."
+        if not timeseries:
+            return "Not available"
 
+        recent = timeseries[-30:]
+        closes = [float(b.get("close", 0.0) or 0.0) for b in recent]
+        highs = [float(b.get("high", b.get("close", 0.0)) or 0.0) for b in recent]
+        lows = [float(b.get("low", b.get("close", 0.0)) or 0.0) for b in recent]
+        first_c = closes[0] or 1.0
+        last_c = closes[-1]
+        ret_30d = ((last_c - first_c) / first_c) * 100.0 if first_c else 0.0
+
+        summary = (
+            f"30-Session Range: Low=${min(lows):.2f}, High=${max(highs):.2f}, "
+            f"Window Return={ret_30d:+.2f}%, Latest Close=${last_c:.2f}\n"
+        )
+        rows = []
+        for i, bar in enumerate(reversed(recent)):
+            dt = bar.get("time") or bar.get("date", "N/A")
+            c_val = float(bar.get("close", 0.0) or 0.0)
+            if i < 5:
+                o_val = float(bar.get("open", c_val) or c_val)
+                h_val = float(bar.get("high", c_val) or c_val)
+                l_val = float(bar.get("low", c_val) or c_val)
+                rows.append(f"d-{i}[{dt}]:O={o_val:.2f},H={h_val:.2f},L={l_val:.2f},C={c_val:.2f},V={int(bar.get('volume', 0) or 0):,}")
+            else:
+                rows.append(f"d-{i}[{dt}]:C=${c_val:.2f}")
+        return summary + "  " + " | ".join(rows)
+
+    def _prepare_copilot_context(
+        self,
+        ticker: str,
+        question: str,
+        stock_data: dict,
+        chat_history: list = None,
+        provider: str = None,
+        model: str = None,
+    ) -> dict:
+        """Extracts quantitative dossier, builds compact LLM prompt, and generates cache key."""
         profile = stock_data.get('profile', {})
         signals = stock_data.get('signals', {})
         ai_data = stock_data.get('aiAnalysis', {})
@@ -1466,6 +2548,7 @@ class AIService:
 
         conviction_score = ai_data.get('convictionScore', 50)
         bias = ai_data.get('directionalBias', 'Neutral')
+        confluence = ai_data.get('confluence') or self.compute_technical_confluence(signals, profile)
         trade_levels = ai_data.get('tradeLevels', {})
         entry_zone = trade_levels.get('entryZone', f"${price}")
         stop_loss = trade_levels.get('stopLoss', round(price - (1.75 * atr), 2))
@@ -1474,85 +2557,191 @@ class AIService:
         rr_ratio = trade_levels.get('riskRewardRatio', '2.5:1')
         scenarios = ai_data.get('scenario30d', {})
 
-        # Build recent historical price table for precise date and price queries
-        history_lines = []
-        if timeseries:
-            for i, bar in enumerate(reversed(timeseries[-30:])):
-                label = f"{i} days ago (Latest)" if i == 0 else f"{i} trading days ago"
-                bar_date = bar.get('time') or bar.get('date', 'N/A')
-                history_lines.append(f"  * {label} [{bar_date}]: Close=${bar.get('close', 0.0):.2f}, Open=${bar.get('open', 0.0):.2f}, High=${bar.get('high', 0.0):.2f}, Low=${bar.get('low', 0.0):.2f}, Vol={bar.get('volume', 0):,}")
-        history_str = "\n".join(history_lines) if history_lines else "Not available"
+        history_str = self._compress_timeseries_context(timeseries)
+        sanitized_history = self._sanitize_chat_history(chat_history)
 
         q = question.strip().lower()
-        target_model = (model or "gemini-3.7-flash").strip()
+        clean_provider = self.normalize_provider(provider, model)
+        target_model = (model or "").strip() or self.get_default_model(clean_provider)
+        history_sig = hashlib.sha256(
+            json.dumps(sanitized_history[-4:], sort_keys=True).encode('utf-8')
+        ).hexdigest()[:8] if sanitized_history else "s0"
+        q_hash = hashlib.sha256(q.encode('utf-8')).hexdigest()[:16]
+        cache_key = f"chat:{ticker}:{q_hash}:{history_sig}:{clean_provider}:{target_model}"
 
-        # Check in-memory cache for recent identical questions
-        cache_key = f"chat:{ticker}:{q}:{target_model}"
+        prompt = f"""
+You are the FinDashIQ AI Financial Copilot, an elite quantitative hedge fund assistant.
+The user is asking a specific question about {company_name} ({ticker}).
+
+COMPACT QUANTITATIVE DOSSIER FOR {ticker}:
+- Price: ${price} (Day: ${day_low}-${day_high}, 52W: ${low_52}-${high_52}) | Sector: {sector}, MCap: {mcap_str}, P/E: {pe_ratio}x (Fwd {forward_pe}x), Beta: {beta}, Div: {div_yield}%
+- AI Conviction: {conviction_score}% ({bias}) | Confluence: {confluence.get('badgeLabel', 'Neutral')} ({confluence.get('tier', '')})
+- Technical Consensus: {overall} ({bullish_count} Bullish / {bearish_count} Bearish / {neutral_count} Neutral)
+- Indicators: ATR ±${atr:.2f}; VWAP ${vwap:.2f} ({'above' if price >= vwap else 'below'}); CMF {cmf:.3f}; SuperTrend {indicators.get('SuperTrend', {}).get('signal', 'N/A')} (${indicators.get('SuperTrend', {}).get('value', 'N/A')}); RSI {indicators.get('RSI', {}).get('value', 'N/A')} ({indicators.get('RSI', {}).get('signal', 'N/A')}); Stoch {indicators.get('Stochastic', {}).get('value', 'N/A')}; MACD {indicators.get('MACD', {}).get('signal', 'N/A')} (Hist {indicators.get('MACD', {}).get('hist', 'N/A')})
+- Trade Levels: Entry {entry_zone} | SL ${stop_loss} | T1 ${target1} | T2 ${target2} | R/R {rr_ratio}
+- 30D Scenarios: Bull ${scenarios.get('bullCase', {}).get('target', 'N/A')} ({scenarios.get('bullCase', {}).get('probability', 'N/A')}%, +{scenarios.get('bullCase', {}).get('returnPct', 'N/A')}%); Base ${scenarios.get('baseCase', {}).get('target', 'N/A')} ({scenarios.get('baseCase', {}).get('probability', 'N/A')}%); Bear ${scenarios.get('bearCase', {}).get('target', 'N/A')} ({scenarios.get('bearCase', {}).get('probability', 'N/A')}%, {scenarios.get('bearCase', {}).get('returnPct', 'N/A')}%)
+- Quant Backtest (6M): Win Rate {quant_bt.get('winRatePct', 0):.1f}%, Return {quant_bt.get('strategyReturnPct', 0):.1f}% (Alpha {quant_bt.get('alpha', 0):.1f}%), PF {quant_bt.get('profitFactor', 1.0):.2f}x
+- Price History (d-N trading days ago):
+{history_str}
+
+USER QUESTION: "{question}"
+
+INSTRUCTIONS:
+1. Answer directly in the first sentence. Extract exact dollar values from d-N entries if historical prices are requested.
+2. Ground your response strictly in the dossier metrics above and reference prior conversation context when helpful.
+3. Format cleanly using Markdown headings, bullet lists, bold numbers, or tables when appropriate.
+""".strip()
+
+        quant_args = (
+            ticker, company_name, price, overall, conviction_score, bias,
+            bullish_count, bearish_count, indicators, atr, vwap, cmf,
+            entry_zone, stop_loss, target1, target2, rr_ratio,
+            scenarios, quant_bt, profile, timeseries, q,
+        )
+        return {
+            "prompt": prompt,
+            "quant_args": quant_args,
+            "cache_key": cache_key,
+            "provider": clean_provider,
+            "model": target_model,
+            "history": sanitized_history,
+        }
+
+    def ask_copilot(
+        self,
+        ticker: str,
+        question: str,
+        stock_data: dict,
+        chat_history: list = None,
+        api_key: str = None,
+        provider: str = None,
+        model: str = None,
+        api_keys: dict = None,
+    ) -> str:
+        """
+        Answers user questions regarding the current stock with contextual quantitative data.
+        Supports multi-turn conversation history and Google Gemini 4, Anthropic Claude, and OpenAI GPT-6
+        with dual-tier caching and Built-in Quantitative Intelligence fallback.
+        """
+        if not stock_data:
+            return f"I don't have current quantitative market data loaded for {ticker}. Please analyze the stock first."
+
+        ctx = self._prepare_copilot_context(ticker, question, stock_data, chat_history, provider, model)
+        clean_provider = ctx["provider"]
+        target_model = ctx["model"]
+        cache_key = ctx["cache_key"]
+
         cached_answer = self._get_cached(cache_key)
         if cached_answer:
             return cached_answer
 
-        # 1. Attempt Google Gemini LLM with rich quantitative context if key is available
-        env_key = api_key or os.environ.get('GEMINI_API_KEY') or ''
-        if env_key and len(env_key.strip()) > 6:
-            prompt = f"""
-            You are the FinDashIQ AI Financial Copilot, an elite quantitative hedge fund assistant.
-            The user is asking a specific question about {company_name} ({ticker}).
-            
-            FULL QUANTITATIVE DOSSIER FOR {ticker}:
-            - Current Price: ${price} (Day Range: ${day_low} - ${day_high}, 52-Wk Range: ${low_52} - ${high_52})
-            - Fundamental Profile: Sector: {sector}, Market Cap: {mcap_str}, P/E: {pe_ratio}x, Forward P/E: {forward_pe}x, Beta: {beta}, Dividend Yield: {div_yield}%
-            - AI Conviction Score: {conviction_score}% ({bias})
-            - Technical Multi-Factor Consensus: {overall} ({bullish_count} Bullish, {bearish_count} Bearish, {neutral_count} Neutral)
-            - Technical Indicators:
-              * ATR Volatility: ±${atr:.2f}
-              * VWAP: ${vwap:.2f} (Price is {'above' if price >= vwap else 'below'} VWAP)
-              * CMF Institutional Flow: {cmf:.3f} ({'Institutional Accumulation' if cmf > 0 else 'Institutional Distribution'})
-              * SuperTrend: {indicators.get('SuperTrend', {}).get('signal', 'N/A')} at ${indicators.get('SuperTrend', {}).get('value', 'N/A')}
-              * RSI (14): {indicators.get('RSI', {}).get('value', 'N/A')} ({indicators.get('RSI', {}).get('signal', 'N/A')})
-              * Stochastic (14,3,3): {indicators.get('Stochastic', {}).get('signal', 'N/A')} (%K: {indicators.get('Stochastic', {}).get('value', 'N/A')})
-              * MACD (12,26,9): {indicators.get('MACD', {}).get('signal', 'N/A')} (Hist: {indicators.get('MACD', {}).get('hist', 'N/A')})
-            - Tactical Trade Levels:
-              * Recommended Entry: {entry_zone}
-              * Dynamic Stop-Loss: ${stop_loss}
-              * Target 1: ${target1}
-              * Target 2: ${target2}
-              * Risk/Reward Ratio: {rr_ratio}
-            - 30-Day Probabilistic Scenarios:
-              * Bull Case: ${scenarios.get('bullCase', {}).get('target', 'N/A')} ({scenarios.get('bullCase', {}).get('probability', 'N/A')}% prob, +{scenarios.get('bullCase', {}).get('returnPct', 'N/A')}%)
-              * Base Case: ${scenarios.get('baseCase', {}).get('target', 'N/A')} ({scenarios.get('baseCase', {}).get('probability', 'N/A')}% prob, {scenarios.get('baseCase', {}).get('returnPct', 'N/A')}%)
-              * Bear Case: ${scenarios.get('bearCase', {}).get('target', 'N/A')} ({scenarios.get('bearCase', {}).get('probability', 'N/A')}% prob, {scenarios.get('bearCase', {}).get('returnPct', 'N/A')}%)
-            - 6-Month Strategy Backtest:
-              * Multi-Factor Quant: Win Rate {quant_bt.get('winRatePct', 0):.1f}%, Return {quant_bt.get('strategyReturnPct', 0):.1f}% (Alpha: {quant_bt.get('alpha', 0):.1f}%), Profit Factor: {quant_bt.get('profitFactor', 1.0):.2f}x
-            - Recent Daily Price History (Last 30 Sessions, most recent first):
-{history_str}
-            
-            USER QUESTION: "{question}"
-
-            INSTRUCTIONS:
-            1. Directly answer the user's question in the very first sentence. If the question asks for a historical price (e.g. 20 days ago), extract and state the exact closing price in dollars from the price history table above.
-            2. Ground your entire answer in the specific numbers and indicators provided in the dossier above.
-            3. Use clear markdown formatting (bolding key numbers and bullet points).
-            4. Keep the answer concise, actionable, and analytical.
-            """
-            gemini_text, used_model, gemini_err = self._call_gemini_api(prompt, env_key, model_name=target_model, allow_fallback=True)
-            if gemini_text:
+        resolved_key = self.resolve_api_key(clean_provider, api_key=api_key, api_keys=api_keys)
+        if resolved_key and len(resolved_key.strip()) > 6:
+            llm_text, used_model, llm_err = self.call_llm(
+                ctx["prompt"],
+                resolved_key,
+                provider=clean_provider,
+                model_name=target_model,
+                allow_fallback=True,
+                max_tokens=2048,
+                thinking_level="low",
+                chat_history=ctx["history"],
+            )
+            provider_label = AI_PROVIDER_CATALOG.get(clean_provider, {}).get("name", clean_provider.title())
+            if llm_text:
                 if used_model != target_model:
-                    full_answer = f"{gemini_text}\n\n*— Generated by Google {used_model} (auto-routed from {target_model} due to free-tier rate limits)*"
+                    full_answer = f"{llm_text}\n\n*— Generated by {provider_label} ({used_model}; auto-routed from {target_model} due to rate limits)*"
                 else:
-                    full_answer = f"{gemini_text}\n\n*— Generated by Google {used_model}*"
-                
-                # Cache response for 10 minutes
+                    full_answer = f"{llm_text}\n\n*— Generated by {provider_label} ({used_model})*"
                 self._set_cached(cache_key, full_answer, ttl_seconds=600)
                 return full_answer
-            elif gemini_err:
-                fallback = self._get_quantitative_response(ticker, company_name, price, overall, conviction_score, bias, bullish_count, bearish_count, indicators, atr, vwap, cmf, entry_zone, stop_loss, target1, target2, rr_ratio, scenarios, quant_bt, profile, timeseries, q)
-                return f"⚠️ *{gemini_err}*\n\n*Falling back to Built-in Quantitative Intelligence:*\n\n{fallback}"
+            elif llm_err:
+                fallback = self._get_quantitative_response(*ctx["quant_args"])
+                return f"⚠️ *{llm_err}*\n\n*Falling back to Built-in Quantitative Intelligence:*\n\n{fallback}"
 
-        # 2. Built-in Quantitative Expert Copilot (Deterministic Response Engine)
-        quant_res = self._get_quantitative_response(ticker, company_name, price, overall, conviction_score, bias, bullish_count, bearish_count, indicators, atr, vwap, cmf, entry_zone, stop_loss, target1, target2, rr_ratio, scenarios, quant_bt, profile, timeseries, q)
+        quant_res = self._get_quantitative_response(*ctx["quant_args"])
         self._set_cached(cache_key, quant_res, ttl_seconds=600)
         return quant_res
+
+    def stream_copilot(
+        self,
+        ticker: str,
+        question: str,
+        stock_data: dict,
+        chat_history: list = None,
+        api_key: str = None,
+        provider: str = None,
+        model: str = None,
+        api_keys: dict = None,
+    ):
+        """
+        Generator yielding SSE payload dicts for real-time Copilot token streaming.
+        Yields {'type': 'delta', 'delta': str} and finishes with {'type': 'done', 'answer': str, 'provider': str, 'model': str}.
+        """
+        if not stock_data:
+            msg = f"I don't have current quantitative market data loaded for {ticker}. Please analyze the stock first."
+            yield {"type": "delta", "delta": msg}
+            yield {"type": "done", "answer": msg, "provider": "builtin", "model": "builtin-quant"}
+            return
+
+        ctx = self._prepare_copilot_context(ticker, question, stock_data, chat_history, provider, model)
+        clean_provider = ctx["provider"]
+        target_model = ctx["model"]
+        cache_key = ctx["cache_key"]
+
+        cached_answer = self._get_cached(cache_key)
+        if cached_answer:
+            yield {"type": "delta", "delta": cached_answer}
+            yield {"type": "done", "answer": cached_answer, "provider": clean_provider, "model": target_model, "cached": True}
+            return
+
+        resolved_key = self.resolve_api_key(clean_provider, api_key=api_key, api_keys=api_keys)
+        provider_label = AI_PROVIDER_CATALOG.get(clean_provider, {}).get("name", clean_provider.title())
+
+        if resolved_key and len(resolved_key.strip()) > 6:
+            collected = []
+            used_model = target_model
+            stream_error = ""
+            for evt in self.stream_llm(
+                ctx["prompt"],
+                resolved_key,
+                provider=clean_provider,
+                model_name=target_model,
+                allow_fallback=True,
+                max_tokens=2048,
+                thinking_level="low",
+                chat_history=ctx["history"],
+            ):
+                if evt.get("type") == "delta" and evt.get("delta"):
+                    used_model = evt.get("model") or used_model
+                    collected.append(evt["delta"])
+                    yield {"type": "delta", "delta": evt["delta"], "model": used_model}
+                elif evt.get("type") == "error":
+                    stream_error = evt.get("error", "")
+
+            if collected:
+                llm_text = "".join(collected).strip()
+                if used_model != target_model:
+                    footer = f"\n\n*— Generated by {provider_label} ({used_model}; auto-routed from {target_model} due to rate limits)*"
+                else:
+                    footer = f"\n\n*— Generated by {provider_label} ({used_model})*"
+                yield {"type": "delta", "delta": footer, "model": used_model}
+                full_answer = llm_text + footer
+                self._set_cached(cache_key, full_answer, ttl_seconds=600)
+                yield {"type": "done", "answer": full_answer, "provider": clean_provider, "model": used_model}
+                return
+
+            if stream_error:
+                fallback = self._get_quantitative_response(*ctx["quant_args"])
+                full_fallback = f"⚠️ *{stream_error}*\n\n*Falling back to Built-in Quantitative Intelligence:*\n\n{fallback}"
+                yield {"type": "delta", "delta": full_fallback}
+                yield {"type": "done", "answer": full_fallback, "provider": "builtin", "model": "builtin-quant"}
+                return
+
+        quant_res = self._get_quantitative_response(*ctx["quant_args"])
+        self._set_cached(cache_key, quant_res, ttl_seconds=600)
+        yield {"type": "delta", "delta": quant_res}
+        yield {"type": "done", "answer": quant_res, "provider": "builtin", "model": "builtin-quant"}
 
 
 ai_service = AIService()

@@ -23,13 +23,37 @@ _PROCESS_START_TIME = time.time()
 class MaintenanceService:
     """
     Institutional Server Maintenance & Telemetry Service.
-    Provides cross-platform memory tracking, 1-click RAM defragmentation,
-    L1/L2 cache sanitation, and zero-downtime worker/server restart orchestration.
+    Provides cross-platform memory tracking, Gunicorn multi-worker cluster telemetry,
+    1-click RAM defragmentation, L1/L2 cache sanitation, and zero-downtime worker recycling.
     """
 
     def __init__(self):
         self._last_optimization_result: Optional[Dict[str, Any]] = None
         self._optimization_lock = threading.Lock()
+
+    def is_gunicorn_running(self) -> bool:
+        """
+        Robustly determines if current process is running inside a Gunicorn worker.
+        Checks sys.modules, environment variables, argv, and Linux parent process cmdline.
+        """
+        if 'gunicorn' in sys.modules or 'gunicorn.app.base' in sys.modules:
+            return True
+        if 'gunicorn' in os.environ.get('SERVER_SOFTWARE', '').lower():
+            return True
+        if any('gunicorn' in arg.lower() for arg in sys.argv):
+            return True
+        if sys.platform.startswith('linux'):
+            try:
+                ppid = os.getppid()
+                cmd_path = f"/proc/{ppid}/cmdline"
+                if os.path.exists(cmd_path):
+                    with open(cmd_path, 'rb') as f:
+                        cmd = f.read().decode('latin1', errors='ignore').lower()
+                        if 'gunicorn' in cmd:
+                            return True
+            except Exception:
+                pass
+        return False
 
     def get_process_rss_mb(self) -> float:
         """
@@ -75,6 +99,101 @@ class MaintenanceService:
             pass
 
         return 45.0  # Conservative nominal fallback
+
+    def get_gunicorn_cluster_info(self) -> Optional[Dict[str, Any]]:
+        """
+        Discovers Gunicorn master process and all sibling worker processes via Linux procfs.
+        Calculates individual worker memory and total cluster RAM footprint.
+        """
+        if not self.is_gunicorn_running():
+            return None
+
+        current_pid = os.getpid()
+        master_pid = os.getppid()
+        workers = []
+        master_rss_mb = 0.0
+
+        if sys.platform.startswith('linux'):
+            try:
+                # 1. Inspect master process memory
+                try:
+                    with open(f"/proc/{master_pid}/status", 'r', encoding='utf-8') as f:
+                        for line in f:
+                            if line.startswith('VmRSS:'):
+                                master_rss_mb = round(int(line.split()[1]) / 1024.0, 1)
+                                break
+                except Exception:
+                    pass
+
+                # 2. Scan all children of master_pid across /proc
+                for entry in os.listdir('/proc'):
+                    if entry.isdigit():
+                        pid = int(entry)
+                        if pid == master_pid:
+                            continue
+                        try:
+                            with open(f"/proc/{pid}/status", 'r', encoding='utf-8') as f:
+                                ppid = None
+                                rss = None
+                                for line in f:
+                                    if line.startswith('PPid:'):
+                                        ppid = int(line.split()[1])
+                                    elif line.startswith('VmRSS:'):
+                                        rss = round(int(line.split()[1]) / 1024.0, 1)
+                                    if ppid is not None and rss is not None:
+                                        break
+                                if ppid == master_pid and rss is not None:
+                                    workers.append({
+                                        "pid": pid,
+                                        "rss_mb": rss,
+                                        "is_current": (pid == current_pid)
+                                    })
+                        except Exception:
+                            continue
+            except Exception as e:
+                logger.debug(f"[Maintenance] Error scanning Gunicorn cluster: {e}")
+
+        # Fallback if procfs didn't yield worker list
+        if not workers:
+            workers.append({
+                "pid": current_pid,
+                "rss_mb": self.get_process_rss_mb(),
+                "is_current": True
+            })
+
+        total_workers_rss = round(sum(w['rss_mb'] for w in workers), 1)
+        total_cluster_rss = round(total_workers_rss + master_rss_mb, 1)
+
+        return {
+            "master_pid": master_pid,
+            "master_rss_mb": master_rss_mb,
+            "worker_count": len(workers),
+            "total_workers_rss_mb": total_workers_rss,
+            "total_cluster_rss_mb": total_cluster_rss,
+            "workers": sorted(workers, key=lambda w: w['pid'])
+        }
+
+    def recycle_gunicorn_cluster(self) -> bool:
+        """
+        Orchestrates zero-downtime rolling worker recycling under Gunicorn:
+        Sends SIGHUP to the Gunicorn master process, which boots fresh replacement
+        workers and gracefully retires older workers with 0 lost client sessions.
+        """
+        if not self.is_gunicorn_running():
+            return False
+
+        def _do_recycle():
+            time.sleep(0.3)
+            try:
+                import signal
+                master_pid = os.getppid()
+                logger.info(f"[Maintenance] Triggering zero-downtime rolling reload via SIGHUP to Gunicorn master (PID {master_pid}).")
+                os.kill(master_pid, signal.SIGHUP)
+            except Exception as e:
+                logger.error(f"[Maintenance] Failed to send SIGHUP to Gunicorn master: {e}", exc_info=True)
+
+        threading.Thread(target=_do_recycle, daemon=True, name="GunicornRollingRecycle").start()
+        return True
 
     def get_os_memory_info(self) -> Dict[str, Any]:
         """
@@ -141,11 +260,9 @@ class MaintenanceService:
         """
         Gathers metrics on in-memory LRU caches and on-disk persistent cache files.
         """
-        # In-memory LRU metrics from CacheRegistry
         in_memory_stats = CacheRegistry.get_stats()
         total_in_memory_items = sum(c.get('size', 0) for c in in_memory_stats)
 
-        # On-disk cache files count & total size
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         data_cache_dir = os.path.join(base_dir, 'data', 'cache')
         
@@ -199,11 +316,7 @@ class MaintenanceService:
         """
         Identifies OS, Python runtime, and execution server model (Gunicorn vs Standalone).
         """
-        is_gunicorn = bool(
-            'gunicorn' in os.environ.get('SERVER_SOFTWARE', '').lower()
-            or 'gunicorn' in sys.argv[0].lower()
-            or any('gunicorn' in arg.lower() for arg in sys.argv)
-        )
+        is_gunicorn = self.is_gunicorn_running()
 
         return {
             "os_name": platform.system(),
@@ -216,19 +329,24 @@ class MaintenanceService:
 
     def get_maintenance_status(self) -> Dict[str, Any]:
         """
-        Aggregates complete real-time server health and memory telemetry.
+        Aggregates complete real-time server health and memory telemetry across process and cluster.
         """
         rss_mb = self.get_process_rss_mb()
         os_mem = self.get_os_memory_info()
         caches = self.get_cache_telemetry()
         uptime = self.get_uptime_info()
         env = self.get_server_environment()
+        cluster = self.get_gunicorn_cluster_info() if env["is_gunicorn"] else None
+
+        total_mem = cluster["total_cluster_rss_mb"] if cluster else rss_mb
 
         return {
             "success": True,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "timestamp_epoch": time.time(),
             "process_memory_mb": rss_mb,
+            "total_cluster_memory_mb": total_mem,
+            "gunicorn_cluster": cluster,
             "os_memory": os_mem,
             "caches": caches,
             "uptime": uptime,
@@ -247,10 +365,14 @@ class MaintenanceService:
         2. Purges stale in-memory LRU cache entries.
         3. Closes idle yfinance / native libcurl HTTP handles.
         4. Runs full 3-generation GC and trims OS heap memory via malloc_trim / _heapmin.
-        5. Measures before and after metrics and returns a detailed report.
+        5. In Gunicorn: initiates zero-downtime rolling worker recycling to completely
+           flush fragmented C/Python heaps and return memory to OS kernel.
+        6. Measures before and after metrics and returns a detailed report.
         """
         with self._optimization_lock:
             before_rss = self.get_process_rss_mb()
+            cluster_before = self.get_gunicorn_cluster_info()
+            before_total = cluster_before["total_cluster_rss_mb"] if cluster_before else before_rss
 
             # 1. Prune expired disk cache files
             pruned_files = prune_expired_disk_cache()
@@ -269,16 +391,33 @@ class MaintenanceService:
 
             after_rss = self.get_process_rss_mb()
             reclaimed_mb = round(max(0.0, before_rss - after_rss), 1)
-            pct_reduction = round((reclaimed_mb / before_rss) * 100.0, 1) if before_rss > 0 else 0.0
+
+            # 5. Under Gunicorn: initiate zero-downtime rolling worker recycling
+            is_gunicorn = self.is_gunicorn_running()
+            recycled = False
+            if is_gunicorn:
+                recycled = self.recycle_gunicorn_cluster()
+
+            if is_gunicorn and cluster_before:
+                msg = (
+                    f"Successfully optimized server memory! Pruned {sum(pruned_files.values())} files, "
+                    f"purged {sum(purged_memory_entries.values())} cache items, and initiated zero-downtime "
+                    f"rolling worker recycling to completely free Gunicorn RAM."
+                )
+            else:
+                pct_reduction = round((reclaimed_mb / before_rss) * 100.0, 1) if before_rss > 0 else 0.0
+                msg = f"Successfully optimized server memory! Reclaimed {reclaimed_mb} MB RAM ({pct_reduction}% reduction)."
 
             result = {
                 "success": True,
-                "message": f"Successfully optimized server memory! Reclaimed {reclaimed_mb} MB RAM ({pct_reduction}% reduction).",
+                "message": msg,
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "before_rss_mb": before_rss,
                 "after_rss_mb": after_rss,
+                "before_total_cluster_mb": before_total,
                 "reclaimed_mb": reclaimed_mb,
-                "reduction_percent": pct_reduction,
+                "gunicorn_recycled": recycled,
+                "is_gunicorn": is_gunicorn,
                 "pruned_files": pruned_files,
                 "purged_memory_entries": purged_memory_entries,
                 "unreachable_objects": unreachable_objects
@@ -305,18 +444,16 @@ class MaintenanceService:
             time.sleep(0.4)
             try:
                 # Flush disk caches and active handles before restart
-                pruned = prune_expired_disk_cache()
+                prune_expired_disk_cache()
                 close_yf_session()
-                purged = CacheRegistry.purge_all()
+                CacheRegistry.purge_all()
 
                 if env["is_gunicorn"]:
                     import signal
-                    # SIGHUP to master Gunicorn process triggers graceful rolling worker reload
                     parent_pid = os.getppid()
                     logger.info(f"[Maintenance] Sending SIGHUP to Gunicorn master (PID {parent_pid}) for zero-downtime reload.")
                     os.kill(parent_pid, signal.SIGHUP)
                 else:
-                    # In standalone mode: execute full in-process runtime cycle & heap defragmentation
                     logger.info("[Maintenance] Executing deep in-process server runtime recycle.")
                     collect_garbage("SoftRestartRecycle")
                     _PROCESS_START_TIME = time.time()
@@ -324,7 +461,7 @@ class MaintenanceService:
             except Exception as e:
                 logger.error(f"[Maintenance] Error during soft restart: {e}", exc_info=True)
 
-        threading.Thread(target=_deferred_restart, daemon=True).start()
+        threading.Thread(target=_deferred_restart, daemon=True, name="ServerSoftRestart").start()
 
         return {
             "success": True,
